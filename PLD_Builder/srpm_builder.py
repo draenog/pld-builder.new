@@ -78,8 +78,8 @@ def build_srpm(r, b):
   status.push("building %s" % b.spec)
   b.src_rpm = ""
   builder_opts = "-nu --nodeps"
-  cmd = "cd rpm/SPECS; ./builder %s -bs %s -r %s %s 2>&1" % \
-               (builder_opts, b.bconds_string(), b.branch, b.spec)
+  cmd = "cd rpm/SPECS; nice -n %s ./builder %s -bs %s -r %s %s 2>&1" % \
+               (config.nice, builder_opts, b.bconds_string(), b.branch, b.spec)
   util.append_to(b.logfile, "request from: %s" % r.requester)
   util.append_to(b.logfile, "started at: %s" % time.asctime())
   util.append_to(b.logfile, "building SRPM using: %s\n" % cmd)
