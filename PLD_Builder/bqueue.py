@@ -4,6 +4,7 @@ import time
 import StringIO
 import os
 import fcntl
+import string
 
 # PLD_Builder:
 import gpg
