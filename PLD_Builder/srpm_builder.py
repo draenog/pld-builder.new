@@ -77,7 +77,7 @@ def transfer_file(r, b):
 def build_srpm(r, b):
   status.push("building %s" % b.spec)
   b.src_rpm = ""
-  builder_opts = "-nu --clean --nodeps"
+  builder_opts = "-nu --nodeps"
   cmd = "cd rpm/SPECS; ./builder %s -bs %s -r %s %s 2>&1" % \
                (builder_opts, b.bconds_string(), b.branch, b.spec)
   util.append_to(b.logfile, "request from: %s" % r.requester)
