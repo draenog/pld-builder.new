@@ -22,11 +22,7 @@ def popen(cmd, user = "builder", mode = "r"):
 def run(cmd, user = "builder", logfile = None):
   c = command(cmd, user)
   if logfile != None:
-    try:
-      c = "%s >> %s 2>&1" % (c, logfile)
-    except UnicodeDecodeError:
-      c.decode('iso-8859-2')
-      c = "%s >> %s 2>&1" % (c, logfile)
+    c = "%s >> %s 2>&1" % (c, logfile)
   f = os.popen(c)
   for l in f.xreadlines():
     pass
