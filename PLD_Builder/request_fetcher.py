@@ -24,7 +24,11 @@ def has_new(control_url):
   cnt_f = open(path.last_req_no_file)
   last_count = int(string.strip(cnt_f.readline()))
   cnt_f.close()
-  f = urllib.urlopen(control_url + "/max_req_no")
+  f = None
+  try:
+    f = urllib.urlopen(control_url + "/max_req_no")
+  except:
+    return 0
   res = 0
   if int(string.strip(f.readline())) != last_count:
     res = 1
