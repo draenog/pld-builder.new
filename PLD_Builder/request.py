@@ -124,6 +124,8 @@ class Batch:
     self.src_rpm = ""
     self.info = ""
     self.spec = ""
+    self.command = ""
+    self.command_flags = []
     self.b_id = attr(e, "id")
     self.depends_on = string.split(attr(e, "depends-on"))
     for c in e.childNodes:
@@ -134,6 +136,9 @@ class Batch:
         self.src_rpm = text(c)
       elif c.nodeName == "spec":
         self.spec = text(c)
+      elif c.nodeName == "command"
+        self.command = text(c)
+        self.command_flags = string.split(attr(c, "flags", ""))
       elif c.nodeName == "info":
         self.info = text(c)
       elif c.nodeName == "branch":
@@ -166,10 +171,17 @@ class Batch:
       builders.append("%s:%s" % (b, self.builders_status[b]))
     f.write("    builders: %s\n" % string.join(builders))
 
+  def is_command(self):
+    return self.command != ""
+
   def dump_html(self, f):
     f.write("<li>\n")
-    f.write("%s (%s -R %s %s) <small>[" % \
-        (self.src_rpm, self.spec, self.branch, self.bconds_string()))
+    if self.is_command():
+      desc = "SH: %s [%s]" % (self.command, ' '.join(self.command_flags))
+    else
+      desc = "%s (%s -R %s %s)" % \
+        (self.src_rpm, self.spec, self.branch, self.bconds_string())
+    f.write("%s <small>[" % desc)
     builders = []
     for b in self.builders:
       s = self.builders_status[b]
@@ -196,11 +208,13 @@ class Batch:
     f.write("""
          <batch id='%s' depends-on='%s'>
            <src-rpm>%s</src-rpm>
+           <command flags="%s">%s</command>
            <spec>%s</spec>
            <branch>%s</branch>
            <info>%s</info>\n""" % (self.b_id, 
              string.join(map(lambda (b): b.b_id, self.depends_on)),
              escape(self.src_rpm), 
+             escape(' '.join(self.command_flags)), escape(self.command),
              escape(self.spec), escape(self.branch), escape(self.info)))
     for b in self.bconds_with:
       f.write("           <with>%s</with>\n" % escape(b))
