@@ -42,7 +42,18 @@ def fetch_src(r, b):
   src_url = config.control_url + "/srpms/" + r.id + "/" + b.src_rpm
   b.log_line("fetching %s" % src_url)
   start = time.time()
-  f = urllib.urlopen(src_url)
+  good=False
+  while not good:
+    try:
+      good=True
+      f = urllib.urlopen(src_url)
+    except IOError, error:
+      if error[1][0] == 60:
+        good=False
+        b.log_line("connection timeout... trying again")
+      else:
+        f = urllib.urlopen(src_url) # So we get the exception logged :)
+
   o = chroot.popen("cat > %s" % b.src_rpm, mode = "w")
   bytes = util.sendfile(f, o)
   f.close()
