@@ -127,11 +127,12 @@ def build_rpm(r, b):
     c=c + "END\n"
     return c
 
-  fname = r.tmp_dir + b.src_rpm + ".uploadinfo"
-  f = open(fname, "w")
-  f.write(uploadinfo(b))
-  f.close()
-  ftp.add(fname, "uploadinfo")
+  if b.files != []:
+    fname = r.tmp_dir + b.src_rpm + ".uploadinfo"
+    f = open(fname, "w")
+    f.write(uploadinfo(b))
+    f.close()
+    ftp.add(fname, "uploadinfo")
 
   status.pop()
 
