@@ -67,6 +67,10 @@ while [ $# -gt 0 ] ; do
       f_upgrade=no
       ;;
 
+    --no-install-br | -ni )
+	  flags="$flags no-install-br" 
+	  ;;
+	  
     --flag | -f )
       flags="$flags $2"
       shift
