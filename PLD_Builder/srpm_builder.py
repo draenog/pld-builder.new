@@ -130,4 +130,5 @@ def main():
   handle_request(r)
   status.pop()
 
-wrap.wrap(main)
+if __name__ == '__main__':
+  wrap.wrap(main)

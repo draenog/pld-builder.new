@@ -162,4 +162,5 @@ def main():
   maybe_flush_queue(path.buildlogs_queue_dir)
   maybe_flush_queue(path.ftp_queue_dir)
 
-wrap.wrap(main)
+if __name__ == '__main__':
+  wrap.wrap(main)

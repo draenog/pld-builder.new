@@ -130,4 +130,5 @@ def main():
   status.pop()
   sys.exit(0)
 
-wrap.wrap(main)
+if __name__ == '__main__':
+  wrap.wrap(main)

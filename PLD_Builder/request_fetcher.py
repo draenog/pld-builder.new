@@ -90,5 +90,6 @@ def main():
     f.write("%d\n" % max_no)
     f.close()
   status.pop()
-
-wrap.wrap(main)
+  
+if __name__ == '__main__':
+  wrap.wrap(main)
