@@ -29,8 +29,11 @@ class Builder_Conf:
     self.arch = get("arch")
     self.chroot = get("chroot")
     self.email = get("email")
-    self.buildlogs_url = get("buildlogs_url", "/dev/null")
-    self.ftp_url = get("ftp_url", "/dev/null")
+    self.buildlogs_url = get("buildlogs_url")
+    self.ftp_url = get("ftp_url")
+    self.job_slots = int(get("job_slots"))
+    self.max_load = float(get("max_load"))
+    self.control_url = get("control_url")
 
 config = Builder_Conf()
 

@@ -8,7 +8,7 @@ import fcntl
 # PLD_Builder:
 import gpg
 import request
-
+import util
 
 class B_Queue:
   def __init__(self, filename):
@@ -74,7 +74,7 @@ class B_Queue:
       f = gzip.open(name, "w", 6)
     else:
       f = open(name, "w")
-    f.write(sio.read())
+    util.sendfile(sio, f)
     f.close()
 
   def add(self, req):

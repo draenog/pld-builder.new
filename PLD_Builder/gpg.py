@@ -1,7 +1,8 @@
 import popen2
 import re
-import xreadlines
 import StringIO
+
+import util
 
 def verify_sig(buf):
   """Check signature.
@@ -11,7 +12,7 @@ def verify_sig(buf):
   object.
   """
   (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --decrypt")
-  gpg_in.write(buf.read())
+  util.sendfile(buf, gpg_in)
   gpg_in.close()
   body = StringIO.StringIO()
   for l in gpg_out.xreadlines():
@@ -29,7 +30,7 @@ def verify_sig(buf):
 
 def sign(buf):
   (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --clearsign --default-key builder")
-  gpg_in.write(buf.read())
+  util.sendfile(buf, gpg_in)
   gpg_in.close()
   body = StringIO.StringIO()
   for l in gpg_out.xreadlines():

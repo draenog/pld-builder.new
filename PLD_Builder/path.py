@@ -15,8 +15,9 @@ req_queue_file = spool_dir + "req_queue"
 processed_ids_file = spool_dir + "processed_ids"
 buildlogs_queue_dir = spool_dir + "buildlogs/"
 ftp_queue_dir = spool_dir + "ftp/"
+last_req_no_file = spool_dir + "last_req_no"
 
 # www/
 srpms_dir = www_dir + "srpms/"
 req_queue_signed_file = www_dir + "queue.gz"
-counter_file = www_dir + "counter"
+max_req_no_file = www_dir + "max_req_no"

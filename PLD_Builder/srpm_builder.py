@@ -102,9 +102,9 @@ def handle_request(r):
     chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
     ftp.add(local)
 
-  # store new queue and counter for binary builders
-  cnt_f = open(path.counter_file, "r+")
-  num = int(string.strip(cnt_f.read()))
+  # store new queue and max_req_no for binary builders
+  cnt_f = open(path.max_req_no_file, "r+")
+  num = int(string.strip(cnt_f.read())) + 1
   r.no = num
   q = B_Queue(path.req_queue_file)
   q.lock(0)
@@ -113,7 +113,6 @@ def handle_request(r):
   q.write()
   q.unlock()
   q.write_signed(path.req_queue_signed_file)
-  num += 1
   cnt_f.seek(0)
   cnt_f.write("%d\n" % num)
   cnt_f.close()
