@@ -15,10 +15,13 @@ def msg(m):
   sys.stderr.write(m)
 
 def sendfile(src, dst):
+  cnt = 0
   while 1:
     s = src.read(10000)
     if s == "": break
+    cnt += len(s)
     dst.write(s)
+  return cnt
 
 def append_to(log, msg):
   f = open(log, "a")
@@ -49,3 +52,13 @@ def wrap(main):
     log.alert("fatal python exception during: %s" % status.get())
     log.alert(s.getvalue())
     sys.exit(1)
+
+def collect_files(log):
+  f = open(log)
+  rx = re.compile(r"^Wrote: (/home.*\.rpm)$")
+  files = []
+  for l in f.xreadlines():
+    m = rx.search(l)
+    if m:
+      files.append(m.group(1))
+  return files

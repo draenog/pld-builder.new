@@ -8,8 +8,6 @@ Roadmap:
 
   architektura.txt -- docs, in Polish.
 
-  binary_builder/ -- scripts for binary builder
-
   client/ -- scripts for clients, i.e. developers sending requests
 
   config/ -- configuration
@@ -28,6 +26,16 @@ Roadmap:
       builders in spool/req_queue (which is mirrored in www/ directory,
       signed and compressed). SRPMS and buildlogs are queued for transmission.
 
+  binary_builder/ -- scripts for binary builder
+
+    request-fetcher.sh
+      Fetch queue.gz from src-builder, and distribute requests for all
+      builders hosted on given account (to spool/queue-<builder> files).
+
+    rpm-builder.sh <builder>
+      Tries to aquire locks for <builder> and for job-slot. If that suceeds, 
+      proccess one request from spool/queue-<builder>.
+  
 Working directories:
   lock/
   spool/
