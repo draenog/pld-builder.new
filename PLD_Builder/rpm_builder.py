@@ -9,6 +9,7 @@ from bqueue import B_Queue
 from acl import acl
 import lock
 import util
+import wrap
 import path
 import status
 import log
@@ -154,4 +155,4 @@ def main():
   handle_request(r)
   status.pop()
   
-util.wrap(main)
+wrap.wrap(main)

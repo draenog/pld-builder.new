@@ -54,7 +54,7 @@ class User:
 
 class ACL_Conf:
   def __init__(self):
-    self.current_user = ""
+    self.current_user = None
     status.push("reading acl.conf")
     p = ConfigParser.ConfigParser()
     p.readfp(open(path.acl_conf))
@@ -69,12 +69,19 @@ class ACL_Conf:
   def user_by_email(self, ems):
     for e in ems:
       if self.users.has_key(e):
-        self.current_user = self.users[e].login
         return self.users[e]
     return None
 
   def user(self, l):
-    self.current_user = self.users[l].login
     return self.users[l]
+
+  def set_current_user(self, u):
+    self.current_user = u
+
+  def current_user_login(self):
+    if self.current_user != None:
+      return self.current_user.login
+    else
+      return ""
 
 acl = ACL_Conf()

@@ -97,8 +97,8 @@ class Group:
     f.write("       </group>\n\n")
 
   def build_all(r, build_fnc):
+    acl.set_current_user(acl.user(r.requester))
     notify.begin(r)
-
     tmp = path.spool_dir + util.uuid() + "/"
     r.tmp_dir = tmp
     os.mkdir(tmp)

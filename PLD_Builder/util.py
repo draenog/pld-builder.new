@@ -2,11 +2,7 @@ import re
 import sys
 import os
 import log
-import traceback
-import StringIO
 import string
-
-import status
 
 def pkg_name(nvr):
   return re.match(r"(.+)-[^-]+-[^-]+", nvr).group(1)
@@ -39,19 +35,6 @@ def uuid():
   if len(u) != 36:
     raise "uuid: fatal, cannot generate uuid: %s" % u
   return u
-
-def wrap(main):
-  try:
-    main()
-  except:
-    exctype, value = sys.exc_info()[:2]
-    if exctype == SystemExit:
-      sys.exit(value)
-    s = StringIO.StringIO()
-    traceback.print_exc(file = s, limit = 20)
-    log.alert("fatal python exception during: %s" % status.get())
-    log.alert(s.getvalue())
-    sys.exit(1)
 
 def collect_files(log):
   f = open(log)

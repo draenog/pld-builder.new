@@ -10,6 +10,7 @@ import request
 import log
 import path
 import util
+import wrap
 import status
 from acl import acl
 from lock import lock
@@ -105,6 +106,7 @@ def handle_request(f):
     # FIXME: security email here
     log.alert("invalid signature, or not in acl %s" % em)
     return
+  acl.set_current_user(user)
   status.push("email from %s" % user.login)
   r = request.parse_request(body)
   if r.kind == 'group':
@@ -128,4 +130,4 @@ def main():
   status.pop()
   sys.exit(0)
 
-util.wrap(main)
+wrap.wrap(main)

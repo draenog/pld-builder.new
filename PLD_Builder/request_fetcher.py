@@ -3,7 +3,6 @@ import os
 import urllib
 import StringIO
 import sys
-
 import gzip
 
 import path
@@ -13,6 +12,7 @@ import lock
 import util
 import gpg
 import request
+import wrap
 from acl import acl
 from bqueue import B_Queue
 from config import config, init_conf
@@ -91,4 +91,4 @@ def main():
     f.close()
   status.pop()
 
-util.wrap(main)
+wrap.wrap(main)
