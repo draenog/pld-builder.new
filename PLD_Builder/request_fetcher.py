@@ -1,4 +1,3 @@
-import ConfigParser
 import string
 import os
 import urllib

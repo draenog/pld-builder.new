@@ -1,9 +1,6 @@
 - file-sender -- buildlogs, ftp queues. support for file://, scp://, rsync://
   remember to send files in order, they were stored
 
-- load-balancer -- process got_lock, and run rpm-builder for archs in proper
-  order, shorten got_lock
-  
 - make mailer.py actually send mail (easy)
 
 - fix make-request.sh to be more user-friendly and configurable
