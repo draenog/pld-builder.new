@@ -62,6 +62,7 @@ class Builder_Conf:
         self.builder = builder
 
         self.binary_builders = string.split(get("binary_builders"))
+        self.src_builder = string.strip(get("src_builder", ""))
         self.tag_prefixes = string.split(get("tag_prefixes", ""))
         self.bot_email = get("bot_email", "")
         self.control_url = get("control_url")
@@ -100,11 +101,12 @@ class Builder_Conf:
 
 config = Builder_Conf()
 
-def init_conf(builder):
+def init_conf(builder=None):
     os.environ['LC_ALL'] = "C"
     status.push("reading builder config")
     log.builder = builder
-    if builder == "": builder = "all"
+    if not builder:
+        builder = "all"
     config.read(builder)
     log.builder = config.builder
     status.pop()

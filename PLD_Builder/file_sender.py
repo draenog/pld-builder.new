@@ -167,7 +167,7 @@ problem = ""
 def main():
     if lock.lock("sending-files", non_block = 1) == None:
         return
-    init_conf("")
+    init_conf()
     maybe_flush_queue(path.buildlogs_queue_dir)
     maybe_flush_queue(path.ftp_queue_dir)
 
