@@ -14,33 +14,39 @@ Roadmap:
 
   go.py -- testing script, don't touch
 
-  src_builder/ -- scripts for srpms builder
+  bin/ -- scripts for builder account outside chroot
   
     request-handler.sh
-      Script to be run from procmail. It process incoming request, 
-      authorizes it and stores in spool/queue.
+      Script to be run from procmail on src builder. It process incoming
+      request, authorizes it and stores in spool/queue.
 
     src-builder.sh
-      Script to be run from cron. It looks for new requests in spool/queue,
-      gets them from there, builds SRPM, and stores request for binary
-      builders in spool/req_queue (which is mirrored in www/ directory,
-      signed and compressed). SRPMS and buildlogs are queued for transmission.
-
-  binary_builder/ -- scripts for binary builder
+      Script to be run from cron on src builder. It looks for new
+      requests in spool/queue, gets them from there, builds SRPM, and
+      stores request for binary builders in spool/req_queue (which is
+      mirrored in www/ directory, signed and compressed). SRPMS and
+      buildlogs are queued for transmission.
 
     request-fetcher.sh
+      Run on binary builder.
       Fetch queue.gz from src-builder, and distribute requests for all
       builders hosted on given account (to spool/queue-<builder> files).
 
     rpm-builder.sh <builder>
+      Run on binary builder.
       Tries to aquire locks for <builder> and for job-slot. If that suceeds, 
       proccess one request from spool/queue-<builder>.
 
     load-balancer.sh
+      Run on binary builder.
       Checks spool/got_lock. Then run rpm-builder.sh in order determined
       from this file (if b1 had lock last time before b2, first run
       rpm-builder.sh b1 and then rpm-builder.sh b2), so builders get
       the same number of requests.
+
+    file-sender.sh
+      Run on both binary and src builder.
+      Sends files queued in spool/{ftp,buildlogs}.
   
 Working directories:
   lock/
