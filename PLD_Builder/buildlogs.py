@@ -20,7 +20,7 @@ class Buildlogs_Queue:
     os.system("bzip2 --best --force < %s > %s" \
                 % (logfile, path.buildlogs_queue_dir + id))
 
-    if l['failed']: s = "FAIL"
+    if failed: s = "FAIL"
     else: s = "OK"
     f = open(path.buildlogs_queue_dir + id + ".info", "w")
     f.write("Status: %s\nEND\n" % s)

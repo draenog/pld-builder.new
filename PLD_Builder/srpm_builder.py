@@ -39,12 +39,14 @@ def pick_request(q):
   
 def send_files(r):
   os.mkdir(path.srpms_dir + r.id)
+  os.chmod(path.srpms_dir + r.id, 0755)
   for batch in r.batches:
     if batch.build_failed: continue
     # export files from chroot
     local = path.srpms_dir + r.id + "/" + batch.src_rpm
     f = batch.src_rpm_file
     chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
+    os.chmod(local, 0644)
     ftp.add(local)
 
 def store_binary_request(r):
@@ -64,11 +66,14 @@ def store_binary_request(r):
   q.add(r)
   q.write()
   q.dump(open(path.queue_stats_file, "w"))
+  os.chmod(path.queue_stats_file, 0644)
   q.write_signed(path.req_queue_signed_file)
+  os.chmod(path.req_queue_signed_file, 0644)
   q.unlock()
   cnt_f.seek(0)
   cnt_f.write("%d\n" % num)
   cnt_f.close()
+  os.chmod(path.max_req_no_file, 0644)
   
 def build_srpm(r, b):
   status.push("building %s" % b.spec)
@@ -108,7 +113,8 @@ def handle_request(r):
 
 def main():
   init_conf("src")
-  lock("building-srpm")
+  if lock("building-srpm", non_block = 1) == None:
+    return
   status.push("srpm: processing queue")
   q = B_Queue(path.queue_file)
   if not q.lock(1): return

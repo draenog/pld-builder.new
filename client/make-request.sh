@@ -50,7 +50,7 @@ done
 
 
 if [ "$builders" = DEF ] ; then
-  builders="i386 i586 i686 athlon ppc"
+  builders="roke-athlon"
 fi
 
 id=$(uuidgen)
@@ -102,5 +102,4 @@ $(gen_req | gpg --clearsign --default-key $default_key)
 EOF
 }
 
-gen_email
-#| $mailer
+gen_email | $mailer
