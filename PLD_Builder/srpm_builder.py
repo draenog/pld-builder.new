@@ -2,7 +2,6 @@ import email
 import string
 import time
 import os
-import os.path
 import StringIO
 import sys
 import re
@@ -15,9 +14,10 @@ import path
 import util
 import loop
 import chroot
-import buildlogs
 import ftp
 import status
+import build
+import report
 
 from acl import acl
 from lock import lock
@@ -38,19 +38,6 @@ def pick_request(q):
   q.requests = q.requests[1:]
   return ret
   
-def send_files(r):
-  os.mkdir(path.srpms_dir + r.id)
-  os.chmod(path.srpms_dir + r.id, 0755)
-  ftp.init(r)
-  for batch in r.batches:
-    if batch.build_failed: continue
-    # export files from chroot
-    local = path.srpms_dir + r.id + "/" + batch.src_rpm
-    f = batch.src_rpm_file
-    chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
-    os.chmod(local, 0644)
-    ftp.add(local)
-
 def store_binary_request(r):
   new_b = []
   for b in r.batches:
@@ -76,7 +63,15 @@ def store_binary_request(r):
   cnt_f.write("%d\n" % num)
   cnt_f.close()
   os.chmod(path.max_req_no_file, 0644)
-  
+
+def transfer_file(r, b):
+  local = path.srpms_dir + r.id + "/" + b.src_rpm
+  f = b.src_rpm_file
+  # export files from chroot
+  chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
+  os.chmod(local, 0644)
+  ftp.add(local)
+
 def build_srpm(r, b):
   status.push("building %s" % b.spec)
   b.src_rpm = ""
@@ -100,17 +95,18 @@ def build_srpm(r, b):
   else:
     util.append_to(b.logfile, "error: No files produced.")
     res = 1
-  buildlogs.add(logfile = b.logfile, failed = res)
+  if res == 0:
+    transfer_file(r, b)
   status.pop()
   return res
 
 def handle_request(r):
-  r.build_all(build_srpm)
-  send_files(r)
-  r.clean_files()
-  r.send_report()
+  os.mkdir(path.srpms_dir + r.id)
+  os.chmod(path.srpms_dir + r.id, 0755)
+  ftp.init(r)
+  build.build_all(r, build_srpm)
+  report.send_report(r)
   store_binary_request(r)
-  buildlogs.flush()
   ftp.flush()
 
 def main():

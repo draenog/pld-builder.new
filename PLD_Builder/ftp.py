@@ -11,6 +11,7 @@ class FTP_Queue:
   def __init__(self):
     self.queue = None
     self.some_failed = 0
+    self.status = ""
 
   def init(self, g):
     self.queue = []
@@ -27,6 +28,8 @@ class FTP_Queue:
     id = util.uuid()
     shutil.copy(file, path.ftp_queue_dir + id)
     self.queue.append({'name': name, 'id': id})
+    st = os.stat(path.ftp_queue_dir + id)
+    self.status += "%10d %s\n" % (st.st_size, name)
 
   def flush(self):
     def desc(l):
@@ -56,3 +59,9 @@ def kill():
 
 def init(r):
   queue.init(r)
+
+def status():
+  return queue.status
+  
+def clear_status():
+  queue.status = ""
