@@ -58,11 +58,6 @@ def handle_group(r, user):
                   % (user.get_login(), config.builder, batch.branch))
       return
 
-    if not user.can_do("ready", config.builder, batch.branch):
-      fail_mail("user %s is not allowed to build to ready (ready:%s:%s)" \
-                  % (user.get_login(), config.builder, batch.branch))
-      return
-
     if "upgrade" in r.flags and not user.can_do("upgrade", config.builder, batch.branch):
       fail_mail("user %s is not allowed to upgrade:%s:%s" \
                   % (user.get_login(), config.builder, batch.branch))
