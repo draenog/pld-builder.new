@@ -32,7 +32,7 @@ def handle_bin():
         if curtime - mtime > config.max_keep_time:
             rmpkgs.append(pkgname)
     if rmpkgs:
-        chroot.run("cd /spools/ready; rm %s" % ' '.join(rmpkgs))
+        chroot.run("cd /spools/ready; rm -f %s" % ' '.join(rmpkgs))
     f.close()
 
 if __name__ == '__main__':
