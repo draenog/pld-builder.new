@@ -9,7 +9,7 @@ from acl import acl
 from config import config, init_conf
 import mailer
 import path
-import util
+import wrap
 import log
 import status
 
@@ -162,4 +162,4 @@ def main():
   maybe_flush_queue(path.buildlogs_queue_dir)
   maybe_flush_queue(path.ftp_queue_dir)
 
-util.wrap(main)
+wrap.wrap(main)

@@ -25,7 +25,7 @@ class FTP_Queue:
     def desc(l):
       return "Target: %s/%s\nBuilder: %s\nTime: %d\nRequester: %s\nEND\n" % \
                 (config.ftp_url, l['name'], config.builder, time.time(), 
-                 acl.current_user)
+                 acl.current_user_login())
     
     for l in self.queue:
       f = open(path.ftp_queue_dir + l['id'] + ".desc", "w")

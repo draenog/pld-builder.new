@@ -13,6 +13,7 @@ import request
 import log
 import path
 import util
+import wrap
 import chroot
 import buildlogs
 import ftp

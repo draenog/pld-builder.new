@@ -35,7 +35,7 @@ Builder: %s
 Time: %d
 Requester: %s
 END
-""" % (config.buildlogs_url, l['name'], config.builder, time.time(), acl.current_user)
+""" % (config.buildlogs_url, l['name'], config.builder, time.time(), acl.current_user_login())
     
     for l in self.queue:
       f = open(path.buildlogs_queue_dir + l['id'] + ".desc", "w")

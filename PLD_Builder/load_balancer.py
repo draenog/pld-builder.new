@@ -6,7 +6,7 @@ import path
 import log
 import status
 import lock
-import util
+import wrap
 from config import config, init_conf
 
 # return list of binary builders in fair-queue order
@@ -60,4 +60,4 @@ def main():
   except:
     pass
 
-util.wrap(main)
+wrap.wrap(main)
