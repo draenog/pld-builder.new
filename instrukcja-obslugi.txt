@@ -1,0 +1,44 @@
+Instrukcja instalacji.
+
+1. Konta
+
+Builder potrzebuje konta na swoje potrzeby. Konto powinno byæ wspólne
+dla wszystkich builderów budj±cych pakiety binarne na danych ho¶cie,
+co pozwala na lepsze wykorzystanie zasobów (hint: zmienna job_slots 
+w konfiguracji). 
+
+SRPMS builder powinien jednak staæ na osobnym koncie.
+
+Konta bêdziemy nazywaæ bin_builder oraz srpms_builder.
+
+2. Wymagania
+
+oba:
+  wysy³anie poczty
+  gpg
+  scp i/lub rsync (wysy³anie buildlogów i plików na ftp)
+  dostêp do odpowiednich chrootów
+
+srpms_builder:
+  skrzynka pocztowa + procmail
+  mo¿liwo¶æ serwowania plików po http
+  po³±czenia cvs
+  po³±czenia ftp lub http (distfiles)
+
+bin_builder:
+  po³±czenia http
+
+dostêp do chrootów przez sudo, wpisy sudoers:
+
+srpms_builder ALL = NOPASSWD: \
+  /usr/sbin/chroot /path/to/chroot *
+  
+bin_builder ALL = NOPASSWD: \
+  /usr/sbin/chroot /path/to/chroot1 *, \
+  /usr/sbin/chroot /path/to/chroot2 *
+
+3. instalacja skryptów
+
+Skrypty *musz±* byæ w ~/pld-builder.new/, checkoutniête z CVS.
+
+[[...]]
