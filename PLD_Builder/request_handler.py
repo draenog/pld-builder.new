@@ -106,12 +106,12 @@ def handle_notification(r, user):
   def leave_it(r):
     # for ,,done'' set timeout to 4d
     if r.is_done() and r.time + 4 * 24 * 60 * 60 > now:
-      return false
+      return False
     # and for not ,,done'' set it to 20d
     if r.time + 20 * 24 * 60 * 60 > now:
       util.clean_tmp(path.srpms_dir + r.id)
-      return false
-    return true
+      return False
+    return True
   q.requests = filter(leave_it, q.requests)
   q.write()
   q.dump(open(path.queue_stats_file, "w"))
