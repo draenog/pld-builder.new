@@ -27,7 +27,6 @@ mailer="/usr/sbin/sendmail -t"
 default_builders="ac-*"
 
 # defaults:
-build_mode=ready
 f_upgrade=yes
 
 EOF
@@ -47,11 +46,6 @@ usage() {
   echo "       Sends request to given builders"
   echo "  --with VALUE --without VALUE"
   echo "       Build package with(out) a given bcond"
-  echo "  -t   --test-build"
-  echo "       Performs a 'test-build'. Package will be uploaded to test/ tree"
-  echo "       and won't be upgraded on builders"
-  echo "  -r   --ready-build"
-  echo "       Build and upgrade package and upload it to ready/ tree"
   echo "  -u   --upgrade"
   echo "       Forces pacakge upgrade (for use with -t)"
   echo "  -n   --no-upgrade"
@@ -86,15 +80,6 @@ while [ $# -gt 0 ] ; do
     --without )
       without="$without $2"
       shift
-      ;;
-
-    --test-build | -t )
-      build_mode=test
-      f_upgrade=no
-      ;;
-
-    --ready-build | -r )
-      build_mode=ready
       ;;
 
     --upgrade | -u )
@@ -165,13 +150,6 @@ fi
 
 if [ "$f_upgrade" = "yes" ] ; then
   flags="$flags upgrade"
-fi
-
-if [ "$build_mode" = "test" ] ; then
-  if [ "$f_upgrade" = "yes" ] ; then
-    die "--upgrade and --test-build are mutually exclusive"
-  fi
-  flags="$flags test-build"
 fi
 
 ok=
