@@ -8,7 +8,7 @@
 
 - fix make-request.sh to be more user-friendly and configurable
 
-- clean everything after build (maybe entire ~/rpm?) (rpm_builder.py)
+- report time consumed by build
 
 ---- current builders functionality ends here ----
 
