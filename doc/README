@@ -1,0 +1,24 @@
+Roadmap:
+
+  Makefile -- nothing interesting.
+
+  PLD_Builder/ -- all python stuff live here.
+
+  admin/ -- scripts for chroot admin.
+
+  architektura.txt -- docs, in Polish.
+
+  binary_builder/ -- scripts for binary builder
+
+  client/ -- scripts for clients, i.e. developers sending requests
+
+  config/ -- configuration
+
+  go.py -- testing script, don't touch
+
+  src_builder/ -- scripts for srpms builder
+
+Working directories:
+  lock/
+  spool/
+  log/
