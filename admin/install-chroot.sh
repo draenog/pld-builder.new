@@ -10,7 +10,7 @@ Variables:
   chroot_dir=/path/to/chroot 		 (required)
   dist_url=ftp://ftp.nest.pld-linux.org/ (required)
   arch=i386 				 (required)
-  cvs_root=:pserver:<user>@<host>:<cvsroot>
+  cvs_root=:pserver:<user>:<password>@<host>:<cvsroot>
   					 (required in src builder)
   builder_uid=2000 			 (optional, uid of builder user 
   					  in chroot)
