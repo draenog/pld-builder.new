@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # FIXME: set with options
-requester=malekith
 priority=2
 default_key=builder
 builder_email=srpms_builder@roke.freak
@@ -57,7 +56,6 @@ id=$(uuidgen)
 
 gen_req() {
   echo "<group id='$id' no='0'>"
-  echo "  <requester>$requester</requester>"
   echo "  <time>$(date +%s)</time>"
   echo "  <priority>$priority</priority>"
   echo

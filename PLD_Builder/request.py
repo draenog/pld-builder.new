@@ -33,7 +33,7 @@ class Group:
     self.no = int(attr(e, "no"))
     self.priority = 2
     self.time = time.time()
-    self.requester = None
+    self.requester = ""
     for c in e.childNodes:
       if is_blank(c): continue
       if c.nodeType != Element.ELEMENT_NODE:
@@ -48,8 +48,6 @@ class Group:
         self.time = int(text(c))
       else:
         raise "xml: evil group child (%s)" % c.nodeName
-    if self.requester == None:
-      raise "xml: no requester"
 
   def dump(self):
     print "group: %s @%d" % (self.id, self.priority)
