@@ -92,8 +92,8 @@ def send_report(r, is_src = False):
 
 def send_cia_report(r, is_src = False):
 
-  if not is_src:
-    return
+  #if not is_src:
+  #  return
 
   s_failed = ' '.join([b.spec for b in r.batches if b.build_failed])
   s_ok = ' '.join([b.spec for b in r.batches if not b.build_failed])
@@ -116,6 +116,6 @@ def send_cia_report(r, is_src = False):
     else: 
       info = "OK"
     # Instead of hardcoded Ac information use some config variable
-    m.write("{red}Builder Ac src{normal} ({gray}%s{normal}): {light blue}%s{normal}:{yellow}%s{normal} {green}%s{normal}\n" % (r.requester_email, b.spec, b.branch, info))
+    m.write("{red}Builder %s{normal} ({gray}%s{normal}): {light blue}%s{normal}:{yellow}%s{normal} {green}%s{normal}\n" % (config.builder, r.requester_email, b.spec, b.branch, info))
 	    
   m.send()
