@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DIST="th"
+DIST="ac"
 DISTTAG="PLD 3.0 (Th)"
 
 die () {
@@ -21,12 +21,13 @@ EOF
 }
 
 default_config () {
-  builder_pkgs="rpm-build poldek shadow net-tools which"
-  builder_uid=2000
+  builder_pkgs="rpm-build poldek shadow net-tools which rpm-perlprov rpm-php-pearprov rpm-pythonprov"
+  builder_uid=`id -u`
+  dist_url="ftp://ftp.$DIST.pld-linux.org"
 
   case "$chroot_type" in
   src )
-    builder_arch_pkgs="cvs wget rpm-perlprov rpm-php-pearprov rpm-pythonprov"
+    builder_arch_pkgs="cvs wget"
     ;;
   bin )
     builder_arch_pkgs=""
@@ -37,8 +38,7 @@ default_config () {
 check_conf () {
   test "$chroot_dir" || die "no chroot_dir"
   test "$arch" || die "no arch"
-#  test "$dist_url" || die "no dist_url"
-  dist_url="ftp://ftp.$DIST.pld-linux.org"
+  test "$dist_url" || die "no dist_url"
   
   case "$chroot_type" in
   src )
