@@ -215,6 +215,22 @@ class Batch:
     if self.logfile != None:
       util.append_to(self.logfile, l)
 
+  def expand_builders(batch):
+    all = []
+    all_builders = config.binary_builders
+    if config.builder not in all_builders:
+      all_builders.append(config.builder)
+    for bld in batch.builders:
+      res = []
+      for my_bld in all_builders:
+        if fnmatch.fnmatch(my_bld, bld):
+          res.append(my_bld)
+      if res != []:
+        all.extend(res)
+      else:
+        all.append(bld)
+    batch.builders = all
+
 class Notification:
   def __init__(self, e):
     self.batches = []
