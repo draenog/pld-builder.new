@@ -22,6 +22,19 @@ import report
 import upgrade
 import install_br
 
+# *HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*
+import socket
+
+socket.myorigsocket=socket.socket
+
+def mysocket(family=socket.AF_INET, type=socket.SOCK_STREAM, proto=0):
+  s=socket.myorigsocket(family, type, proto)
+  s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+  return s
+
+socket.socket=mysocket
+# *HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*
+
 # this code is duplicated in srpm_builder, but we
 # might want to handle some cases differently here
 def pick_request(q):
