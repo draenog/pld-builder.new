@@ -6,7 +6,7 @@ requester=malekith
 default_key=builder
 builder_email=srpms_builder@roke.freak
 mailer="/usr/sbin/sendmail -t"
-default_builders="roke-athlon"
+default_builders="roke-athlon roke-i686"
 
 builders=
 specs=
