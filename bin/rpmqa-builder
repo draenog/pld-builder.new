@@ -3,7 +3,7 @@ DIST=ac
 ARCH_LIST="somearch1 somearch2"
 FTP_HOST="fpldac@ep09.pld-linux.org"
 FTP_PATH="/home/ftp/pub/Linux/PLD/dists/${DIST}/.stat/builder/ac/"
-CHROOT="~/chroots/chroot-"
+CHROOT="$HOME/chroots/chroot-"
 
 for arch in ${ARCH_LIST} ; do
 	file=`mktemp /tmp/rpmqa-XXXXXX`
