@@ -9,7 +9,7 @@ die () {
 }
 
 default_config () {
-  builder_pkgs="rpm-build poldek shadow"
+  builder_pkgs="rpm-build poldek shadow net-tools"
   spools_dir="/spools/"
   builder_uid=2000
 
