@@ -205,9 +205,9 @@ class Batch:
       link_post = ""
       if bl_archs.has_key(b) and (s == "OK" or s == "FAIL") and len(self.spec) > 5:
         if self.is_command():
-	   bl_name = "command"
-	 else:
-	   bl_name = self.spec[:len(self.spec)-5]
+	  bl_name = "command"
+	else:
+	  bl_name = self.spec[:len(self.spec)-5]
         path = "/%s/%s/%s.bz2" % (b.replace('-','/'), s, bl_name)
         is_ok = 0
         if s == "OK": is_ok = 1
