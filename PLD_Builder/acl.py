@@ -49,11 +49,11 @@ class User:
     return 0
 
   def check_priority(self, prio, where):
-    action = "*:%s" % (where,)
     for priv in self.privs:
-      if fnmatch.fnmatch(action, priv):
+      val,builder=priv.split(":")
+      if fnmatch.fnmatch(where, builder):
 	try:
-          val=int(priv.split(":")[0])
+          val=int(val)
         except ValueError:
           continue
         if prio>=val:
