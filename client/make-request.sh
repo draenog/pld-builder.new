@@ -61,8 +61,12 @@ gen_req() {
   echo "  <priority>$priority</priority>"
   echo
 
+  # first id:
+  fid=
   for s in $specs ; do
-    echo "  <batch>"
+    bid=$(uuidgen)
+    echo "  <batch id='$bid' depends-on='$fid'>"
+    [ "$fid" = "" ] && fid="$bid"
     name=$(echo "$s" | sed -e 's|:.*||')
     branch=$(echo "$s" | sed -e 's|.*:||')
     echo "     <spec>$name</spec>"
@@ -81,6 +85,7 @@ gen_req() {
     done
     echo "  </batch>"
   done
+  
   echo "</group>"
 }
 

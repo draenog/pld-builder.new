@@ -1,7 +1,15 @@
 from xml.dom.minidom import *
 import string
 import time
+import os
+import atexit
 import xml.sax.saxutils 
+
+import log
+import path
+import util
+import chroot
+from acl import acl
 
 __all__ = ['parse_request', 'parse_requests']
   
@@ -16,7 +24,9 @@ def text(e):
   else:
     raise "xml: text expected: <%s>" % e.nodeName
 
-def attr(e, a):
+def attr(e, a, default = None):
+  if default != None and not e.attributes.has_key(a):
+    return default
   return e.attributes[a].value
 
 def escape(s):
@@ -48,6 +58,19 @@ class Group:
         self.time = int(text(c))
       else:
         raise "xml: evil group child (%s)" % c.nodeName
+    # note that we also check that group is sorted WRT deps
+    m = {}
+    for b in self.batches:
+      deps = []
+      m[b.b_id] = b
+      for dep in b.depends_on:
+        if m.has_key(dep):
+          # avoid self-deps
+          if id(m[dep]) != id(b):
+            deps.append(m[dep])
+        else:
+          raise "xml: dependency not found in group"
+      b.depends_on = deps
 
   def dump(self):
     print "group: %s @%d" % (self.id, self.priority)
@@ -67,6 +90,72 @@ class Group:
       b.write_to(f)
     f.write("       </group>\n\n")
 
+  def build_all(r, build_fnc):
+    tmp = path.spool_dir + util.uuid() + "/"
+    r.tmp_dir = tmp
+    os.mkdir(tmp)
+    atexit.register(util.clean_tmp, tmp)
+  
+    log.notice("started processing %s" % r.id)
+    r.chroot_files = []
+    r.some_ok = 0
+    for batch in r.batches:
+      can_build = 1
+      failed_dep = ""
+      for dep in batch.depends_on:
+        if dep.build_failed:
+          can_build = 0
+          failed_dep = dep.spec
+          
+      if can_build:
+        log.notice("building %s" % batch.spec)
+        batch.logfile = tmp + batch.spec + ".log"
+        batch.build_failed = build_fnc(r, batch)
+        if batch.build_failed:
+          log.notice("building %s FAILED" % batch.spec)
+        else:
+          r.some_ok = 1
+          log.notice("building %s OK" % batch.spec)
+      else:
+        batch.build_failed = 1
+        batch.skip_reason = "SKIPED [%s failed]" % failed_dep
+        batch.logfile = None
+        log.notice("building %s %s" % (batch.spec, batch.skip_reason))
+
+  def clean_files(r):
+    chroot.run("rm -f %s" % string.join(r.chroot_files))
+
+  def send_report(r):
+    def names(l): return map(lambda (b): b.spec, l)
+    s_failed = filter(lambda (x): x.build_failed, r.batches)
+    s_ok = filter(lambda (x): not x.build_failed, r.batches)
+    subject = ""
+    if s_failed != []:
+      subject += " ERRORS: " + string.join(names(s_failed))
+    if s_ok != []:
+      subject += " OK: " + string.join(names(s_ok))
+    
+    m = acl.user(r.requester).message_to()
+    m.set_headers(subject = subject[0:100])
+
+    for b in r.batches:
+      if b.build_failed and b.logfile == None:
+        info = b.skip_reason
+      elif b.build_failed: 
+        info = "FAILED"
+      else: 
+        info = "OK"
+      m.write("%s (%s): %s\n" % (b.spec, b.branch, info))
+    
+    for b in r.batches:
+      # FIXME: include unpackaged files section
+      if b.build_failed and b.logfile != None:
+        m.write("\n\n*** buildlog for %s\n" % b.spec)
+        m.append_log(b.logfile)
+        m.write("\n\n")
+        
+    m.send()
+
 class Batch:
   def __init__(self, e):
     self.bconds_with = []
@@ -76,6 +165,8 @@ class Batch:
     self.src_rpm = ""
     self.info = ""
     self.spec = ""
+    self.b_id = attr(e, "id")
+    self.depends_on = string.split(attr(e, "depends-on"))
     for c in e.childNodes:
       if is_blank(c): continue
       if c.nodeType != Element.ELEMENT_NODE:
@@ -114,11 +205,13 @@ class Batch:
     
   def write_to(self, f):
     f.write("""
-         <batch>
+         <batch id='%s' depends-on='%s'>
            <src-rpm>%s</src-rpm>
            <spec>%s</spec>
            <branch>%s</branch>
-           <info>%s</info>\n""" % (escape(self.src_rpm), 
+           <info>%s</info>\n""" % (self.b_id, 
+             string.join(map(lambda (b): b.b_id, self.depends_on)),
+             escape(self.src_rpm), 
              escape(self.spec), escape(self.branch), escape(self.info)))
     for b in self.bconds_with:
       f.write("           <with>%s</with>\n" % escape(b))

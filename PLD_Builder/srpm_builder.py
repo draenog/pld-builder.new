@@ -36,62 +36,24 @@ def pick_request(q):
   ret = q.requests[0]
   q.requests = q.requests[1:]
   return ret
-
-def handle_request(r):
-  def build_srpm(b):
-    status.push("building %s" % b.spec)
-    b.src_rpm = ""
-    builder_opts = "-nu --clean --nodeps"
-    cmd = "cd rpm/SPECS; ./builder %s -bs %s -r %s %s 2>&1" % \
-                 (builder_opts, b.bconds_string(), b.branch, b.spec)
-    spec_log = tmp + b.spec + ".log"
-    util.append_to(spec_log, "Building SRPM using: %s\n" % cmd)
-    res = chroot.run(cmd, logfile = spec_log)
-    files = util.collect_files(spec_log)
-    if len(files) > 0:
-      if len(files) > 1:
-        util.append_to(spec_log, "error: More then one file produced: %s" % files)
-        res = 1
-      last = files[len(files) - 1]
-      b.src_rpm_file = last
-      b.src_rpm = os.path.basename(last)
-      all_files.extend(files)
-    else:
-      util.append_to(spec_log, "error: No files produced.")
-      res = 1
-    buildlogs.add(logfile = spec_log, failed = res)
-    status.pop()
-    return res
-
-  tmp = path.spool_dir + r.id + "/"
-  os.mkdir(tmp)
-  atexit.register(util.clean_tmp, tmp)
-  user = acl.user(r.requester)
-  log.notice("started processing %s" % r.id)
-  all_files = []
-  for batch in r.batches:
-    log.notice("building %s" % batch.spec)
-    if build_srpm(batch):
-      # clean up
-      log.notice("building %s failed" % batch.spec)
-      chroot.run("rm -f %s" % string.join(all_files))
-      m = user.message_to()
-      m.set_headers(subject = "SRPMS: %s failed" % batch.spec)
-      # FIXME: write about other specs from group
-      m.write("Building SRPM failed for %s.\nAttached log:\n" % batch.spec)
-      m.append_log(tmp + batch.spec + ".log")
-      m.send()
-      buildlogs.flush()
-      return
-    log.notice("building %s finished" % batch.spec)
+  
+def send_files(r):
   os.mkdir(path.srpms_dir + r.id)
   for batch in r.batches:
+    if batch.build_failed: continue
     # export files from chroot
     local = path.srpms_dir + r.id + "/" + batch.src_rpm
     f = batch.src_rpm_file
     chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
     ftp.add(local)
 
+def store_binary_request(r):
+  new_b = []
+  for b in r.batches:
+    if not b.build_failed: new_b.append(b)
+  if new_b == []:
+    return
+  r.batches = new_b
   # store new queue and max_req_no for binary builders
   cnt_f = open(path.max_req_no_file, "r+")
   num = int(string.strip(cnt_f.read())) + 1
@@ -106,7 +68,40 @@ def handle_request(r):
   cnt_f.seek(0)
   cnt_f.write("%d\n" % num)
   cnt_f.close()
-  # FIXME: send notification?
+  
+def build_srpm(r, b):
+  status.push("building %s" % b.spec)
+  b.src_rpm = ""
+  builder_opts = "-nu --clean --nodeps"
+  cmd = "cd rpm/SPECS; ./builder %s -bs %s -r %s %s 2>&1" % \
+               (builder_opts, b.bconds_string(), b.branch, b.spec)
+  util.append_to(b.logfile, "request from: %s" % r.requester)
+  util.append_to(b.logfile, "started at: %s" % time.asctime())
+  util.append_to(b.logfile, "building SRPM using: %s\n" % cmd)
+  res = chroot.run(cmd, logfile = b.logfile)
+  util.append_to(b.logfile, "exit status %d" % res)
+  files = util.collect_files(b.logfile)
+  if len(files) > 0:
+    if len(files) > 1:
+      util.append_to(b.logfile, "error: More then one file produced: %s" % files)
+      res = 1
+    last = files[len(files) - 1]
+    b.src_rpm_file = last
+    b.src_rpm = os.path.basename(last)
+    r.chroot_files.extend(files)
+  else:
+    util.append_to(b.logfile, "error: No files produced.")
+    res = 1
+  buildlogs.add(logfile = b.logfile, failed = res)
+  status.pop()
+  return res
+
+def handle_request(r):
+  r.build_all(build_srpm)
+  send_files(r)
+  r.clean_files()
+  r.send_report()
+  store_binary_request(r)
   buildlogs.flush()
   ftp.flush()
 
