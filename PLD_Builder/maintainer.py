@@ -1,11 +1,13 @@
 # vi: encoding=utf-8 ts=8 sts=4 sw=4 et
 
-from config import config, init_conf
-import path
 import os
 import time
+
+from config import config, init_conf
 import util
 import chroot
+import ftp
+import path
 
 def clean_dir(path, max):
     curtime=time.time()
@@ -16,10 +18,24 @@ def clean_dir(path, max):
             else:
                 os.unlink(path+'/'+i)
 
+def send_rpmqa():
+    tmp = path.build_dir + util.uuid() + '/'
+    os.mkdir(tmp)
+    log = tmp + config.rpmqa_filename
+    chroot.run("rpm -qa|sort", logfile=log)
+    os.chmod(log,0644)
+    ftp.init(rpmqa=True)
+    ftp.add(log)
+    ftp.flush()
+    os.unlink(log)
+    os.rmdir(tmp)
+
 def handle_src():
+    send_rpmqa()
     clean_dir(path.www_dir+'srpms', 2592000) # a month
 
 def handle_bin():
+    send_rpmqa()
     f=chroot.popen("""ls -l --time-style +%s /spools/ready""", 'root')
     rmpkgs=[]
     curtime=time.time()

@@ -86,6 +86,7 @@ class Builder_Conf:
         self.ftp_url = get("ftp_url")
         self.test_ftp_url = get("test_ftp_url", "/dev/null")
         self.rpmqa_url = get("rpmqa_url", "/dev/null")
+        self.rpmqa_filename = get("rpmqa_filename")
         self.job_slots = int(get("job_slots"))
         self.max_load = float(get("max_load"))
         self.control_url = get("control_url")
