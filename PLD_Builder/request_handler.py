@@ -105,10 +105,10 @@ def handle_notification(r, user):
   now = time.time()
   def leave_it(r):
     # for ,,done'' set timeout to 4d
-    if r.is_done() and r.time + 4 * 24 * 60 * 60 > now:
+    if r.is_done() and r.time + 4 * 24 * 60 * 60 < now:
       return False
     # and for not ,,done'' set it to 20d
-    if r.time + 20 * 24 * 60 * 60 > now:
+    if r.time + 20 * 24 * 60 * 60 < now:
       util.clean_tmp(path.srpms_dir + r.id)
       return False
     return True
