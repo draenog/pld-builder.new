@@ -85,7 +85,7 @@ def build_rpm(r, b):
       b.files = files
   chroot.run("rm -rf %s; cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
              "--clean --rmspec --rmsource %s" % \
-             (tmpdir, b.b_id, b.spec), logfile = b.logfile)
+             (tmpdir, b.spec), logfile = b.logfile)
   chroot.run("rm -rf $HOME/rpm/BUILD/*")
 
   def ll(l):
