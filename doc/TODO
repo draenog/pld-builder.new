@@ -1,12 +1,7 @@
-- sending reports from binary to src builder, so it can update its queue and
-  clean srpms that ain't needed anymore
-  
 - store rpms in /spool/ready/ in chroot? (rpm_builder.py)
 
 - deps install/uninstall machinery (hard stuff -- building deps tree already 
   done)
-
-- make mailer.py actually send mail (easy)
 
 - fix make-request.sh to be more user-friendly and configurable
 

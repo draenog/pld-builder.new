@@ -19,21 +19,23 @@ class Buildlogs_Queue:
     id = util.uuid()
     os.system("bzip2 --best --force < %s > %s" \
                 % (logfile, path.buildlogs_queue_dir + id))
+
+    if l['failed']: s = "FAIL"
+    else: s = "OK"
+    f = open(path.buildlogs_queue_dir + id + ".info", "w")
+    f.write("Status: %s\nEND\n" % s)
+    f.close()
+
     self.queue.append({'name': name, 'id': id, 'failed': failed})
 
   def flush(self):
     def desc(l):
-      if l['failed']: s = "FAIL"
-      elif self.some_failed: s = "OKOF" # OK but Others Failed
-      else: s = "OK"
       return """Target: %s/%s
 Builder: %s
-Status: %s
-Store-desc: yes
 Time: %d
 Requester: %s
 END
-""" % (config.buildlogs_url, l['name'], config.builder, s, time.time(), acl.current_user)
+""" % (config.buildlogs_url, l['name'], config.builder, time.time(), acl.current_user)
     
     for l in self.queue:
       f = open(path.buildlogs_queue_dir + l['id'] + ".desc", "w")

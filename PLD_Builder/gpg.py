@@ -29,7 +29,7 @@ def verify_sig(buf):
   return (emails, body)
 
 def sign(buf):
-  (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --clearsign --default-key builder")
+  (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --clearsign")
   util.sendfile(buf, gpg_in)
   gpg_in.close()
   body = StringIO.StringIO()

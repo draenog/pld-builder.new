@@ -17,8 +17,10 @@ buildlogs_queue_dir = spool_dir + "buildlogs/"
 ftp_queue_dir = spool_dir + "ftp/"
 last_req_no_file = spool_dir + "last_req_no"
 got_lock_file = spool_dir + "got_lock"
+log_file = spool_dir + "log"
 
 # www/
 srpms_dir = www_dir + "srpms/"
 req_queue_signed_file = www_dir + "queue.gz"
 max_req_no_file = www_dir + "max_req_no"
+queue_state_file = www_dir + "queue.txt"

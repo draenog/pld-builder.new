@@ -10,6 +10,7 @@ import path
 import util
 import chroot
 from acl import acl
+import notify
 
 __all__ = ['parse_request', 'parse_requests']
   
@@ -72,12 +73,12 @@ class Group:
           raise "xml: dependency not found in group"
       b.depends_on = deps
 
-  def dump(self):
-    print "group: %s @%d" % (self.id, self.priority)
-    print "  from: %s" % self.requester
-    print "  time: %s" % time.asctime(time.localtime(self.time))
+  def dump(self, f):
+    f.write("group: %d (id=%s pri=%d)\n" % (self.no, self.id, self.priority))
+    f.write("  from: %s\n" % self.requester)
+    f.write("  time: %s\n" % time.asctime(time.localtime(self.time)))
     for b in self.batches:
-      b.dump()
+      b.dump(f)
 
   def write_to(self, f):
     f.write("""
@@ -91,6 +92,8 @@ class Group:
     f.write("       </group>\n\n")
 
   def build_all(r, build_fnc):
+    notify.begin(r)
+
     tmp = path.spool_dir + util.uuid() + "/"
     r.tmp_dir = tmp
     os.mkdir(tmp)
@@ -113,14 +116,17 @@ class Group:
         batch.build_failed = build_fnc(r, batch)
         if batch.build_failed:
           log.notice("building %s FAILED" % batch.spec)
+          notify.add_batch(batch, "FAIL")
         else:
           r.some_ok = 1
           log.notice("building %s OK" % batch.spec)
+          notify.add_batch(batch, "OK")
       else:
         batch.build_failed = 1
         batch.skip_reason = "SKIPED [%s failed]" % failed_dep
         batch.logfile = None
         log.notice("building %s %s" % (batch.spec, batch.skip_reason))
+        notify.add_batch(batch, "SKIP")
 
   def clean_files(r):
     chroot.run("rm -f %s" % string.join(r.chroot_files))
@@ -156,6 +162,13 @@ class Group:
         
     m.send()
 
+  def is_done(self):
+    ok = 1
+    for b in self.batches:
+      if not b.is_done():
+        ok = 0
+    return ok
+
 class Batch:
   def __init__(self, e):
     self.bconds_with = []
@@ -181,19 +194,31 @@ class Batch:
         self.branch = text(c)
       elif c.nodeName == "builder":
         self.builders.append(text(c))
+        self.builders_status[text(c)] = attr(c, "status", "?")
       elif c.nodeName == "with":
         self.bconds_with.append(text(c))
       elif c.nodeName == "without":
         self.bconds_without.append(text(c))
       else:
         raise "xml: evil batch child (%s)" % c.nodeName
-  
-  def dump(self):
-    print "  batch: %s/%s" % (self.src_rpm, self.spec)
-    print "    info: %s" % self.info
-    print "    branch: %s" % self.branch
-    print "    bconds: %s" % self.bconds_string()
-    print "    for: %s" % string.join(self.builders)
+ 
+  def is_done(self):
+    ok = 1
+    for b in self.builders:
+      s = self.builders_status[b]
+      if not (s == "OK" or s == "FAIL" or s == "SKIP"):
+        ok = 0
+    return ok
+      
+  def dump(self, f):
+    f.write("  batch: %s/%s\n" % (self.src_rpm, self.spec))
+    f.write("    info: %s\n" % self.info)
+    f.write("    branch: %s\n" % self.branch)
+    f.write("    bconds: %s\n" % self.bconds_string())
+    builders = []
+    for b in self.builders:
+      builders.append("%s:%s" % (b, self.builders_status[b]))
+    f.write("    builders: %s\n" % string.join(builders))
 
   def bconds_string(self):
     r = ""
@@ -218,14 +243,44 @@ class Batch:
     for b in self.bconds_without:
       f.write("           <without>%s</without>\n" % escape(b))
     for b in self.builders:
-      f.write("           <builder>%s</builder>\n" % escape(b))
+      f.write("           <builder status='%s'>%s</builder>\n" % \
+                        (escape(self.builders_status[b]), escape(b)))
     f.write("         </batch>\n")
+
+class Notification:
+  def __init__(self, e):
+    self.batches = []
+    self.kind = 'notification'
+    self.group_id = attr(e, "group-id")
+    self.builder = attr(e, "builder")
+    self.batches = {}
+    for c in e.childNodes:
+      if is_blank(c): continue
+      if c.nodeType != Element.ELEMENT_NODE:
+        raise "xml: evil notification child %d" % c.nodeType
+      if c.nodeName == "batch":
+        id = attr(e, "id")
+        status = attr(e, "status")
+        if status != "OK" and status != "FAIL" and status != "SKIP":
+          raise "xml notification: bad status: %s" % self.status
+        self.batches[id] = status
+      else:
+        raise "xml: evil notification child (%s)" % c.nodeName
+
+  def apply_to(self, q):
+    for r in q.requests:
+      if r.kind == "group":
+        for b in r.batches:
+          if self.batches.has_key(b.b_id):
+            b.builders_status[self.builder] = self.batches[b.b_id]
 
 def build_request(e):
   if e.nodeType != Element.ELEMENT_NODE:
     raise "xml: evil request element"
   if e.nodeName == "group":
     return Group(e)
+  elif e.nodeName == "notification":
+    return Notification(e)
   elif e.nodeName == "command":
     # FIXME
     return Command(e)

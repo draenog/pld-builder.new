@@ -115,8 +115,8 @@ def flush_queue(dir):
     if send_file(d['_file'], d['Target']):
       error = d
       break
-    if d.has_key('Store-desc') and d['Store-desc'] == "yes":
-      if send_file(d['_desc'], d['Target'] + ".desc"):
+    if os.access(d['_file'] + ".info", os.F_OK):
+      if send_file(d['_file'] + ".info", d['Target'] + ".info"):
         error = d
         break
     os.unlink(d['_file'])
