@@ -76,6 +76,7 @@ def build_all(r, build_fnc):
       log.notice("building %s" % batch.spec)
       stopwatch.start()
       batch.logfile = tmp + batch.spec + ".log"
+      batch.gb_id=r.id
       batch.build_failed = build_fnc(r, batch)
       if batch.build_failed:
         log.notice("building %s FAILED" % batch.spec)
