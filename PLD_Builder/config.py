@@ -64,6 +64,7 @@ class Builder_Conf:
         self.binary_builders = string.split(get("binary_builders"))
         self.src_builder = string.strip(get("src_builder", ""))
         self.tag_prefixes = string.split(get("tag_prefixes", ""))
+        self.max_keep_time = get("max_keep_time", 168)*60*60
         self.bot_email = get("bot_email", "")
         self.control_url = get("control_url")
         self.notify_email = get("notify_email")
