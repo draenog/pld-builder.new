@@ -16,6 +16,7 @@ import gpg
 import request
 from acl import acl
 from bqueue import B_Queue
+from config import config, init_conf
 
 last_count = 0
 
@@ -71,20 +72,12 @@ def handle_reqs(builder, reqs):
   q.unlock()
 
 def main():
-  os.environ['LC_ALL'] = "C"
   lock.lock("request_fetcher")
-  
-  status.push("reading builder config")
-  p = ConfigParser.ConfigParser()
-  p.readfp(open(path.builder_conf))
-  builders = string.split(p.get("all", "builders"))
-  control_url = p.get("all", "control_url")
-  queue_signed_by = p.get("all", "queue_signed_by")
-  status.pop()
+  init_conf("")
   
   status.push("fetching requests")
-  if has_new(control_url):
-    q = fetch_queue(control_url, queue_signed_by)
+  if has_new(config.control_url):
+    q = fetch_queue(config.control_url, config.queue_signed_by)
     max_no = 0
     q_new = []
     for r in q:
@@ -92,7 +85,7 @@ def main():
         max_no = r.no
       if r.no > last_count:
         q_new.append(r)
-    for b in builders:
+    for b in config.builders:
       handle_reqs(b, q_new)
     f = open(path.last_req_no_file, "w")
     f.write("%d\n" % max_no)
