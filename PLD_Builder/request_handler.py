@@ -9,6 +9,7 @@ import gpg
 import request
 import log
 import path
+import util
 from acl import acl
 from lock import lock
 from bqueue import B_Queue
@@ -96,4 +97,4 @@ def main():
   handle_request(sys.stdin)
   sys.exit(0)
 
-main()
+util.wrap(main)

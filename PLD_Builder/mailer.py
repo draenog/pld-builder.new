@@ -4,12 +4,7 @@ import sys
 import StringIO
 
 from config import config
-
-def sendfile(src, dst):
-  while 1:
-    s = src.read(10000)
-    if s == "": break
-    dst.write(s)
+import util
 
 class Message:
   def __init__(self):
@@ -51,7 +46,7 @@ class Message:
           self.body.write("\n\n[...]\n\n")
         line += 1
     else:
-      sendfile(open(log), self.body)
+      util.sendfile(open(log), self.body)
 
   def set_std_headers(self):
     self.headers["Date"] = time.asctime()
@@ -66,7 +61,7 @@ class Message:
       f.write("%s: %s\n" % (k, v))
     f.write("\n")
     self.body.seek(0)
-    sendfile(self.body, f)
+    util.sendfile(self.body, f)
 
   def send(self):
     # FIXME
