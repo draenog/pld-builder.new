@@ -87,6 +87,7 @@ class Builder_Conf:
     self.control_url = get("control_url")
     self.builder_user = get("builder_user", "builder")
     self.sudo_chroot_wrapper = get("sudo_chroot_wrapper", "")
+    self.nice = get("nice", "0")
     
     f = get("syslog", "")
     if f != "":
