@@ -105,9 +105,9 @@ rm -rf rpm
 mkdir rpm
 cd rpm
 mkdir SPECS SOURCES SRPMS RPMS BUILD
-echo "%packager       PLD bug tracking system ( http://bugs.pld-linux.org/ )">.rpmmacros
-echo "%vendor         PLD">>.rpmmacros
-echo "%distribution   $DISTTAG">>rpmmacros
+echo "%packager       PLD bug tracking system ( http://bugs.pld-linux.org/ )">~/.rpmmacros
+echo "%vendor         PLD">>~/.rpmmacros
+echo "%distribution   $DISTTAG">>~/.rpmmacros
 EOF
   chb "sh" < install-bt
   rm install-bt
