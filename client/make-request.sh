@@ -1,12 +1,17 @@
 #!/bin/sh
 
-# FIXME: set with options
+
+if [ -f "$HOME/.requestrc" ]; then
+	. $HOME/.requestrc
+else
+	echo "Creating config file ~/.requestrc. You *must* edit it."
+	cat <<EOF >$HOME/.requestrc
 priority=2
-requester=malekith
-default_key=builder
-builder_email=srpms_builder@roke.freak
+requester=deviloper
+default_key=deviloper@pld-linux.org
+builder_email=builder-ac@pld-linux.org
 mailer="/usr/sbin/sendmail -t"
-default_builders="roke-athlon roke-i686"
+default_builders="ac-*"
 
 builders=
 specs=
@@ -17,6 +22,10 @@ flags=
 # defaults:
 build_mode=ready
 f_upgrade=yes
+
+EOF
+exit
+fi
 
 die () {
   echo "$0: $*" 1>&2
@@ -42,7 +51,7 @@ while [ $# -gt 0 ] ; do
 
     --test-build | -t )
       build_mode=test
-      f_upgrade=
+      f_upgrade=no
       ;;
 
     --ready-build | -r )
@@ -54,7 +63,7 @@ while [ $# -gt 0 ] ; do
       ;;
 
     --no-upgrade | -n )
-      f_upgrade=
+      f_upgrade=no
       ;;
 
     --flag | -f )
@@ -82,12 +91,12 @@ if [ "$builders" = "" ] ; then
   builders="$default_builders"
 fi
 
-if [ "$f_upgrade" ] ; then
+if [ "$f_upgrade" = "yes" ] ; then
   flags="$flags upgrade"
 fi
 
 if [ "$build_mode" = "test" ] ; then
-  if [ "$f_upgrade" ] ; then
+  if [ "$f_upgrade" = "yes" ] ; then
     die "--upgrade and --test-build are mutually exclusive"
   fi
   flags="$flags test-build"
