@@ -60,6 +60,7 @@ class Builder_Conf:
     self.builder = builder
 
     self.binary_builders = string.split(get("binary_builders"))
+    self.tag_prefixes = string.split(get("tag_prefixes", ""))
     self.control_url = get("control_url")
     self.notify_email = get("notify_email")
     self.admin_email = get("admin_email")
