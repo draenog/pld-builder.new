@@ -102,9 +102,9 @@ def send_cia_report(r, is_src = False):
   m.set_header("X-builder", "PLD")
 
   # get header of xml message from file
-#  f = open('cia-head.xml')
-#  m.write(f.read())
-#  f.close()
+  #f = open('cia-head.xml')
+  #m.write(f.read())
+  #f.close()
 
   # write in iteration list and status of all processed files
   for b in r.batches:
