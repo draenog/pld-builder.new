@@ -78,6 +78,9 @@ def fetch_src(r, b):
     else:
         b.log_line("fetched %d bytes, %.1f K/s" % (bytes, bytes / 1024.0 / t))
 
+def prepare_env():
+    chroot.run("test ! -f /proc/uptime && mount /proc", 'root')
+
 def build_rpm(r, b):
     status.push("building %s" % b.spec)
     b.log_line("request from: %s" % r.requester)
@@ -92,6 +95,7 @@ def build_rpm(r, b):
         b.log_line("error: installing src rpm failed")
         res = 1
     else:
+        prepare_env()
         chroot.run("install -m 700 -d %s" % tmpdir)
         rpmbuild_opt = "%s --target %s-pld-linux" % (b.bconds_string(), config.arch)
         cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb %s %s" % \
