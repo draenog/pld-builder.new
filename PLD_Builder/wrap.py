@@ -27,14 +27,14 @@ def wrap(main):
     f = os.popen("/usr/sbin/sendmail -t", "w")
     f.write("""Subject: builder failure
 To: %s
-Cc: %s
+Cc: %s, %s
 Date: %s
 X-PLD-Builder: fatal error report
 
 %s
 
 during: %s
-""" % (status.admin, status.email, \
+""" % (status.admin, status.email, status.builder_list, \
        time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()), \
        s.getvalue(), status.get()))
     f.close()

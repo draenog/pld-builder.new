@@ -53,7 +53,7 @@ class User:
 
   def message_to(self):
     m = Message()
-    m.set_headers(to = self.mail_to())
+    m.set_headers(to = self.mail_to(), cc = config.builder_list)
     return m
 
   def get_login(self):
