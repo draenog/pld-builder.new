@@ -4,12 +4,14 @@ import os
 
 from config import config
 import util
-from acl import acl
 
 class Buildlogs_Queue:
   def __init__(self):
     self.queue = []
     self.some_failed = 0
+
+  def init(self, g):
+    self.requester_email = g.requester_email
 
   def add(self, logfile, failed):
     # if /dev/null, don't even bother to store it
@@ -35,7 +37,7 @@ Builder: %s
 Time: %d
 Requester: %s
 END
-""" % (config.buildlogs_url, l['name'], config.builder, time.time(), acl.current_user_login())
+""" % (config.buildlogs_url, l['name'], config.builder, time.time(), self.requester_email)
     
     for l in self.queue:
       f = open(path.buildlogs_queue_dir + l['id'] + ".desc", "w")
@@ -43,6 +45,9 @@ END
       f.close()
 
 queue = Buildlogs_Queue()
+
+def init(r):
+  queue.init(r)
 
 def add(logfile, failed):
   "Add new buildlog with specified status."

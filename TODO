@@ -17,10 +17,6 @@
   This should be class in requester.py, with kind='command', also look for
   kind checking elsewhere in the code (grep for 'kind.*group')
 
-- store requester email in request, after checking priviliges, so rpm_builder
-  need not have all users in his acl.conf, only srpm_builder user, with priv
-  to sign queue.
-
 - make default configs reasonable
 
 - fix make-request.sh to be more user-friendly and configurable

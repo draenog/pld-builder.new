@@ -15,11 +15,11 @@ import util
 import loop
 import chroot
 import ftp
+import buildlogs
 import status
 import build
 import report
 
-from acl import acl
 from lock import lock
 from bqueue import B_Queue
 from config import config, init_conf
@@ -106,6 +106,7 @@ def handle_request(r):
   os.mkdir(path.srpms_dir + r.id)
   os.chmod(path.srpms_dir + r.id, 0755)
   ftp.init(r)
+  buildlogs.init(r)
   build.build_all(r, build_srpm)
   report.send_report(r)
   store_binary_request(r)

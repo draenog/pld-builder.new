@@ -7,7 +7,6 @@ import urllib
 
 from config import config, init_conf
 from bqueue import B_Queue
-from acl import acl
 import lock
 import util
 import loop
@@ -16,6 +15,7 @@ import status
 import log
 import chroot
 import ftp
+import buildlogs
 import notify
 import build
 import report
@@ -113,6 +113,7 @@ def build_rpm(r, b):
 
 def handle_request(r):
   ftp.init(r)
+  buildlogs.init(r)
   build.build_all(r, build_rpm)
   report.send_report(r)
   ftp.flush()

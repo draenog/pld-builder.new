@@ -50,7 +50,7 @@ class Message:
 
   def set_std_headers(self):
     self.headers["Date"] = time.asctime()
-    self.headers["Message-ID"] = "<pld-builder.%d.%d@%s>" \
+    self.headers["Message-ID"] = "<pld-builder.%f.%d@%s>" \
         % (time.time(), os.getpid(), os.uname()[1])
     self.headers["From"] = "PLD %s builder <%s>" \
         % (config.builder, config.email)

@@ -16,7 +16,7 @@ def log(p, s):
   
 def panic(s):
   log(syslog.LOG_ALERT, "PANIC: %s" % s)
-  raise "PANIC: %s" % s
+  raise "PANIC: %s" % str(s)
 
 def alert(s):
   log(syslog.LOG_ALERT, "alert: %s" % s) 

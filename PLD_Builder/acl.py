@@ -87,6 +87,8 @@ class ACL_Conf:
     return None
 
   def user(self, l):
+    if not self.users.has_key(l):
+      log.panic("no such user: %s" % l)
     return self.users[l]
 
   def set_current_user(self, u):

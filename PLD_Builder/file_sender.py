@@ -5,7 +5,6 @@ import os
 import time
 import shutil
 
-from acl import acl
 from config import config, init_conf
 import mailer
 import path
@@ -137,14 +136,12 @@ def flush_queue(dir):
     remaining = q[1:]
     
   if error != None:
-    users = {}
+    emails = {}
+    emails[config.admin_email] = 1
     for d in remaining:
       if d.has_key('Requester'):
-        r = d['Requester']
-        if r != "" and not users.has_key(r):
-          users[r] = acl.user(r)
-    e = [config.admin_email]
-    for u in users.values(): e.append(u.mail_to())
+        emails[d['Requester']] = 1
+    e = emails.keys()
     m = mailer.Message()
     m.set_headers(to = string.join(e, ", "), 
                   subject = "builder queue problem")

@@ -67,6 +67,7 @@ def handle_group(r, user):
         return
 
   r.requester = user.get_login()
+  r.requester_email = user.mail_to()
   r.time = time.time()
   log.notice("queued %s from %s" % (r.id, user.get_login()))
   q = B_Queue(path.queue_file)
