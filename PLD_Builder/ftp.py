@@ -15,9 +15,6 @@ class FTP_Queue:
   def init(self, g):
     self.queue = []
     self.requester_email = g.requester_email
-#    if "test-build" in g.flags:
-#      self.url = config.test_ftp_url
-#    else:
     self.url = config.ftp_url
     
   def add(self, file, type):

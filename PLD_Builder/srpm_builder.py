@@ -84,7 +84,7 @@ def build_srpm(r, b):
   status.push("building %s" % b.spec)
   b.src_rpm = ""
   builder_opts = "-nu --nodeps"
-  if ("test-build" in r.flags) or b.branch and b.branch.startswith(config.tag_prefixes[0]):
+  if b.branch and b.branch.startswith(config.tag_prefixes[0]):
 	  tag_test=""
   else:
 	  tag_test=" -Tp %s -tt" % (config.tag_prefixes[0],)
@@ -110,7 +110,7 @@ def build_srpm(r, b):
     res = 1
   if res == 0:
     transfer_file(r, b)
-  if res == 0 and not "test-build" in r.flags:
+  if res == 0 and:
     for pref in config.tag_prefixes:
       util.append_to(b.logfile, "tagging: %s" % pref)
       chroot.run("cd rpm/SPECS; ./builder -r %s -Tp %s -Tv %s" % \
