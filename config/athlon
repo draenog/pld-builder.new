@@ -1,0 +1,6 @@
+#!/bin/sh
+chroot_name="athlon"
+chroot_dir="/adm/chroot-athlon"
+arch="athlon"
+# default for *
+# builder_arch_pkgs=""

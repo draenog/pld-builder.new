@@ -143,8 +143,23 @@ EOF
   rm install-specs
 }
 
+install_build_tree () {
+  cat >install-bt <<EOF
+set -x
+rm -rf rpm
+mkdir rpm
+cd rpm
+mkdir SPECS SOURCES SRPMS RPMS BUILD
+EOF
+  chb "sh" < install-bt
+  rm install-bt
+}
+
 case $chroot_name in
   src* )
     install_SPECS_builder
+    ;;
+  * )
+    install_build_tree
     ;;
 esac
