@@ -139,6 +139,7 @@ def flush_queue(dir):
             if send_file(d['_file'] + ".info", d['Target'] + ".info"):
                 error = d
                 break
+            os.unlink(d['_file'] + ".info")
         os.unlink(d['_file'])
         os.unlink(d['_desc'])
         remaining = q[1:]
