@@ -23,7 +23,6 @@ def unpackaged_files(b):
 def add_pld_builder_info(b):
   l = open(b.logfile, "a")
   l.write("Begin-PLD-Builder-Info\n")
-  l.write("\n--- %s:%s:\n" % (b.spec, b.branch))
   l.write("Build-Time: %s\n\n" % b.build_time)
   st = ftp.status()
   if st != "":
@@ -37,8 +36,12 @@ def info_from_log(b, target):
   end = "End-PLD-Builder-Info\n"
   f = open(b.logfile)
   copy_mode = 0
+  need_header = 1
   for l in f.xreadlines():
     if l == beg:
+      if need_header:
+        need_header = 0
+        target.write("\n--- %s:%s:\n" % (b.spec, b.branch))
       copy_mode = 1
     elif copy_mode:
       if l == end:

@@ -39,7 +39,7 @@ load_config "$1"
 
 poldek_src () {
   if test "$1" ; then
-    echo "source = local,pri=1 $spools_dir/local-ready/"
+    echo "source = local,pri=1 $spools_dir/ready/"
   fi
   cat <<EOF
 source = main-test,noauto,pri=2 $dist_url/test/$arch/
@@ -115,7 +115,7 @@ esac
 echo "OK"
 echo "installing conf..."
 cat >poldek.conf <<EOF
-$(poldek_src)
+$(poldek_src local)
 $(common_poldek_opt)
 cachedir = $spools_dir/poldek
 keep_downloads = yes
@@ -125,6 +125,7 @@ chr "cat > /etc/poldek.conf" < poldek.conf
 chr "useradd -c 'PLD $chroot_name builder' -d /home/users/builder -m -g users -s /bin/sh builder"
 chr "cat > /etc/resolv.conf" < /etc/resolv.conf
 chr "cat > /etc/mtab" < /dev/null
+chr "mkdir /spools/ready/" < /dev/null
 
 install_SPECS_builder () {
   cat >install-specs <<EOF

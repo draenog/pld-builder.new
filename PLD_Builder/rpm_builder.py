@@ -2,6 +2,7 @@ import sys
 import os
 import atexit
 import time
+import string
 import urllib
 
 from config import config, init_conf
@@ -18,6 +19,8 @@ import ftp
 import notify
 import build
 import report
+import upgrade
+import install_br
 
 # this code is duplicated in srpm_builder, but we
 # might want to handle some cases differently here
@@ -58,27 +61,46 @@ def build_rpm(r, b):
   b.log_line("installing srpm: %s" % b.src_rpm)
   res = chroot.run("rpm -U %s" % b.src_rpm, logfile = b.logfile)
   chroot.run("rm -f %s" % b.src_rpm, logfile = b.logfile)
+  b.files = []
   if res:
     b.log_line("error: installing src rpm failed")
     res = 1
   else:
-    cmd = "install -m 700 -d $HOME/%s; cd rpm/SPECS; " \
-          "TMPDIR=$HOME/%s rpmbuild -bb %s" % \
-          (b.b_id, b.b_id, b.spec)
-    b.log_line("building RPM using: %s" % cmd)
-    res = chroot.run(cmd, logfile = b.logfile)
-    files = util.collect_files(b.logfile)
-    if len(files) > 0:
-      r.chroot_files.extend(files)
-    else:
-      # FIXME: is it error?
-      b.log_line("error: No files produced.")
+    chroot.run("install -m 700 -d $HOME/%s" % b.b_id)
+    cmd = "cd rpm/SPECS; TMPDIR=$HOME/%s rpmbuild -bb %s %s" % \
+        (b.b_id, b.bconds_string(), b.spec)
+    if install_br.install_br(r, b):
       res = 1
-    b.files = files
+    else:
+      b.log_line("building RPM using: %s" % cmd)
+      res = chroot.run(cmd, logfile = b.logfile)
+      files = util.collect_files(b.logfile)
+      if len(files) > 0:
+        r.chroot_files.extend(files)
+      else:
+        b.log_line("error: No files produced.")
+        res = 1 # FIXME: is it error?
+      b.files = files
   chroot.run("rm -rf $HOME/%s; cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
              "--clean --rmspec --rmsource %s" % \
              (b.b_id, b.spec), logfile = b.logfile)
-  
+
+  def ll(l):
+    util.append_to(b.logfile, l)
+ 
+  if b.files != []:
+    if "test-build" not in r.flags:
+      chroot.run("cp -f %s /spools/ready/; poldek --mkidxz -s /spools/ready/" % \
+                 string.join(b.files), logfile = b.logfile, user = "root")
+    else:
+      ll("test-build: not coping to /spools/ready/")
+    ll("Begin-PLD-Builder-Info")
+    if "upgrade" in r.flags:
+      upgrade.upgrade_from_batch(r, b)
+    else:
+      ll("not upgrading")
+    ll("End-PLD-Builder-Info")
+
   for f in b.files:
     local = r.tmp_dir + os.path.basename(f)
     chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
