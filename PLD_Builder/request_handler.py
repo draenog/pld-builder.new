@@ -79,6 +79,8 @@ def handle_request(f):
     log.alert(msg)
     user.notify_about_failure(msg)
 
-def go():
+def main():
   handle_request(sys.stdin)
   sys.exit(0)
+
+main()
