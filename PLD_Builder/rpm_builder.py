@@ -70,7 +70,7 @@ def build_rpm(r, b):
     rpmbuild_opt = "%s --target %s-pld-linux" % (b.bconds_string(), config.arch)
     cmd = "cd rpm/SPECS; TMPDIR=$HOME/%s rpmbuild -bb %s %s" % \
         (b.b_id, rpmbuild_opt, b.spec)
-    if install_br.install_br(r, b):
+    if ("no-install-br" not in r.flags) and install_br.install_br(r, b):
       res = 1
     else:
       b.log_line("building RPM using: %s" % cmd)
