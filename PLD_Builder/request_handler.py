@@ -3,6 +3,7 @@ import string
 import time
 import os
 import StringIO
+import sys
 
 import gpg
 import request
@@ -77,3 +78,7 @@ def handle_request(f):
                 % (user.get_login(), r.kind)
     log.alert(msg)
     user.notify_about_failure(msg)
+
+def go():
+  handle_request(sys.stdin)
+  sys.exit(0)
