@@ -1,5 +1,12 @@
 #!/bin/sh
 
+builders=
+specs=
+with=
+without=
+flags=
+command=
+command_flags=
 
 if [ -f "$HOME/.requestrc" ]; then
 	. $HOME/.requestrc
@@ -12,12 +19,6 @@ default_key=deviloper@pld-linux.org
 builder_email=builder-ac@pld-linux.org
 mailer="/usr/sbin/sendmail -t"
 default_builders="ac-*"
-
-builders=
-specs=
-with=
-without=
-flags=
 
 # defaults:
 build_mode=ready
@@ -129,7 +130,7 @@ gen_req() {
     branch=$(echo "$s" | sed -e 's|.*:||')
     echo "     <spec>$name</spec>"
     echo "     <branch>$branch</branch>"
-    echo "     <info>blah..</info>"
+    echo "     <info></info>"
     echo
     for b in $with ; do
       echo "     <with>$b</with>"
