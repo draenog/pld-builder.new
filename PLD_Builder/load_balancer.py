@@ -3,10 +3,14 @@ import os
 import time
 
 import path
+import sys
 import log
 import status
 import lock
 import wrap
+
+import rpm_builder
+
 from config import config, init_conf
 
 # return list of binary builders in fair-queue order
@@ -45,8 +49,11 @@ def builders_order():
   return bl
 
 def run_rpm_builder(b):
-  prog = path.root_dir + "bin/rpm-builder.sh"
-  os.spawnl(os.P_NOWAIT, prog, prog, b)
+  if os.fork() == 0:
+    return
+  else:
+    rpm_builder.main_for(b)
+    sys.exit(0)
 
 def main():
   init_conf("")
