@@ -77,6 +77,8 @@ class ACL_Conf:
 
   def set_current_user(self, u):
     self.current_user = u
+    if u != None:
+      status.email = u.mail_to()
 
   def current_user_login(self):
     if self.current_user != None:

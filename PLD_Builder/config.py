@@ -34,6 +34,7 @@ class Builder_Conf:
     self.queue_signed_by = get("queue_signed_by")
     self.notify_email = get("notify_email")
     self.admin_email = get("admin_email")
+    status.admin = self.admin_email
     self.email = self.admin_email
 
     if builder == "all":
