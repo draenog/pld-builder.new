@@ -2,6 +2,10 @@
 
 umask 077
 
+if [ -e "~/pld-builder/config/global" ]; then
+	. ~/pld-builder/config/global
+fi
+
 if [ "$1" != "y" ] ; then
   echo "this scripts kills current queue and installs new"
   echo "run '$0 y' to run it"
@@ -15,6 +19,9 @@ echo -n > spool/processed_ids
 echo -n > spool/got_lock
 echo '<queue/>' > spool/queue
 echo '<queue/>' > spool/req_queue
+test ! -z "$binary_builders" && for bb in $binary_builders; do
+	echo '<queue/>' > spool/queue-$bb
+done
 
 chmod 755 www www/srpms
 chmod 644 www/max_req_no
