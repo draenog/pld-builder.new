@@ -127,6 +127,7 @@ class Batch:
     self.spec = ""
     self.command = ""
     self.command_flags = []
+    self.gb_id = ""
     self.b_id = attr(e, "id")
     self.depends_on = string.split(attr(e, "depends-on"))
     for c in e.childNodes:
