@@ -19,8 +19,18 @@ class B_Queue:
     self.fd = None
 
   def dump(self, f):
+    self.requests.reverse()
     for r in self.requests:
       r.dump(f)
+    self.requests.reverse()
+  
+  def dump_html(self, f):
+    f.write("<html><head><title>PLD builder queue</title></head><body>\n")
+    self.requests.reverse()
+    for r in self.requests:
+      r.dump_html(f)
+    self.requests.reverse()
+    f.write("</body></html>\n")
   
   # read possibly compressed, signed queue
   def read_signed(self):

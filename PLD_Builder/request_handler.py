@@ -93,6 +93,8 @@ def handle_notification(r, user):
   q.requests = filter(leave_it, q.requests)
   q.write()
   q.dump(open(path.queue_stats_file, "w"))
+  q.dump_html(open(path.queue_html_stats_file, "w"))
+  os.chmod(path.queue_html_stats_file, 0644)
   os.chmod(path.queue_stats_file, 0644)
   q.unlock()
 
