@@ -1,4 +1,6 @@
 state = []
+email = ""
+admin = ""
 
 def push(s):
   state.append(s)
