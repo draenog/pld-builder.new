@@ -3,7 +3,7 @@ Instrukcja instalacji.
 1. Konta
 
 Builder potrzebuje konta na swoje potrzeby. Konto powinno byæ wspólne
-dla wszystkich builderów budj±cych pakiety binarne na danych ho¶cie,
+dla wszystkich builderów buduj±cych pakiety binarne na danych ho¶cie,
 co pozwala na lepsze wykorzystanie zasobów (hint: zmienna job_slots 
 w konfiguracji). 
 
