@@ -50,14 +50,10 @@ def info_from_log(b, target):
         target.write(l)
   
 def send_report(r, is_src = False):
-  def names(l): return map(lambda (b): b.spec, l)
-  s_failed = filter(lambda (x): x.build_failed, r.batches)
-  s_ok = filter(lambda (x): not x.build_failed, r.batches)
-  subject = ""
-  if s_failed != []:
-    subject += " ERRORS: " + string.join(names(s_failed))
-  if s_ok != []:
-    subject += " OK: " + string.join(names(s_ok))
+  subject = 'ERRORS: %s OK: %s' % ( \
+    ' '.join([b.spec for b in r.batches if b.build_failed]), \
+    ' '.join([b.spec for b in r.batches if not b.build_failed]) \
+  )
   
   m = mailer.Message()
   m.set_headers(to = r.requester_email,
