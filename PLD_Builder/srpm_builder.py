@@ -117,6 +117,7 @@ def handle_request(r):
   buildlogs.init(r)
   build.build_all(r, build_srpm)
   report.send_report(r, is_src = True)
+  report.send_cia_report(r, is_src = True)
   store_binary_request(r)
   ftp.flush()
 
