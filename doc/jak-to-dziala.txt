@@ -1,0 +1,105 @@
+1. Developer wysy³a zlecenie, z u¿yciem client/make-request.sh, na adres
+srpm buildera.
+
+2. Na koncie srpm buildera skrypt request_handler.py wo³any z procmaila obs³uguje
+   zlecenie.
+     a) sprawdza podpis gpg, wyci±ga wszystkie Good sinature from <...>
+        je¶li brak -- wypad
+     b) szuka w swoim acl.conf czy osoba z Good signature from mo¿e robiæ
+        cokolwiek, w.p.p wypad
+     c) xml-parsuje zlecenie (request.py)
+	i.   je¶li jest to <notifcation ...>, sparawdza uprawnienie
+	     notify:<builder>, i je¶li OK, to zmienia odpowiednio
+	     kolejkê spool/req_queue.  Je¶li wszystki buildery
+	     zakoñczy³y ju¿ budowanie danej grupy usuwane s± src rpmy
+	     z www/srpms/<group-id>/.  Generuje stronê ze statystykami
+	     (www/queue.html).
+	ii.  je¶li jest to <group ...> to sprawdza src:<w³asna-nazwa>, oraz 
+	     binary:<builder> dla ka¿dego buildera dla którego jest zlecenie.
+	     Je¶li OK, to wrzuca zlecenie do spool/queue
+
+3. Na koncie srpm buildera z crona chodzi skrypt srpm_builder.py.
+   a) Czyta on spool/queue, i je¶li s± tam jakie¶ zlecenia wybiera zlecenie Z
+      o najwy¿szym priorytecie, które jest najstarsze, wyci±ga je z kolejki
+      i zapisuje kolejkê.
+   b) Obs³uguje tylko <group ...>.
+   c) Buduje w chroot wszystkie pakiety z grupy, kolejkuj±c pliki w spool/ftp/
+      oraz spool/buildlogs/. Dodatkowo srpmy s± wrzucane do www/srpms/<group-id>/
+      sk±d ci±gn± je bin-buildery.
+   d) je¶li nie powiod³o siê budowanie ¿adnego pakietu to wypad
+   e) zleceniu nadawany jest numer
+   f) zlecenie jest wrzucane do spool/req_queue
+   g) kolejka jest podpisywana kluczem srpm buildera, gzipowana i wrzucana do 
+      www/queue.gz
+   h) numer zapisywany jest w www/max_req_no
+   i) generacja strony ze statystykami
+
+4. Na kontach srpm buildera i bin-builderów chodzi
+   file_sender.py. Monitoruje on kolejki spool/{buildlogs,ftp}. S± w
+   nich pliki, jak:
+
+     faa1f592-437f-446d-b1e6-ac41976c5775
+     faa1f592-437f-446d-b1e6-ac41976c5775.info
+     faa1f592-437f-446d-b1e6-ac41976c5775.desc
+
+   Plik .desc jest kontrolny dla file_sender.py. Jest w nim napisany
+   email zlecaj±cego (do alarmowania), czas skolejkowania (pliki s±
+   wysy³ane dok³adnie w kolejno¶ci wrzucania do kolejki) oraz cel (url),
+   gdzie nale¿y przes³aæ plik.
+
+   Plik .info jest tylko dla buildlogów. Je¶li taki plik istnieje to jest
+   przesy³any po przes³aniu w³a¶ciwego pliku (tego bez rozszerzenia). Jest
+   w nim zapisany status buildloga (OK|FAIL). helpers/buildlogs-mover.sh
+   u¿ywa tych plików.
+
+   Pliki .info i .desc koñcza siê s³owem END, samym w lini. Skrypty
+   nic nie robi± z nimi je¶li tam tego s³owa nie ma (transmisja nie
+   dokoñczona).
+
+   URLe wspierane jako cel to:
+   
+     rsync://user@host/modul/sci/ezka/plik
+     scp://user@host/sciezka/plik
+     /absolutna/sciezka/do/pliku
+   
+   W pliki config/rsync-passwords s± has³a do rsync, w formacie:
+
+     user@host has³o
+
+   scp dzia³a po kluczach (z ~/.ssh)
+
+5. Na koncie bin-buildera chodzi skrypt request_fetcher.py.
+   a) ¶ci±ga $control_url/max_req_no i porównuje z spool/last_req_no.
+      je¶li takie same to wypad.
+   b) ¶ci±ga $control_url/queue.gz, dekompresuje, sprawdza podpis (w
+      config/acl.conf dla podpisuj±cego u¿ytkownika musi byæ
+      "sign_queue:all") [sidenote: konto bin buildera nie potrzebuje
+      kluczy gpg innych ni¿ swój i srpm buildera, nie potrzebuje te¿
+      acl.conf pe³nego, tylko srpm_builder z sign_queue:all]
+   c) wrzuca zlecenia do spool/queue
+   d) zapisuje najwiêkszy numer zlecenia wrzuconego w spool/last_req_no.
+
+6. Na koncie bin-buildera chodzi skrypt rpm_builder.py.
+   a) sprawdzenie loadu, je¶li za wysoki to papa
+   b) lockowanie build-slot-N, gdzie N < job_slots, je¶li sie nie da
+      to papa
+   c) lockowanie building-rpm-for-<builder> (tylko jeden build w chroot
+      na raz)
+   d) Czyta on spool/queue, i je¶li s± tam jakie¶ zlecenia wybiera zlecenie Z
+      o najwy¿szym priorytecie, które jest najstarsze, wyci±ga je z kolejki
+      i zapisuje kolejkê.
+   e) buduje pakiety, wrzuca pliki do spool/{buildlogs,ftp}. Je¶li nie ma flagi
+      test-build to pakiety wrzuca te¿ do /spools/ready/ w chroot (i generuje
+      tam idx poldka)
+
+Budowanie pakietów:
+  1. ¶ci±gniêcie srpm
+  2. instalacja srpm
+  3. próba budowania (z --nobuild), wy³apanie "foo is needed by ...",
+     instalacja wszystkich takich foo. UWAGA: to nie zawsze dzia³a, np. je¶li
+     rpm wywali siê z braku pliku do %include. trzeba napisaæ osobny parser.
+  4. budowanie
+  5. je¶li nie test-build to przerzucenie pakietów do /spools/ready/
+  6. je¶li upgrade, to próba upgrejdu, wywalenie wszystkich przeszkadzaj±cych
+     pakietów, chyba, ¿e trzeba by wywaliæ poldka, lub rpm-build.
+  7. upgrade
