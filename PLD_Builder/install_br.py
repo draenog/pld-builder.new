@@ -20,7 +20,7 @@ def install_br(r, b):
     return
   br = string.join(needed.keys())
   b.log_line("installing BR: %s" % br)
-  res = chroot.run("poldek --up; poldek --unique-pkg-names -v --install %s" % br,
+  res = chroot.run("poldek --up; poldek --upa; poldek --unique-pkg-names -v --upgrade %s" % br,
              user = "root",
              logfile = b.logfile)
   if res != 0:
