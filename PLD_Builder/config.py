@@ -70,6 +70,7 @@ class Builder_Conf:
         self.notify_email = get("notify_email")
         self.admin_email = get("admin_email")
         self.builder_list = get("builder_list", "")
+        self.generate_uploadinfo = get("generate_uploadinfo", "yes")
         status.admin = self.admin_email
         status.builder_list = self.builder_list
         self.email = self.admin_email
