@@ -208,7 +208,7 @@ class Batch:
         is_ok = 0
         if s == "OK": is_ok = 1
         link_pre = "<!-- from %s --><a href=\"http://buildlogs.pld-linux.org/index.php?idx=%d&ok=%d&id=%s\">" \
-                % (path, bl_archs[b], is_ok, binascii.b2a_hex(md5.new("/ac/ppc/FAIL/kernel.bz2").digest()))
+                % (path, bl_archs[b], is_ok, binascii.b2a_hex(md5.new(path).digest()))
         link_post = "</a>"
       builders.append(link_pre + ("<font color='%s'><b>%s:%s</b></font>" % (c, b, s)) + link_post)
     f.write("%s]</small></li>\n" % string.join(builders))
