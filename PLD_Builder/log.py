@@ -9,7 +9,10 @@ do_syslog = 0
 
 def log(p, s):
   if do_syslog:
-    syslog.syslog(p, s)
+    try:
+      syslog.syslog(p, str(s))
+    except TypeError:
+      syslog.syslog(p, repr(s))
   f = open(path.log_file, "a")
   f.write("%s [%s]: %s\n" % (time.asctime(), builder, s))
   f.close()
