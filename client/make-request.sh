@@ -6,18 +6,26 @@ requester=malekith
 default_key=builder
 builder_email=srpms_builder@roke.freak
 mailer="/usr/sbin/sendmail -t"
+default_builders="roke-athlon"
 
-builders="DEF"
+builders=
 specs=
 with=
 without=
+flags=
+
+# defaults:
+build_mode=ready
+f_upgrade=yes
+
+die () {
+  echo "$0: $*" 1>&2
+  exit 1
+}
 
 while [ $# -gt 0 ] ; do
   case "$1" in
-    -b )
-      if [ "$builders" = DEF ] ; then
-        builders=
-      fi
+    --builder | -b )
       builders="$builders $2"
       shift
       ;;
@@ -31,10 +39,31 @@ while [ $# -gt 0 ] ; do
       without="$without $2"
       shift
       ;;
+
+    --test-build | -t )
+      build_mode=test
+      f_upgrade=
+      ;;
+
+    --ready-build | -r )
+      build_mode=ready
+      ;;
+
+    --upgrade | -u )
+      f_upgrade=yes
+      ;;
+
+    --no-upgrade | -n )
+      f_upgrade=
+      ;;
+
+    --flag | -f )
+      flags="$flags $2"
+      shift
+      ;;
       
     -* )
-      echo "unknown knob: $1"
-      exit 1
+      die "unknown knob: $1"
       ;;
       
     *:* )
@@ -49,14 +78,25 @@ while [ $# -gt 0 ] ; do
 done
 
 
-if [ "$builders" = DEF ] ; then
-  builders="roke-athlon"
+if [ "$builders" = "" ] ; then
+  builders="$default_builders"
+fi
+
+if [ "$f_upgrade" ] ; then
+  flags="$flags upgrade"
+fi
+
+if [ "$build_mode" = "test" ] ; then
+  if [ "$f_upgrade" ] ; then
+    die "--upgrade and --test-build are mutually exclusive"
+  fi
+  flags="$flags test-build"
 fi
 
 id=$(uuidgen)
 
 gen_req() {
-  echo "<group id='$id' no='0'>"
+  echo "<group id='$id' no='0' flags='$flags'>"
   echo "  <time>$(date +%s)</time>"
   echo "  <priority>$priority</priority>"
   echo
@@ -102,4 +142,4 @@ $(gen_req | gpg --clearsign --default-key $default_key)
 EOF
 }
 
-gen_email | $mailer
+gen_email #| $mailer
