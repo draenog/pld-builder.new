@@ -3,6 +3,7 @@ import string
 
 import path
 import log
+import status
 from mailer import Message
 from config import config
 
@@ -54,6 +55,7 @@ class User:
 
 class ACL_Conf:
   def __init__(self):
+    status.push("reading acl.conf")
     p = ConfigParser.ConfigParser()
     p.readfp(open(path.acl_conf))
     self.users = {}
@@ -62,6 +64,7 @@ class ACL_Conf:
       for e in user.emails:
         self.users[e] = user
       self.users[login] = user
+    status.pop()
   
   def user_by_email(self, ems):
     for e in ems:

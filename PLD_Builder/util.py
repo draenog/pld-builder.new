@@ -4,6 +4,9 @@ import os
 import log
 import traceback
 import StringIO
+import string
+
+import status
 
 def pkg_name(nvr):
   return re.match(r"(.+)-[^-]+-[^-]+", nvr).group(1)
@@ -26,7 +29,13 @@ def clean_tmp(dir):
   # FIXME: use python
   os.system("rm -f %s/* 2>/dev/null; rmdir %s 2>/dev/null" % (dir, dir))
 
-status = "unknown"
+def uuid():
+  f = os.popen("uuidgen 2>&1")
+  u = string.strip(f.read())
+  f.close()
+  if len(u) != 36:
+    raise "uuid: fatal, cannot generate uuid: %s" % u
+  return u
 
 def wrap(main):
   try:
@@ -37,6 +46,6 @@ def wrap(main):
       sys.exit(value)
     s = StringIO.StringIO()
     traceback.print_exc(file = s, limit = 20)
-    log.alert("fatal python exception during: %s" % status)
+    log.alert("fatal python exception during: %s" % status.get())
     log.alert(s.getvalue())
     sys.exit(1)

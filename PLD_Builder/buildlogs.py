@@ -2,6 +2,7 @@ import path
 import os
 
 from config import config
+import util
 
 class Buildlogs_Queue:
   def __init__(self):
@@ -10,20 +11,21 @@ class Buildlogs_Queue:
 
   def add(self, logfile, failed):
     name = os.path.basename(logfile) + ".bz2"
+    id = util.uuid()
     os.system("bzip2 --best --force < %s > %s" \
-                % (logfile, path.buildlogs_queue_dir + name))
-    self.queue.append({'name': name, 'failed': failed})
+                % (logfile, path.buildlogs_queue_dir + id))
+    self.queue.append({'name': name, 'id': id, 'failed': failed})
 
   def flush(self):
     def desc(l):
       if l['failed']: s = "FAIL"
       elif self.some_failed: s = "OKOF" # OK but Others Failed
       else: s = "OK"
-      return "Target: %s/%s\nBuilder: %s\nStatus: %s\nEND\n" % \
+      return "Target: %s/%s\nBuilder: %s\nStatus: %s\nStore-desc: yes\nEND\n" % \
                 (config.buildlogs_url, l['name'], config.builder, s)
     
     for l in self.queue:
-      f = open(path.buildlogs_queue_dir + l['name'] + ".desc", "w")
+      f = open(path.buildlogs_queue_dir + l['id'] + ".desc", "w")
       f.write(desc(l))
       f.close()
 
