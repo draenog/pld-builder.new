@@ -59,7 +59,7 @@ usage() {
   echo "       Executes a given command on builders"
   echo "       --cvsup"
   echo "       Updates builders infrastructure (outside chroot)"
-  echo "       --priority VALUE"
+  echo "  -p   --priority VALUE"
   echo "       sets request priority (default 2)"
   echo "  -h   --help"
   echo "       Displays this help message"
@@ -84,7 +84,7 @@ while [ $# -gt 0 ] ; do
       shift
       ;;
 
-    --priority )
+    --priority | -p )
       priority=$2
       shift
       ;;
