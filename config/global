@@ -1,6 +1,6 @@
 #!/bin/sh
 dist_url="ftp://roke.freak/dists/nest/"
-binary_builders="athlon"
+binary_builders="roke-athlon"
 
 # builder_pkgs="rpm-build poldek shadow"
 # spools_dir="/spools/"
