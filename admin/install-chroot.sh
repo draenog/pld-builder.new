@@ -30,7 +30,7 @@ default_config () {
     builder_arch_pkgs="cvs wget"
     ;;
   bin )
-    builder_arch_pkgs="tmpwatch"
+    builder_arch_pkgs="tmpwatch mount"
     ;;
   esac
 }
