@@ -52,57 +52,46 @@ def handle_request(r):
     else:
       log_line("fetched %d bytes, %.1f K/s" % (bytes, bytes / 1024.0 / t))
 
-  def build_rpm(b):
+  def build_rpm(r, b):
     global spec_log
-    spec_log = tmp + b.spec + ".log"
+    spec_log = b.logfile
     status.push("building %s" % b.spec)
+    log_line("request from: %s" % r.requester)
+    log_line("started at: %s" % time.asctime())
     fetch_src(b)
+    log_line("installing srpm: %s" % b.src_rpm)
     res = chroot.run("rpm -U %s && rm -f %s" % (b.src_rpm, b.src_rpm), 
-                     logfile = spec_log)
+                     logfile = b.logfile)
     if res:
       log_line("error: installing src rpm failed")
+      res = 1
     else:
       cmd = "cd rpm/SPECS; rpmbuild -bb %s" % b.spec
-      log_line("Building RPM using: %s" % cmd)
-      res = chroot.run(cmd, logfile = spec_log)
-      files = util.collect_files(spec_log)
+      log_line("building RPM using: %s" % cmd)
+      res = chroot.run(cmd, logfile = b.logfile)
+      files = util.collect_files(b.logfile)
       if len(files) > 0:
-        all_files.extend(files)
+        r.chroot_files.extend(files)
       else:
         # FIXME: is it error?
         log_line("error: No files produced.")
         res = 1
-    buildlogs.add(logfile = spec_log, failed = res)
+      b.files = files
+    buildlogs.add(logfile = b.logfile, failed = res)
     status.pop()
     return res
 
-  tmp = path.spool_dir + r.id + "/"
-  os.mkdir(tmp)
-  atexit.register(util.clean_tmp, tmp)
-  user = acl.user(r.requester)
-  log.notice("started processing %s" % r.id)
-  all_files = []
-  for batch in r.batches:
-    log.notice("building %s" % batch.spec)
-    if build_rpm(batch):
-      # clean up
-      log.notice("building %s failed" % batch.spec)
-      chroot.run("rm -f %s" % string.join(all_files))
-      m = user.message_to()
-      m.set_headers(subject = "Binary: %s failed" % batch.spec)
-      # FIXME: write about other specs from group
-      m.write("Building RPM failed for %s.\nAttached log:\n" % batch.spec)
-      m.append_log(spec_log)
-      m.send()
-      buildlogs.flush()
-      return
-    log.notice("building %s finished" % batch.spec)
-  for f in all_files:
-    local = tmp + os.path.basename(f)
-    chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
-    ftp.add(local)
+  r.build_all(build_rpm)
 
-  # FIXME: send notification?
+  for b in r.batches:
+    if not b.build_failed: 
+      for f in b.files:
+        local = r.tmp_dir + os.path.basename(f)
+        chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
+        ftp.add(local)
+
+  r.clean_files()
+  r.send_report()
   buildlogs.flush()
   ftp.flush()
 

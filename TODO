@@ -1,4 +1,5 @@
 - file-sender -- buildlogs, ftp queues. support for file://, scp://, rsync://
+  remember to send files in order, they were stored
 
 - load-balancer -- process got_lock, and run rpm-builder for archs in proper
   order, shorten got_lock
@@ -24,3 +25,6 @@
 - allow blocking some packages
 
 - add possibility of tagging stuff for source builder
+
+- fetch src.rpm once for all builders on this account, separate fetching 
+  src.rpms, so we can build and fetch at the same time
