@@ -23,6 +23,16 @@
 
 - add possibility of tagging stuff for source builder
 
+- jabber daemon. it should connect to jabber server and login to
+  conference room. Next open unix socket, so other scripts can write it,
+  and jabber server forwards this to conference room.
+  
+  Next step for such daemon would be to create second unix socket, where
+  scripts log what thay are doing so, we can do things like tail on
+  current buildlog.
+
+- add log.debug (log only with special options) to log.py, and use it
+
 - if magic comment found in spec: single-build -- aquire all job-slots
 
 - allow blocking some packages
