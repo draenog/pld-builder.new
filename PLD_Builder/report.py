@@ -3,6 +3,7 @@ import string
 import ftp
 import stopwatch
 import mailer
+from config import config
 
 def unpackaged_files(b):
   msg = "warning: Installed (but unpackaged) file(s) found:\n"
@@ -60,6 +61,7 @@ def send_report(r, is_src = False):
   
   m = mailer.Message()
   m.set_headers(to = r.requester_email,
+                cc = config.builder_list,
                 subject = subject[0:100])
   if is_src:
     m.set_header("Message-ID", "<%s@pld.src.builder>" % r.id)

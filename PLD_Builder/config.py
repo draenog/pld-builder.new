@@ -64,7 +64,9 @@ class Builder_Conf:
     self.control_url = get("control_url")
     self.notify_email = get("notify_email")
     self.admin_email = get("admin_email")
+    self.builder_list = get("builder_list", "")
     status.admin = self.admin_email
+    status.builder_list = self.builder_list
     self.email = self.admin_email
 
     if builder == "all":
