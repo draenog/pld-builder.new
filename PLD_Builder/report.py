@@ -60,7 +60,12 @@ def send_report(r, is_src = False):
     if s_failed: s_failed = "ERRORS: %s" % s_failed
     if s_ok: s_ok = "OK: %s" % s_ok
 
-    subject = ' '.join((s_failed, s_ok))
+    subject = ''
+
+    if is_src and 'test-build' in r.flags:
+        subject = 'TEST BUILD '
+
+    subject += ' '.join((s_failed, s_ok)).strip()
     
     m = mailer.Message()
     m.set_headers(to = r.requester_email,
