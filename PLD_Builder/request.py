@@ -188,15 +188,6 @@ class Batch:
                 (self.src_rpm, self.spec, self.branch, self.bconds_string())
         f.write("%s <small>[" % desc)
         builders = []
-        bl_archs = {
-            "th-SRPMS":0, "th-i486":1, "th-i686":2, "th-athlon":3, "th-ia64":4,
-            "th-alpha":5, "th-sparc":6, "th-ppc":7,
-            "ac-SRPMS":8, "ac-i386":9, "ac-i586":10, "ac-i686":11, "ac-athlon":12,
-            "ac-amd64":13, "ac-alpha":14, "ac-sparc":15, "ac-ppc":16,
-            "ra-i386":17, "ra-i586":18, "ra-i686":19, "ra-alpha":20,
-            "ra-sparc":21, "ra-ppc":22, "nest-i486":23, "nest-i686":24,
-            "nest-alpha":25, "nest-ppc":26
-        }
         for b in self.builders:
             s = self.builders_status[b]
             if s == "OK":
@@ -209,16 +200,18 @@ class Batch:
                 c = "black"
             link_pre = ""
             link_post = ""
-            if bl_archs.has_key(b) and (s == "OK" or s == "FAIL") and len(self.spec) > 5:
+            if (s == "OK" or s == "FAIL") and len(self.spec) > 5:
                 if self.is_command():
                     bl_name = "command"
                 else:
                     bl_name = self.spec[:len(self.spec)-5]
                 path = "/%s/%s/%s.bz2" % (b.replace('-','/'), s, bl_name)
                 is_ok = 0
-                if s == "OK": is_ok = 1
-                link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?idx=%d&ok=%d&id=%s\">" \
-                        % (bl_archs[b], is_ok, binascii.b2a_hex(md5.new(path).digest()))
+                if s == "OK":
+                    is_ok = 1
+                bld = b.split('-')
+                link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&id=%s\">" \
+                     % (bld[0], bld[1], is_ok, binascii.b2a_hex(md5.new(path).digest()))
                 link_post = "</a>"
             builders.append(link_pre + ("<font color='%s'><b>%s:%s</b></font>" %
                                         (c, b, s)) + link_post)
