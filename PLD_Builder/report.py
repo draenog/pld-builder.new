@@ -53,10 +53,10 @@ def send_report(r, is_src = False):
   s_failed = ' '.join([b.spec for b in r.batches if b.build_failed])
   s_ok = ' '.join([b.spec for b in r.batches if not b.build_failed])
 
-  if s_failed: s_failed = "ERRORS: %s " % s_failed
+  if s_failed: s_failed = "ERRORS: %s" % s_failed
   if s_ok: s_ok = "OK: %s" % s_ok
 
-  subject = '%s%s' % (s_failed, s_ok)
+  subject = ' '.join((s_failed, s_ok))
   
   m = mailer.Message()
   m.set_headers(to = r.requester_email,
