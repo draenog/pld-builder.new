@@ -14,13 +14,17 @@ class FTP_Queue:
         self.some_failed = 0
         self.status = ""
 
-    def init(self, g):
+    def init(self, g=None, rpmqa=False):
         self.queue = []
-        self.requester_email = g.requester_email
-        if "test-build" in g.flags:
-            self.url = config.test_ftp_url
+        if rpmqa:
+            self.requester_email = config.admin_email
+            self.url = config.rpmqa_url
         else:
-            self.url = config.ftp_url
+            self.requester_email = g.requester_email
+            if "test-build" in g.flags:
+                self.url = config.test_ftp_url
+            else:
+                self.url = config.ftp_url
         
     def add(self, file, type):
         # if /dev/null, say bye bye
@@ -63,8 +67,8 @@ def flush():
 def kill():
     queue.kill()
 
-def init(r):
-    queue.init(r)
+def init(r=None, rpmqa=False):
+    queue.init(r, rpmqa)
 
 def status():
     return queue.status
