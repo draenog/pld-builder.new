@@ -10,7 +10,7 @@ Variables:
   chroot_dir=/path/to/chroot 		 (required)
   dist_url=ftp://ftp.nest.pld-linux.org/ (required)
   arch=i386 				 (required)
-  cvs_root=:pserver:<user>:<pass>@<host>:<cvsroot>
+  cvs_root=:pserver:<user>@<host>:<cvsroot>
   					 (required in src builder)
   builder_uid=2000 			 (optional, uid of builder user 
   					  in chroot)
@@ -112,7 +112,7 @@ cat install-$chroot_name.sh
 echo 
 cat <<EOF
 what to do?
-  r) run already run the script, 
+  r) the script was already ran; continue,
   s) run it using sudo, 
   a) abort"
 EOF
