@@ -47,22 +47,33 @@ def copy_file(src, target):
     problem = "cannot copy file: %s" % format_exception_only(exctype, value)
     return 1
 
-def rsync_file(src, user, password, host, path):
+def rsync_file(src, target, host):
   global problem
-  # FIXME: use --password-file?
-  f = os.popen("RSYNC_PASSWORD='%s' rsync --verbose --archive %s %s@%s::%s 2>&1 < /dev/null" \
-                % (password, src, user, host, path))
+  p = open(path.rsync_password_file, "r")
+  password = None
+  for l in p.xreadlines():
+    l = string.split(l)
+    if len(l) >= 2 and l[0] == host:
+      password = l[1]
+  p.close()
+  rsync = "rsync --verbose --archive"
+  if password != None:
+    p = open(".rsync.pass", "w")
+    os.chmod(".rsync.pass", 0600)
+    p.write("%s\n" % password)
+    p.close()
+    rsync += " --password-file .rsync.pass"
+  f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
   problem = f.read()
+  res = f.close()
+  if password != None: os.unlink(".rsync.pass")
   return f.close()
   
 def send_file(src, target):
   log.notice("sending %s" % target)
-  m = re.match('rsync://([^@:]+):([^@]+)@([^/:]+)(:|/)(.*)', target)
+  m = re.match('rsync://([^/]+)/.*', target)
   if m:
-    return rsync_file(src, user = m.group(1), 
-                           password = m.group(2), 
-                           host = m.group(3),
-                           path = m.group(5))
+    return rsync_file(src, target, host = m.group(1))
   if target != "" and target[0] == '/':
     return copy_file(src, target)
   m = re.match('scp://([^@:]+@[^/:]+)(:|)(.*)', target)
@@ -102,6 +113,7 @@ def maybe_flush_queue(dir):
 
 def flush_queue(dir):
   q = []
+  os.chdir(dir)
   for f in glob.glob(dir + "/*.desc"):
     d = read_name_val(f)
     if d != None: q.append(d)

@@ -8,6 +8,7 @@ www_dir = root_dir + "www/"
 
 acl_conf = conf_dir + "acl.conf"
 builder_conf = conf_dir + "builder.conf"
+rsync_password_file = conf_dir + "rsync-passwords"
 
 # spool/
 queue_file = spool_dir + "queue"
