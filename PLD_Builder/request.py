@@ -187,10 +187,13 @@ class Batch:
     f.write("%s <small>[" % desc)
     builders = []
     bl_archs = {
-      "ac-SRPMS":0, "ac-i386":1, "ac-i586":2, "ac-i686":3, "ac-athlon":4, "ac-amd64":5,
-      "ac-alpha":6, "ac-sparc":7, "ac-ppc":8, "ra-i386":9, "ra-i586":10, "ra-i686":11,
-      "ra-alpha":12, "ra-sparc":13, "ra-ppc":14, "nest-i386":15, "nest-i586":16, "nest-i686":17,
-      "nest-athlon":18, "nest-alpha":19, "nest-ppc":20
+      "th-SRPMS":0, "th-i486":1, "th-i686":2, "th-athlon":3, "th-ia64":4,
+      "th-alpha":5, "th-sparc":6, "th-ppc":7,
+      "ac-SRPMS":8, "ac-i386":9, "ac-i586":10, "ac-i686":11, "ac-athlon":12,
+      "ac-amd64":13, "ac-alpha":14, "ac-sparc":15, "ac-ppc":16,
+      "ra-i386":17, "ra-i586":18, "ra-i686":19, "ra-alpha":20,
+      "ra-sparc":21, "ra-ppc":22, "nest-i486":23, "nest-i686":24,
+      "nest-alpha":25, "nest-ppc":26
     }
     for b in self.builders:
       s = self.builders_status[b]
