@@ -1,12 +1,13 @@
 #!/bin/sh
 DIST=ac
 ARCH_LIST="somearch1 somearch2"
-FTP_HOST="fpldac@ep09.pub.kernel.pl"
+FTP_HOST="fpldac@ep09.pld-linux.org"
 FTP_PATH="/home/ftp/pub/Linux/PLD/dists/${DIST}/.stat/builder/ac/"
+CHROOT="~/chroots/chroot-$arch"
 
 for arch in ${ARCH_LIST} ; do
 	file=`mktemp /tmp/rpmqa-XXXXXX`
-	sudo chroot ~/chroots/chroot-$arch /bin/su - builder bin/rpmqa-chroot > $file
+	sudo chroot $CHROOT /bin/su - builder bin/rpmqa-chroot > $file
 	chmod 644 $file
 	scp -B -p $file ${FTP_HOST}:${FTP_PATH}/rpmqa-$arch.txt
 	rm -f $file
