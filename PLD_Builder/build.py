@@ -36,7 +36,7 @@ def run_command(batch):
 def build_all(r, build_fnc):
     status.email = r.requester_email
     notify.begin(r)
-    tmp = path.spool_dir + util.uuid() + "/"
+    tmp = path.build_dir + util.uuid() + "/"
     r.tmp_dir = tmp
     os.mkdir(tmp)
     atexit.register(util.clean_tmp, tmp)
