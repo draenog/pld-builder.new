@@ -57,7 +57,7 @@ def handle_group(r, user):
     return
 
   for batch in r.batches:
-    batch.expand_builders()
+    batch.expand_builders(config.binary_builders)
     if config.builder in batch.builders:
       batch.builders.remove(config.builder)
     for bld in batch.builders:

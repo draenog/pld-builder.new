@@ -1,7 +1,8 @@
 from xml.dom.minidom import *
 import string
 import time
-import xml.sax.saxutils 
+import xml.sax.saxutils
+import fnmatch
 
 import util
 import log
@@ -215,11 +216,8 @@ class Batch:
     if self.logfile != None:
       util.append_to(self.logfile, l)
 
-  def expand_builders(batch):
+  def expand_builders(batch, all_builders):
     all = []
-    all_builders = config.binary_builders
-    if config.builder not in all_builders:
-      all_builders.append(config.builder)
     for bld in batch.builders:
       res = []
       for my_bld in all_builders:
