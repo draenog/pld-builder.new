@@ -51,22 +51,23 @@ def handle_group(r, user):
   if check_double_id(r.id):
     return
     
-  if not user.can_do("src", config.builder):
-    fail_mail("user %s is not allowed to src:%s" \
-                % (user.get_login(), config.builder))
-    return
-
-  if not "test-build" in r.flags and not user.can_do("ready", config.builder):
-    fail_mail("user %s is not allowed to build to ready (ready:%s)" \
-                % (user.get_login(), config.builder))
-    return
-
-  if "upgrade" in r.flags and not user.can_do("upgrade", config.builder):
-    fail_mail("user %s is not allowed to upgrade:%s" \
-                % (user.get_login(), config.builder))
-    return
 
   for batch in r.batches:
+    if not user.can_do("src", config.builder, batch.branch):
+      fail_mail("user %s is not allowed to src:%s:%s" \
+                  % (user.get_login(), config.builder, batch.branch))
+      return
+
+    if not "test-build" in r.flags and not user.can_do("ready", config.builder, batch.branch):
+      fail_mail("user %s is not allowed to build to ready (ready:%s:%s)" \
+                  % (user.get_login(), config.builder, batch.branch))
+      return
+
+    if "upgrade" in r.flags and not user.can_do("upgrade", config.builder, batch.branch):
+      fail_mail("user %s is not allowed to upgrade:%s:%s" \
+                  % (user.get_login(), config.builder, batch.branch))
+      return
+
     batch.expand_builders(config.binary_builders)
     if not batch.is_command() and config.builder in batch.builders:
       batch.builders.remove(config.builder)
@@ -81,13 +82,13 @@ def handle_group(r, user):
           fail_mail("user %s is not allowed to command:%s" \
                         % (user.get_login(), bld))
           return
-      elif not user.can_do("binary", bld):
+      elif not user.can_do("binary", bld, batch.branch):
         pkg = batch.spec
         if pkg.endswith(".spec"):
           pkg = pkg[:-5]
-        if not user.can_do("binary-" + pkg, bld):
-          fail_mail("user %s is not allowed to binary-%s:%s" \
-                        % (user.get_login(), pkg, bld))
+        if not user.can_do("binary-" + pkg, bld, batch.branch):
+          fail_mail("user %s is not allowed to binary-%s:%s:%s" \
+                        % (user.get_login(), pkg, bld, batch.branch))
           return
   
   r.priority = user.check_priority(r.priority,config.builder)

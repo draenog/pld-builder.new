@@ -29,15 +29,20 @@ class User:
     if p.has_option(login, "privs"):
       for p in string.split(p.get(login, "privs")):
         l = string.split(p, ":")
-        if len(l) != 2 or l[0] == "" or l[1] == "":
+        if len(l) not in (2,3) or l[0] == "" or l[1] == "":
           log.panic("acl: invalid priv format: '%s' [%s]" % (p, login))
+        elif len(l) == 2:
+          p+=":*"
         else:
           self.privs.append(p)
     else:
       log.panic("acl: [%s] has no privs" % login)
 
-  def can_do(self, what, where):
-    action = "%s:%s" % (what, where)
+  def can_do(self, what, where, branch=None):
+    if branch:
+        action = "%s:%s:%s" % (what, where, branch)
+    else:
+        action = "%s:%s:N-A" % (what, where)
     for priv in self.privs:
       if priv[0] == "!":
         ret = 0
