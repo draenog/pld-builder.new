@@ -13,7 +13,7 @@ from acl import acl
 from lock import lock
 from bqueue import B_Queue
 
-import chroot # needs to be fixed
+import chroot
 
 def pick_request(q):
   def mycmp(r1, r2):
@@ -29,25 +29,60 @@ def pick_request(q):
   q.batches = q.batches[1:]
   return ret
 
+def collect_files(log):
+  f = open(log)
+  rx = re.compile(r"^Wrote: (/home.*\.rpm)$")
+  files = []
+  for l in f.xreadlines():
+    m = rx.search(l)
+    if m:
+      files.append(m.group(1))
+  return files
 
+def append_to(log, msg)
+  f = open(log, "a")
+  f.write("%s\n" % msg)
+  f.close()
+  
 def handle_request(r):
   def build_srpm(b):
-    builder_opts = "-nu --clean"
-    f = chroot.popen("cd rpm/SPECS; ./builder %s -bs %s -r %s %s 2>&1" % \
-                 (build_opts, b.bconds_string(), b.branch, b.spec))
-    log = StringIO.StringIO()
-    log.write(f.read())
-    res = f.close()
-    log.seek(0)
-    files = []
-    for l in log.readlines():
-      re.search(r"^Wrote: (/home.*\.rpm)")
-      #finish me
+    b.src_rpm = ""
+    builder_opts = "-nu --clean --nodeps"
+    cmd = "cd rpm/SPECS; ./builder %s -bs %s -r %s %s 2>&1" % \
+                 (build_opts, b.bconds_string(), b.branch, b.spec)
+    res = chroot.run(cmd, logfile = log)
+    files = collect_files(log)
+    if len(files) > 0:
+      if len(files) > 1:
+        append_to(log, "error: More then one file produced."
+        res = 1
+      b.src_rpm = files[len(files) - 1]
+      all_files.extend(files)
+    else:
+      append_to(log, "error: No files produced."
+      res = 1
+    return res
 
-
+  tmp = spool_dir + r.id
+  mkdir(tmp)
+  log = tmp + "log"
   user = acl.user(r.requester)
   log.notice("started processing %s" % r.id)
-  os.mkdir(path.srpms_dir + r.id)
+  all_files = []
+  for batch in r.batches:
+    if build_srpm(batch):
+      # clean up
+      chroot.run("rm -f %s" % string.join(all_files))
+      user.notify_about_failure()
+      break
+  if oops:
+  else:
+    os.mkdir(path.srpms_dir + r.id)
+    for f in files:
+      # export files from chroot
+      rpm = 
+      local = path.srpms_dir + r.id + "/" + os.path.basename(f)
+      chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
   
 def main():
   lock("building-srpm")
