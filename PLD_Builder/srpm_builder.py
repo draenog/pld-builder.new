@@ -41,6 +41,7 @@ def pick_request(q):
 def send_files(r):
   os.mkdir(path.srpms_dir + r.id)
   os.chmod(path.srpms_dir + r.id, 0755)
+  ftp.init(r)
   for batch in r.batches:
     if batch.build_failed: continue
     # export files from chroot
