@@ -2,6 +2,14 @@
 
 umask 077
 
+if [ -d "$HOME/pld-builder.new/" ]; then
+	cd "$HOME/pld-builder.new/"
+else
+	echo "the '$HOME/pld-builder.new/' directory does not exist"
+	exit 1
+fi
+
+
 if [ -f "$HOME/pld-builder.new/config/global" ]; then
 	. $HOME/pld-builder.new/config/global
 fi
