@@ -93,6 +93,15 @@ if [ "$build_mode" = "test" ] ; then
   flags="$flags test-build"
 fi
 
+ok=
+for s in $specs ; do
+  ok=1
+done
+
+if [ "$ok" = "" ] ; then
+  die "no specs passed"
+fi
+
 id=$(uuidgen)
 
 gen_req() {
