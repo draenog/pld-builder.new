@@ -121,9 +121,12 @@ def build_rpm(r, b):
         util.append_to(b.logfile, l)
  
     if b.files != []:
-        chroot.run("cp -f %s /spools/ready/; poldek --nodiff --mkidxz " \
+        if "test-build" not in r.flags:
+            chroot.run("cp -f %s /spools/ready/; poldek --nodiff --mkidxz " \
                      "-s /spools/ready/" % \
                      string.join(b.files), logfile = b.logfile, user = "root")
+        else:
+            ll("test-build: not copying to /spools/ready/")
         ll("Begin-PLD-Builder-Info")
         if "upgrade" in r.flags:
             upgrade.upgrade_from_batch(r, b)

@@ -60,6 +60,10 @@ def handle_group(r, user):
                         % (user.get_login(), config.builder, batch.branch))
             return
 
+        if 'test-build' in r.flags and 'upgrade' in r.flags:
+            fail_mail("it's forbidden to upgrade from a test build")
+            return
+
         if "upgrade" in r.flags and not user.can_do("upgrade", config.builder, batch.branch):
             fail_mail("user %s is not allowed to upgrade:%s:%s" \
                         % (user.get_login(), config.builder, batch.branch))
