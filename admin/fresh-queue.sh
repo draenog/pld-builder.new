@@ -2,8 +2,8 @@
 
 umask 077
 
-if [ -e "~/pld-builder/config/global" ]; then
-	. ~/pld-builder/config/global
+if [ -f "$HOME/pld-builder.new/config/global" ]; then
+	. $HOME/pld-builder.new/config/global
 fi
 
 if [ "$1" != "y" ] ; then
