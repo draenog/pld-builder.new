@@ -31,8 +31,7 @@ def attr(e, a, default = None):
   except:
     if default != None:
       return default
-    # get the same exception
-    return e.attributes[a].value
+    raise
 
 def escape(s):
   return xml.sax.saxutils.escape(s)

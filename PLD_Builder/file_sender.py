@@ -9,9 +9,10 @@ from acl import acl
 from config import config, init_conf
 import mailer
 import path
-import wrap
 import log
+import loop
 import status
+import lock
 
 retries_times = [5 * 60, 15 * 60, 60 * 60, 2 * 60 * 60, 5 * 60 * 60]
 
@@ -158,9 +159,11 @@ def flush_queue(dir):
 problem = ""
 
 def main():
+  if lock.lock("sending-files", non_block = 1) == None:
+    return
   init_conf("")
   maybe_flush_queue(path.buildlogs_queue_dir)
   maybe_flush_queue(path.ftp_queue_dir)
 
 if __name__ == '__main__':
-  wrap.wrap(main)
+  loop.run_loop(main)

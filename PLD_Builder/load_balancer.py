@@ -7,7 +7,7 @@ import sys
 import log
 import status
 import lock
-import wrap
+import loop
 
 import rpm_builder
 
@@ -68,4 +68,4 @@ def main():
     pass
 
 if __name__ == '__main__':
-  wrap.wrap(main)
+  loop.run_loop(main)
