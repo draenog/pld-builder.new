@@ -75,6 +75,7 @@ class ACL_Conf:
     return None
 
   def user(self, l):
+    self.current_user = self.users[l]
     return self.users[l]
 
 acl = ACL_Conf()

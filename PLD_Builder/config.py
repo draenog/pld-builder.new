@@ -27,6 +27,7 @@ class Builder_Conf:
     self.builders = string.split(get("builders"))
     self.control_url = get("control_url")
     self.queue_signed_by = get("queue_signed_by")
+    self.admin_email = get("admin_email")
 
     if builder == "all":
       return
