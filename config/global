@@ -1,0 +1,5 @@
+#!/bin/sh
+dist_url="ftp://roke.freak/dists/nest/"
+# builder_pkgs="rpm-build poldek shadow"
+# spools_dir="/spools/"
+# builder_uid=2000
