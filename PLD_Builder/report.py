@@ -62,8 +62,11 @@ def send_report(r, is_src = False):
 
     subject = ''
 
-    if is_src and 'test-build' in r.flags:
+    if 'test-build' in r.flags:
         subject = 'TEST BUILD '
+
+    if 'upgrade' in r.flags and not f.upgraded:
+        subject = 'UPGRADE FAILED '
 
     subject += ' '.join((s_failed, s_ok)).strip()
     
