@@ -136,7 +136,8 @@ class Batch:
         self.src_rpm = text(c)
       elif c.nodeName == "spec":
         self.spec = text(c)
-      elif c.nodeName == "command"
+      elif c.nodeName == "command":
+        self.spec = "COMMAND"
         self.command = text(c)
         self.command_flags = string.split(attr(c, "flags", ""))
       elif c.nodeName == "info":
@@ -178,7 +179,7 @@ class Batch:
     f.write("<li>\n")
     if self.is_command():
       desc = "SH: %s [%s]" % (self.command, ' '.join(self.command_flags))
-    else
+    else:
       desc = "%s (%s -R %s %s)" % \
         (self.src_rpm, self.spec, self.branch, self.bconds_string())
     f.write("%s <small>[" % desc)

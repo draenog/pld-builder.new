@@ -62,7 +62,7 @@ def handle_group(r, user):
       batch.builders.remove(config.builder)
     for bld in batch.builders:
       batch.builders_status[bld] = '?'
-      if bld not in config.binary_builders:
+      if bld not in config.binary_builders and bld != config.builder:
         fail_mail("I (src rpm builder '%s') do not handle binary builder '%s', only '%s'" % \
                         (config.builder, bld, string.join(config.binary_builders)))
         return

@@ -81,7 +81,7 @@ def send_report(r, is_src = False):
       info_from_log(b, m)
 
   for b in r.batches:
-    if b.build_failed and b.logfile != None:
+    if (b.is_command () or b.build_failed) and b.logfile != None:
       m.write("\n\n*** buildlog for %s\n" % b.spec)
       m.append_log(b.logfile)
       m.write("\n\n")
