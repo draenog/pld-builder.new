@@ -5,6 +5,7 @@ import path
 import os
 import time
 import util
+import chroot
 
 def clean_dir(path, max):
     curtime=time.time()
@@ -19,12 +20,25 @@ def handle_src():
     clean_dir(path.www_dir+'srpms', 2592000) # a month
 
 def handle_bin():
-    pass
+    f=chroot.popen("""ls -l --time-style +%s /spools/ready""", 'root')
+    rmpkgs=[]
+    curtime=time.time()
+    for i in f:
+        if i[-4:-1]!='rpm':
+            continue
+        tmp=i.split()
+        mtime=int(tmp[5])
+        pkgname=tmp[6]
+        if curtime - mtime > config.max_keep_time:
+            rmpkgs.append(pkgname)
+    if rmpkgs:
+        print ' '.join(rmpkgs)
+    f.close()
 
 if __name__ == '__main__':
     init_conf()
     bb=config.binary_builders[:]
-    clean_dir(path.spool_dir+'builds', config.max_keep_time)
+    clean_dir(path.spool_dir+'builds', 2592000) # a month
     if config.src_builder:
         try:
             init_conf(config.src_builder)
