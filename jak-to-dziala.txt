@@ -14,9 +14,10 @@ srpm buildera.
            zakoñczy³y ju¿ budowanie danej grupy usuwane s± src rpmy
            z www/srpms/<group-id>/.  Generuje stronê ze statystykami
            (www/queue.html).
-      ii.  je¶li jest to <group ...> to sprawdza src:<w³asna-nazwa>, oraz 
-           binary:<builder> dla ka¿dego buildera dla którego jest zlecenie.
-           Je¶li OK, to wrzuca zlecenie do spool/queue
+      ii.  je¶li jest to <group ...> to sprawdza czy u¿ytkownik,
+           który wys³a³ zlecenie ma uprawnienia src:<nazwa-src-buildera>,
+           oraz binary:<builder> dla ka¿dego buildera dla którego jest
+           zlecenie.  Je¶li OK, to wrzuca zlecenie do spool/queue
 
 3. Na koncie srpm buildera z crona chodzi skrypt srpm_builder.py.
    a) Czyta on spool/queue, i je¶li s± tam jakie¶ zlecenia wybiera zlecenie Z
