@@ -14,3 +14,7 @@ def warn(s):
  
 def notice(s):
   log("notice: %s" % s) 
+
+def panic(s):
+  log("PANIC: %s" % s)
+  raise "PANIC: %s" % s

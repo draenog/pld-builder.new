@@ -26,6 +26,7 @@ class User:
       log.alert("acl: [%s] has no privs" % login)
 
   def can_do(self, what, where):
+    # TODO: use fnmatch
     for (pwhat, pwhere) in self.privs:
       if pwhat[0] == "!":
         ret = 0
