@@ -112,9 +112,9 @@ def send_cia_report(r, is_src = False):
     # Instead of hardcoded Ac information use some config variable
     m.write('<package name="%s" arch="%s">\n' % (b.spec, b.branch))
     if b.build_failed:
-	    m.write('<success/>\n')
-    else:
 	    m.write('<failed/>\n')
+    else:
+	    m.write('<success/>\n')
     m.write('</package>\n')
 
   # get footer of xml message from file
