@@ -1,4 +1,5 @@
 import string
+import path
 
 import ftp
 import stopwatch
@@ -101,6 +102,10 @@ def send_cia_report(r, is_src = False):
   m.set_header("X-mailer", "$Id$")
   m.set_header("X-builder", "PLD")
 
+  # get header of xml message from file
+  f = open(path.root + 'PLD_Builder/cia-head.xml')
+  m.write(f.read())
+  f.close()
 
   # write in iteration list and status of all processed files
   for b in r.batches:
@@ -112,6 +117,10 @@ def send_cia_report(r, is_src = False):
 	    m.write('<failed/>\n')
     m.write('</package>\n')
 
+  # get footer of xml message from file
+  f.open(path.root + 'PLD_Builder/cia-foot.xml')
+  m.write(f.read())
+  f.close()
 	    
   # send the e-mail
   m.send()
