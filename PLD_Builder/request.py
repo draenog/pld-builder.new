@@ -83,6 +83,7 @@ class Group:
     f.write("  time: %s\n" % time.asctime(time.localtime(self.time)))
     for b in self.batches:
       b.dump(f)
+    f.write("\n")
 
   def write_to(self, f):
     f.write("""
