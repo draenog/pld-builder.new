@@ -23,13 +23,18 @@ class Builder_Conf:
       else:
         log.panic("cannot find %s::%s" % (builder, o))
         
+    if builder == "src":
+      self.builder = get("src_builder", builder)
+    else
+      self.builder = builder
+
     p.readfp(open(path.builder_conf))
     self.builders = string.split(get("builders"))
     self.control_url = get("control_url")
     self.queue_signed_by = get("queue_signed_by")
+    self.notify_email = get("notify_email")
     self.admin_email = get("admin_email")
     self.email = self.admin_email
-    self.builder = builder
 
     if builder == "all":
       return
@@ -54,4 +59,5 @@ def init_conf(builder):
   log.builder = builder
   if builder == "": builder = "all"
   config.read(builder)
+  log.builder = config.builder
   status.pop()

@@ -15,6 +15,7 @@ import log
 import chroot
 import ftp
 import buildlogs
+import notify
 
 # this code is duplicated in srpm_builder, but we
 # might want to handle some cases differently here
@@ -97,6 +98,7 @@ def handle_request(r):
   r.send_report()
   buildlogs.flush()
   ftp.flush()
+  notify.send()
 
 def check_load():
   try:

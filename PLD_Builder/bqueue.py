@@ -15,6 +15,10 @@ class B_Queue:
     self.name = filename
     self.requests = []
     self.fd = None
+
+  def dump(self, f):
+    for r in self.requests:
+      r.dump(f)
   
   # read possibly compressed, signed queue
   def read_signed(self):

@@ -71,6 +71,25 @@ def handle_group(r, user):
   q.write()
   q.unlock()
 
+def handle_notification(r, user):
+  if not user.can_do("notify", r.builder):
+    log.alert("user %s is not allowed to notify:%s" % (user.login, r.builder))
+  q = B_Queue(path.req_queue_file)
+  q.lock(0)
+  q.read()
+  not_fin = filter(lambda (r): not r.is_done(), q.requests)
+  r.apply_to(q)
+  for r in not_fin:
+    if r.is_done():
+      clean_tmp(path.srpms_dir + r.id)
+  now = time.time()
+  def leave_it(r):
+    return not r.is_done() or r.time + 4 * 24 * 60 * 60 > now
+  q.requests = filter(leave_it, q.requests)
+  q.write()
+  q.dump(open(path.queue_stats_file, "w"))
+  q.unlock()
+
 def handle_request(f):
   sio = StringIO.StringIO()
   util.sendfile(f, sio)
@@ -85,6 +104,8 @@ def handle_request(f):
   r = request.parse_request(body)
   if r.kind == 'group':
     handle_group(r, user)
+  elif r.kind == 'notification':
+    handle_notification(r, user)
   else:
     msg = "%s: don't know how to handle requests of this kind '%s'" \
                 % (user.get_login(), r.kind)

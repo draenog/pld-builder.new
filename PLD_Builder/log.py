@@ -1,9 +1,14 @@
 import sys
+import time
+
+import path
 
 builder = ""
 
 def log(s):
-  sys.stderr.write("LOG[%s]: %s\n" % (builder, s))
+  f = open(path.log_file, "a")
+  f.stderr.write("%s [%s]: %s\n" % (time.asctime(), builder, s))
+  f.close()
   
 def alert(s):
   log("alert: %s" % s) 
