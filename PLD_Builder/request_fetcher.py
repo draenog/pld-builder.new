@@ -35,7 +35,7 @@ def has_new(control_url):
   f.close()
   return res
 
-def fetch_queue(control_url, queue_signed_by):
+def fetch_queue(control_url):
   f = urllib.urlopen(control_url + "/queue.gz")
   sio = StringIO.StringIO()
   util.sendfile(f, sio)
@@ -47,9 +47,8 @@ def fetch_queue(control_url, queue_signed_by):
   if u == None:
     log.alert("queue.gz not signed with signature of valid user: %s" % signers)
     sys.exit(1)
-  if u.login != queue_signed_by:
-    log.alert("queue.gz should be signed by %s not by %s" \
-        % (queue_signed_by, u.login))
+  if not u.can_do("sign_queue", "all"):
+    log.alert("user %s is not allowed to sign my queue" % u.login)
     sys.exit(1)
   body.seek(0)
   return request.parse_requests(body)
@@ -80,7 +79,7 @@ def main():
   
   status.push("fetching requests")
   if has_new(config.control_url):
-    q = fetch_queue(config.control_url, config.queue_signed_by)
+    q = fetch_queue(config.control_url)
     max_no = 0
     q_new = []
     for r in q:

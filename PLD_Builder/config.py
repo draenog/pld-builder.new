@@ -61,7 +61,6 @@ class Builder_Conf:
 
     self.binary_builders = string.split(get("binary_builders"))
     self.control_url = get("control_url")
-    self.queue_signed_by = get("queue_signed_by")
     self.notify_email = get("notify_email")
     self.admin_email = get("admin_email")
     status.admin = self.admin_email
