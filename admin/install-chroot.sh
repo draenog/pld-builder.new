@@ -59,11 +59,11 @@ poldek_src () {
     echo "source = local,pri=1 /spools/ready/"
   fi
   cat <<EOF
-source = main-test,noauto,pri=2 $dist_url/test/$arch/
-source = main-ready,pri=3 $dist_url/ready/$arch/
-source = main-ug,pri=4 $dist_url/updates/general/$arch/
-source = main-us,pri=5 $dist_url/updates/security/$arch/
-source = main,pri=6 $dist_url/PLD/$arch/PLD/RPMS/
+source = main-test,noauto,pri=2 $dist_url/dists/ac/test/$arch/
+source = main-ready,pri=3 $dist_url/dists/ac/ready/$arch/
+source = main-ug,pri=4 $dist_url/dists/ac/updates/general/$arch/
+source = main-us,pri=5 $dist_url/dists/ac/updates/security/$arch/
+source = main,pri=6 $dist_url/dists/ac/PLD/$arch/PLD/RPMS/
 EOF
 }
 
