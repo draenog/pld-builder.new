@@ -1,45 +1,62 @@
 #!/bin/sh
 
-# ------------------ functions
-conf_dir="$HOME/pld-builder.new/config"
-
 die () {
   echo "$0: $*" 1>&2
+  cat 1>&2 <<EOF
+USAGE: $0 name1=val2 name2=val2 ...
+
+Variables:
+  chroot_type=src or chroot_type=bin 	 (required)
+  chroot_dir=/path/to/chroot 		 (required)
+  dist_url=ftp://ftp.nest.pld-linux.org/ (required)
+  arch=i386 				 (required)
+  cvs_root=:pserver:<user>:<pass>@<host>:<cvsroot>
+  					 (required in src builder)
+  builder_uid=2000 			 (optional, uid of builder user 
+  					  in chroot)
+EOF
   exit 1
 }
 
 default_config () {
-  builder_pkgs="rpm-build poldek shadow net-tools"
-  spools_dir="/spools/"
+  builder_pkgs="rpm-build poldek shadow net-tools which"
   builder_uid=2000
 
-  case "$1" in
-  src* )
+  case "$chroot_type" in
+  src )
     builder_arch_pkgs="cvs wget rpm-perlprov rpm-php-pearprov rpm-pythonprov"
+    ;;
+  bin )
+    builder_arch_pkgs=""
     ;;
   esac
 }
 
-load_config () {
-  test -d $conf_dir || die "cannot find $conf_dir"
-  test "$1" = "" && die "USAGE: $0 chroot-name"
-  test -f $conf_dir/global || die "no global conf ($conf_dir/global)"
-  test -f $conf_dir/$1 || die "no local conf ($conf_dir/$1)"
+check_conf () {
+  test "$chroot_dir" || die "no chroot_dir"
+  test "$arch" || die "no arch"
+  test "$dist_url" || die "no dist_url"
   
-  default_config "$1"
-
-  . $conf_dir/global
-  . $conf_dir/$1
-
-  test "$chroot_name" != "$1" && die "config is for '$chroot_name' not for '$1'"
+  case "$chroot_type" in
+  src )
+    test "$cvs_root" || die "no cvs_root"
+    ;;
+  bin )
+    ;;
+  * )
+    die "evil chroot_type: $chroot_type"
+    ;;
+  esac
 }
-# ------------------ end functions
 
-load_config "$1"
+eval "$*" || usage
+default_config
+eval "$*"
+check_conf
 
 poldek_src () {
   if test "$1" ; then
-    echo "source = local,pri=1 $spools_dir/ready/"
+    echo "source = local,pri=1 /spools/ready/"
   fi
   cat <<EOF
 source = main-test,noauto,pri=2 $dist_url/test/$arch/
@@ -73,7 +90,7 @@ cd tmp-chroot
 cat >poldek.conf <<EOF
 $(poldek_src)
 $(common_poldek_opt)
-cachedir = $chroot_dir$spools_dir/poldek
+cachedir = $chroot_dir/spools/poldek
 keep_downloads = no
 EOF
 
@@ -82,7 +99,7 @@ cat > install-$chroot_name.sh <<EOF
 set -x
 cd $PWD
 rm -rf $chroot_dir
-mkdir -p $chroot_dir/$spools_dir/poldek
+mkdir -p $chroot_dir/spools/poldek
 poldek --conf poldek.conf --mkdir --install-dist $chroot_dir \
 	$builder_pkgs $builder_arch_pkgs
 EOF
@@ -117,7 +134,7 @@ echo "installing conf..."
 cat >poldek.conf <<EOF
 $(poldek_src local)
 $(common_poldek_opt)
-cachedir = $spools_dir/poldek
+cachedir = /spools/poldek
 keep_downloads = yes
 EOF
 
@@ -156,11 +173,11 @@ EOF
   rm install-bt
 }
 
-case $chroot_name in
-  src* )
+case $chroot_type in
+  src )
     install_SPECS_builder
     ;;
-  * )
+  bin )
     install_build_tree
     ;;
 esac
