@@ -1,3 +1,5 @@
+# vi: encoding=utf-8 ts=8 sts=4 sw=4 et
+
 import string
 import os
 import atexit
@@ -15,88 +17,88 @@ from config import config, init_conf
 
 
 def run_command(batch):
-  if "no-chroot" in batch.command_flags:
-    c = "%s >> %s 2>&1" % (batch.command, batch.logfile)
-    f = os.popen(c)
-    for l in f.xreadlines():
-      pass
-    r = f.close()
-    if r == None:
-      return 0
+    if "no-chroot" in batch.command_flags:
+        c = "%s >> %s 2>&1" % (batch.command, batch.logfile)
+        f = os.popen(c)
+        for l in f.xreadlines():
+            pass
+        r = f.close()
+        if r == None:
+            return 0
+        else:
+            return r
     else:
-      return r
-  else:
-    user = "root"
-    if "as-builder" in batch.command_flags:
-      user = "builder"
-    return chroot.run(batch.command, logfile = batch.logfile, user = user)
+        user = "root"
+        if "as-builder" in batch.command_flags:
+            user = "builder"
+        return chroot.run(batch.command, logfile = batch.logfile, user = user)
 
 def build_all(r, build_fnc):
-  status.email = r.requester_email
-  notify.begin(r)
-  tmp = path.spool_dir + util.uuid() + "/"
-  r.tmp_dir = tmp
-  os.mkdir(tmp)
-  atexit.register(util.clean_tmp, tmp)
+    status.email = r.requester_email
+    notify.begin(r)
+    tmp = path.spool_dir + util.uuid() + "/"
+    r.tmp_dir = tmp
+    os.mkdir(tmp)
+    atexit.register(util.clean_tmp, tmp)
 
-  log.notice("started processing %s" % r.id)
-  r.chroot_files = []
-  r.some_ok = 0
-  for batch in r.batches:
-    can_build = 1
-    failed_dep = ""
-    for dep in batch.depends_on:
-      if dep.build_failed:
-        can_build = 0
-        failed_dep = dep.spec
-    
-    if batch.is_command() and can_build:
-      batch.logfile = tmp + "command"
-      if config.builder in batch.builders:
-        log.notice("running %s" % batch.command)
-        stopwatch.start()
-        batch.build_failed = run_command(batch)
-        if batch.build_failed:
-          log.notice("running %s FAILED" % batch.command)
-          notify.add_batch(batch, "FAIL")
+    log.notice("started processing %s" % r.id)
+    r.chroot_files = []
+    r.some_ok = 0
+    for batch in r.batches:
+        can_build = 1
+        failed_dep = ""
+        for dep in batch.depends_on:
+            if dep.build_failed:
+                can_build = 0
+                failed_dep = dep.spec
+        
+        if batch.is_command() and can_build:
+            batch.logfile = tmp + "command"
+            if config.builder in batch.builders:
+                log.notice("running %s" % batch.command)
+                stopwatch.start()
+                batch.build_failed = run_command(batch)
+                if batch.build_failed:
+                    log.notice("running %s FAILED" % batch.command)
+                    notify.add_batch(batch, "FAIL")
+                else:
+                    r.some_ok = 1
+                    log.notice("running %s OK" % batch.command)
+                    notify.add_batch(batch, "OK")
+                batch.build_time = stopwatch.stop()
+                report.add_pld_builder_info(batch)
+                buildlogs.add(batch.logfile, failed = batch.build_failed)
+            else:
+                log.notice("not running command, not for me.")
+                batch.build_failed = 0
+                batch.log_line("queued command %s for other builders" % batch.command)
+                r.some_ok = 1
+                buildlogs.add(batch.logfile, failed = batch.build_failed)
+        elif can_build:
+            log.notice("building %s" % batch.spec)
+            stopwatch.start()
+            batch.logfile = tmp + batch.spec + ".log"
+            batch.gb_id=r.id
+            batch.requester=r.requester
+            batch.requester_email=r.requester_email
+            batch.build_failed = build_fnc(r, batch)
+            if batch.build_failed:
+                log.notice("building %s FAILED" % batch.spec)
+                notify.add_batch(batch, "FAIL")
+            else:
+                r.some_ok = 1
+                log.notice("building %s OK" % batch.spec)
+                notify.add_batch(batch, "OK")
+            batch.build_time = stopwatch.stop()
+            report.add_pld_builder_info(batch)
+            buildlogs.add(batch.logfile, failed = batch.build_failed)
         else:
-          r.some_ok = 1
-          log.notice("running %s OK" % batch.command)
-          notify.add_batch(batch, "OK")
-        batch.build_time = stopwatch.stop()
-        report.add_pld_builder_info(batch)
-        buildlogs.add(batch.logfile, failed = batch.build_failed)
-      else:
-        log.notice("not running command, not for me.")
-        batch.build_failed = 0
-        batch.log_line("queued command %s for other builders" % batch.command)
-        r.some_ok = 1
-        buildlogs.add(batch.logfile, failed = batch.build_failed)
-    elif can_build:
-      log.notice("building %s" % batch.spec)
-      stopwatch.start()
-      batch.logfile = tmp + batch.spec + ".log"
-      batch.gb_id=r.id
-      batch.requester=r.requester
-      batch.requester_email=r.requester_email
-      batch.build_failed = build_fnc(r, batch)
-      if batch.build_failed:
-        log.notice("building %s FAILED" % batch.spec)
-        notify.add_batch(batch, "FAIL")
-      else:
-        r.some_ok = 1
-        log.notice("building %s OK" % batch.spec)
-        notify.add_batch(batch, "OK")
-      batch.build_time = stopwatch.stop()
-      report.add_pld_builder_info(batch)
-      buildlogs.add(batch.logfile, failed = batch.build_failed)
-    else:
-      batch.build_failed = 1
-      batch.skip_reason = "SKIPED [%s failed]" % failed_dep
-      batch.logfile = None
-      batch.build_time = ""
-      log.notice("building %s %s" % (batch.spec, batch.skip_reason))
-      notify.add_batch(batch, "SKIP")
-      
-  buildlogs.flush()
-  chroot.run("rm -f %s" % string.join(r.chroot_files))
+            batch.build_failed = 1
+            batch.skip_reason = "SKIPED [%s failed]" % failed_dep
+            batch.logfile = None
+            batch.build_time = ""
+            log.notice("building %s %s" % (batch.spec, batch.skip_reason))
+            notify.add_batch(batch, "SKIP")
+            
+    buildlogs.flush()
+    chroot.run("rm -f %s" % string.join(r.chroot_files))
