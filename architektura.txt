@@ -6,31 +6,29 @@ Zlecenie dla binary-builder:
   <batch>
     <src-rpm>foo-1.2-3.src.rpm</src-rpm>
     <spec>foo.spec</spec>
-    <bcond>
-      <with>foo</with>
-      <without>bar</without>
-    </bcond>
+
     <info>foo.spec -r DEVEL blah,blah</info>
-    <archs>
-      <arch>i386</arch>
-      <arch>i586</arch>
-      <arch>i686</arch>
-      <arch>ppc</arch>
-    </archs>
+    
+    <with>foo</with>
+    <without>bar</without>
+    
+    <builder>i386</builder>
+    <builder>i586</builder>
+    <builder>i686</builder>
+    <builder>ppc</builder>
   </batch>
   <batch>
     <src-rpm>bar-1.2-1.src.rpm</src-rpm>
     <spec>bar.spec</spec>
-    <bcond>
-      <with>foo</with>
-      <without>bar</without>
-    </bcond>
+
     <info>bar.spec -r HEAD blah,blah</info>
-    <archs>
-      <arch>i386</arch>
-      <arch>i586</arch>
-      <arch>i686</arch>
-    </archs>
+    
+    <with>foo</with>
+    <without>bar</without>
+    
+    <builder>i386-security</builder>
+    <builder>i586-security</builder>
+    <builder>i686-security</builder>
   </batch>
 </group>
 
