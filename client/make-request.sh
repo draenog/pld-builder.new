@@ -22,9 +22,9 @@ else
 priority=2
 requester=deviloper@pld-linux.org
 default_key=deviloper@pld-linux.org
-builder_email=builder-ac@pld-linux.org
+builder_email=builder-th@pld-linux.org
 mailer="/usr/sbin/sendmail -t"
-default_builders="ac-*"
+default_builders="th-*"
 
 # defaults:
 f_upgrade=yes
@@ -46,10 +46,14 @@ usage() {
   echo "       Sends request to given builders"
   echo "  --with VALUE --without VALUE"
   echo "       Build package with(out) a given bcond"
+  echo "  -t   --test-build"
+  echo "       Performs a test build. No upgrades on builders, no tagging,"
+  echo "       rpms will get uploaded to '.test-builds' dir on ftp and removed"
+  echo "       after a couple of days."
   echo "  -u   --upgrade"
-  echo "       Forces pacakge upgrade (for use with -t)"
+  echo "       Forces pacakge upgrade"
   echo "  -n   --no-upgrade"
-  echo "       Disables package upgrade (for use with -r)"
+  echo "       Disables package upgrade"
   echo "  -ni  -no-install-br"
   echo "       Do not install missing BuildRequires (--nodeps)"
   echo "  -f   --flag"
@@ -83,6 +87,11 @@ while [ $# -gt 0 ] ; do
       without="$without $2"
       shift
       ;;
+
+	--test-build | -t )
+	  build_mode=test
+	  f_upgrade=no
+	  ;;
 
     --priority | -p )
       priority=$2
@@ -157,6 +166,13 @@ fi
 
 if [ "$f_upgrade" = "yes" ] ; then
   flags="$flags upgrade"
+fi
+
+if [ "$build_mode" = "test" ] ; then
+  if [ "$f_upgrade" = "yes" ] ; then
+	die "--upgrade and --test-build are mutually exclusive"
+  fi
+  flags="$flags test-build"
 fi
 
 ok=
