@@ -35,6 +35,12 @@ Roadmap:
     rpm-builder.sh <builder>
       Tries to aquire locks for <builder> and for job-slot. If that suceeds, 
       proccess one request from spool/queue-<builder>.
+
+    load-balancer.sh
+      Checks spool/got_lock. Then run rpm-builder.sh in order determined
+      from this file (if b1 had lock last time before b2, first run
+      rpm-builder.sh b1 and then rpm-builder.sh b2), so builders get
+      the same number of requests.
   
 Working directories:
   lock/
