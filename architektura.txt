@@ -1,0 +1,161 @@
+Zlecenie dla binary-builder:
+
+<group id="d30eb8ae-3c54-4103-9188-69b1114d6ac7">
+  <priority>2</priority>
+  <requester>malekith</requester>
+  <batch>
+    <src-rpm>foo-1.2-3.src.rpm</src-rpm>
+    <spec>foo.spec</spec>
+    <bcond>
+      <with>foo</with>
+      <without>bar</without>
+    </bcond>
+    <info>foo.spec -r DEVEL blah,blah</info>
+    <archs>
+      <arch>i386</arch>
+      <arch>i586</arch>
+      <arch>i686</arch>
+      <arch>ppc</arch>
+    </archs>
+  </batch>
+  <batch>
+    <src-rpm>bar-1.2-1.src.rpm</src-rpm>
+    <spec>bar.spec</spec>
+    <bcond>
+      <with>foo</with>
+      <without>bar</without>
+    </bcond>
+    <info>bar.spec -r HEAD blah,blah</info>
+    <archs>
+      <arch>i386</arch>
+      <arch>i586</arch>
+      <arch>i686</arch>
+    </archs>
+  </batch>
+</group>
+
+--------------------------------------------------------------------------
+Skrypt dla binary-builder, z crona.
+
+  1. Je¶li ju¿ co¶ siê buduje lub za wysoki load to wyjd¼. 
+
+  2. Je¶li wewnêtrzna kolejka jest pusta, nie ma notyfikacji, ¿e ,,s±
+     nowe zlecenia'' (poczt±, od srcbuildera) i ostatnie sprawdzenie
+     pliku zleceñ na src-builderze by³o mniej ni¿ 10 minut temu to wyjd¼.
+  
+  3. Pobierz plik kolejki z srcbuildera.
+
+  4. Wrzuæ wszystkie nie obs³u¿one jeszcze zlecenia do lokalnej kolejki.
+
+  5. Z lokalnej kolejki wybierz grupê G o najwy¿szym priorytecie, która jest
+     najstarsza.
+
+  6. Dla ka¿dego zlecenia Z w G:
+
+     a) ¦ci±gnij srpm.
+     
+     b) Wyci±gnij spec z srpm
+     
+     b) Je¶li mo¿na na raz budowaæ tylko jeden taki pakiet (co jest napisane
+        w specu), to MAX = 1, else MAX = z konfiguracji buildera (ew. z 
+	uwzglêdnieniem aktualnego loadu)
+	
+     c) Dla ka¿dej architektury sprawd¼ czy nale¿y budowaæ (czy jest zablokowany
+        i czy arch jest wymieniona w zleceniu)
+	
+     d) build_rpm(Z, arch), nie wiêcej ni¿ MAX na raz.
+
+  7. Wy¶lij raport o zakoñczeniu budowania.
+
+
+--------------------------------------------------------------------------
+
+build_rpm(Z, arch):
+
+  1. Oblicz jakie pakiety s± wymagane do zbudowania Z.
+
+  1,5. poldek --up w chroot.
+
+  2. Wyinstaluj pakiety z chroot, które nie s± wymagane.
+
+  3. Zrób poldek --uprade * w chroot.
+
+  4. Zrób poldek --install (co jeszcze potrzebne do budowy) w chroot.
+
+  5. Wrzuæ srpm do chroot.
+
+  6. Uruchom rpmbuild w chroot, wyj¶cie zapmiêtuj±c w pliku.
+
+  7. Wyci±gnij z chroot zbudowane rpm'y.
+
+  8. Je¶li test-build(Z) to 
+       po³ó¿ rpm'y w local-test/
+     w.p.p 
+       po³ó¿ rpm'y w local-ready/
+       przegeneruj indexy poldeka w local-ready/
+       
+  9. po³ó¿ buildlogi w buildlogs/
+
+  10. po³ó¿ zlecenie wys³anie tego wszystkiego w trasnfers/
+
+
+--------------------------------------------------------------------------
+
+Wysy³anie buildlogów i rpm'ów:
+  
+  1. Je¶li transfers/ puste -- wyjd¼.
+
+  2. We¼ zlecenie z transfers/
+  
+  3. Wy¶lij rpm'y, buildlogi.
+  
+  4. Wys³ane pliki z buildlogs/ i local-test/ skasuj, local-ready/ jest
+     czyszczone z crona, pliki starsze ni¿ ile¶-tam wylatuj±.
+  
+  5. Wy¶lij powiadomienie do zlecaj±cego.
+
+--------------------------------------------------------------------------
+
+Konfiguracja poldka w chroot.
+
+source = local,pri=1 /.../local-ready
+source = ready,pri=2 ftp://.../ac/ready
+source = main-su,pri=3 ftp://.../updates/security
+source = main-gu,pri=4 ftp://.../updates/general
+source = main,pri=5 ftp://.../../RPMS
+
+keep_downloads = yes # + usuwanie z crona starych
+
+Dodatkowo poldek jest odpalany z -Q (tylko najnowsza wersja ka¿dego 
+pakietu).
+
+--------------------------------------------------------------------------
+
+Na ró¿nych etapach mo¿na zrobiæ powiadamianie buildlogs (czy te¿ buildstats),
+¿e np. rozpoczê³o siê budowanie foobar etc. Mo¿na potem zrobiæ stronê z 
+informacj± co siê gdzie aktualnie buduje.
+
+--------------------------------------------------------------------------
+
+Skrypt obs³ugi src-builder, zlecenia dostaje maile, procmail je kolejkuje.
+
+Z crona:
+
+1. We¼ zlecenie z kolejki
+
+2. Sprawd¼ autentykacjê (wynik login lub b³±d)
+
+3. Sprawd¼ czy login ma uprawnienia (je¶l nie to wypad)
+
+4. Uruchom w chroot ./builder -r BLAH -bs foo.spec
+
+5. Wyci±gnij z chroot srcrpm'a i wrzuæ na http
+
+6. Updajtnij kolejkê zleceñ
+
+--------------------------------------------------------------------------
+
+Wszêdzie s/arch/linia? builder? cokolwiek. My¶lê, ¿e mog³by byæ osobny 
+,,arch'' do sec-updates, który by np. nie mia³ w ¼ród³ach w poldku local-ready/
+czy ready/.
+
