@@ -6,7 +6,7 @@ if [ "$1" != "y" ] ; then
   exit 1
 fi
 
-mkdir -p spool www/srpms log lock
+mkdir -p spool/{buildlogs,ftp} www/srpms log lock
 echo 1 > www/counter
 echo -n > spool/processed_ids
 echo '<queue/>' > spool/queue

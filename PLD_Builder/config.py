@@ -19,7 +19,7 @@ class Builder_Conf:
       elif d != None:
         return d
       else:
-        log.panic("cannot find %s::%s" % (builder, d))
+        log.panic("cannot find %s::%s" % (builder, o))
         
     p.readfp(open(path.builder_conf))
     if builder not in p.sections():
@@ -28,6 +28,8 @@ class Builder_Conf:
     self.arch = get("arch")
     self.chroot = get("chroot")
     self.email = get("email")
+    self.buildlogs_url = get("buildlogs_url", "/dev/null")
+    self.ftp_url = get("ftp_url", "/dev/null")
 
 config = Builder_Conf()
 

@@ -13,6 +13,8 @@ builder_conf = conf_dir + "builder.conf"
 queue_file = spool_dir + "queue"
 req_queue_file = spool_dir + "req_queue"
 processed_ids_file = spool_dir + "processed_ids"
+buildlogs_queue_dir = spool_dir + "buildlogs/"
+ftp_queue_dir = spool_dir + "ftp/"
 
 # www/
 srpms_dir = www_dir + "srpms/"

@@ -6,17 +6,20 @@ import os.path
 import StringIO
 import sys
 import re
+import atexit
 
 import gpg
 import request
 import log
 import path
+import util
+import chroot
+import buildlogs
+
 from acl import acl
 from lock import lock
 from bqueue import B_Queue
 from config import config, init_conf
-import chroot
-import buildlogs
 
 def pick_request(q):
   def mycmp(r1, r2):
@@ -42,15 +45,6 @@ def collect_files(log):
       files.append(m.group(1))
   return files
 
-def append_to(log, msg):
-  f = open(log, "a")
-  f.write("%s\n" % msg)
-  f.close()
-
-def clean_tmp(dir):
-  # FIXME: use python
-  os.system("rm -f %s/*; rmdir %s" % (dir, dir))
-
 def handle_request(r):
   def build_srpm(b):
     b.src_rpm = ""
@@ -58,25 +52,26 @@ def handle_request(r):
     cmd = "cd rpm/SPECS; ./builder %s -bs %s -r %s %s 2>&1" % \
                  (builder_opts, b.bconds_string(), b.branch, b.spec)
     spec_log = tmp + b.spec + ".log"
-    append_to(spec_log, "Building SRPM using: %s\n" % cmd)
+    util.append_to(spec_log, "Building SRPM using: %s\n" % cmd)
     res = chroot.run(cmd, logfile = spec_log)
     files = collect_files(spec_log)
     if len(files) > 0:
       if len(files) > 1:
-        append_to(spec_log, "error: More then one file produced: %s" % files)
+        util.append_to(spec_log, "error: More then one file produced: %s" % files)
         res = 1
       last = files[len(files) - 1]
       b.src_rpm_file = last
       b.src_rpm = os.path.basename(last)
       all_files.extend(files)
     else:
-      append_to(spec_log, "error: No files produced.")
+      util.append_to(spec_log, "error: No files produced.")
       res = 1
     buildlogs.add(logfile = spec_log, failed = res)
     return res
 
   tmp = path.spool_dir + r.id + "/"
   os.mkdir(tmp)
+  atexit.register(util.clean_tmp, tmp)
   user = acl.user(r.requester)
   log.notice("started processing %s" % r.id)
   all_files = []
@@ -93,7 +88,6 @@ def handle_request(r):
       m.append_log(tmp + batch.spec + ".log")
       m.send()
       buildlogs.flush()
-      clean_tmp(tmp)
       return
     log.notice("building %s finished" % batch.spec)
   os.mkdir(path.srpms_dir + r.id)
@@ -120,6 +114,7 @@ def handle_request(r):
   cnt_f.write("%d\n" % num)
   cnt_f.close()
   # FIXME: send notification?
+  buildlogs.flush()
 
 def main():
   init_conf("src")
@@ -133,4 +128,4 @@ def main():
   q.unlock()
   handle_request(r)
 
-main()
+util.wrap(main)
