@@ -58,7 +58,7 @@ def run_rpm_builder(b):
         sys.exit(0)
 
 def main():
-    init_conf("")
+    init_conf()
     for b in builders_order():
         run_rpm_builder(b)
         # give builder some time to aquire lock

@@ -97,7 +97,7 @@ def main():
     lck = lock.lock("request_fetcher", non_block = True)
     if lck == None:
         sys.exit(1)
-    init_conf("")
+    init_conf()
     
     status.push("fetching requests")
     if has_new(config.control_url):
