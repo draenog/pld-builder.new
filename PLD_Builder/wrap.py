@@ -28,11 +28,13 @@ def wrap(main):
     f.write("""Subject: builder failure
 To: %s
 Cc: %s
+Date: %s
+X-PLD-Builder: fatal error report
 
 %s
 
 during: %s
-""" % (status.admin, status.email, s.getvalue(), status.get()))
+""" % (status.admin, status.email, time.asctime(), s.getvalue(), status.get()))
     f.close()
 
     sys.exit(1)
