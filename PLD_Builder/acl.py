@@ -18,7 +18,7 @@ class User:
     if p.has_option(login, "gpg_emails"):
       self.gpg_emails = string.split(p.get(login, "gpg_emails"))
     else:
-      log.alert("acl: [%s] has no gpg_emails" % login)
+      log.panic("acl: [%s] has no gpg_emails" % login)
       
     if p.has_option(login, "mailto"):
       self.mailto = p.get(login, "mailto")
@@ -30,11 +30,11 @@ class User:
       for p in string.split(p.get(login, "privs")):
         l = string.split(p, ":")
         if len(l) != 2 or l[0] == "" or l[1] == "":
-          log.alert("acl: invalid priv format: '%s' [%s]" % (p, login))
+          log.panic("acl: invalid priv format: '%s' [%s]" % (p, login))
         else:
           self.privs.append(p)
     else:
-      log.alert("acl: [%s] has no privs" % login)
+      log.panic("acl: [%s] has no privs" % login)
 
   def can_do(self, what, where):
     action = "%s:%s" % (what, where)
@@ -68,12 +68,12 @@ class ACL_Conf:
     self.users = {}
     for login in p.sections():
       if self.users.has_key(login):
-        log.alert("acl: duplicate login: %s" % login)
+        log.panic("acl: duplicate login: %s" % login)
         continue
       user = User(p, login)
       for e in user.gpg_emails:
         if self.users.has_key(e):
-          log.alert("acl: user email colision %s <-> %s" % \
+          log.panic("acl: user email colision %s <-> %s" % \
                                 (self.users[e].login, login))
         else:
           self.users[e] = user
