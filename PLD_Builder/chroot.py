@@ -22,8 +22,7 @@ def popen(cmd, user = "builder", mode = "r"):
 def run(cmd, user = "builder", logfile = None):
   c = command(cmd, user)
   if logfile != None:
-    # c = "%s >> %s 2>&1" % (c, logfile)
-    c = c+" >> "+logfile+" 2>&1"  
+    c = "%s >> %s 2>&1" % (c, logfile)
   f = os.popen(c)
   for l in f.xreadlines():
     pass
