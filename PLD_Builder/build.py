@@ -12,6 +12,23 @@ import log
 import buildlogs
 import status
 
+def run_command(batch):
+  if "no-chroot" in batch.command_flags:
+    user = "root"
+    if "as-builder" in batch.command_flags:
+      user = "builder"
+    return chroot.run(batch.command, logfile = batch.logfile, user = user)
+  else:
+    c = "%s >> %s 2>&1" % (batch.command, logfile)
+    f = os.popen(c)
+    for l in f.xreadlines():
+      pass
+    r = f.close()
+    if r == None:
+      return 0
+    else:
+      return r
+
 def build_all(r, build_fnc):
   status.email = r.requester_email
   notify.begin(r)
@@ -30,8 +47,30 @@ def build_all(r, build_fnc):
       if dep.build_failed:
         can_build = 0
         failed_dep = dep.spec
-     
-    if can_build:
+    
+    if batch.is_command() and can_build:
+      batch.logfile = tmp + batch.spec + ".log"
+      if config.builder in batch.builders:
+        log.notice("running %s" % batch.command)
+        stopwatch.start()
+        batch.build_failed = run_command(batch)
+        if batch.build_failed:
+          log.notice("running %s FAILED" % batch.command)
+          notify.add_batch(batch, "FAIL")
+        else:
+          r.some_ok = 1
+          log.notice("running %s OK" % batch.command)
+          notify.add_batch(batch, "OK")
+        batch.build_time = stopwatch.stop()
+        report.add_pld_builder_info(batch)
+        buildlogs.add(batch.logfile, failed = batch.build_failed)
+      else:
+        log.notice("not running command, not for me.")
+        batch.build_failed = 0
+        batch.log_line("queued command %s for other builders" % batch.command)
+        r.some_ok = 1
+        buildlogs.add(batch.logfile, failed = batch.build_failed)
+    elif can_build:
       log.notice("building %s" % batch.spec)
       stopwatch.start()
       batch.logfile = tmp + batch.spec + ".log"

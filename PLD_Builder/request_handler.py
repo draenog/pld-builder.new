@@ -58,7 +58,7 @@ def handle_group(r, user):
 
   for batch in r.batches:
     batch.expand_builders(config.binary_builders)
-    if config.builder in batch.builders:
+    if not batch.is_command() and config.builder in batch.builders:
       batch.builders.remove(config.builder)
     for bld in batch.builders:
       batch.builders_status[bld] = '?'
@@ -66,7 +66,12 @@ def handle_group(r, user):
         fail_mail("I (src rpm builder '%s') do not handle binary builder '%s', only '%s'" % \
                         (config.builder, bld, string.join(config.binary_builders)))
         return
-      if not user.can_do("binary", bld):
+      if batch.is_command():
+        if not user.can_do("command", bld):
+          fail_mail("user %s is not allowed to command:%s" \
+                        % (user.get_login(), bld))
+          return
+      elif not user.can_do("binary", bld):
         pkg = batch.spec
         if pkg.endswith(".spec"):
           pkg = pkg[:-5]
