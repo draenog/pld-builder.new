@@ -10,6 +10,8 @@ from config import config, init_conf
 import mailer
 import path
 import util
+import log
+import status
 
 retries_times = [5 * 60, 15 * 60, 60 * 60, 2 * 60 * 60, 5 * 60 * 60]
 
@@ -24,7 +26,7 @@ def read_name_val(file):
     m = rx.search(l)
     if m:
       r[m.group(1)] = string.strip(m.group(2))
-    else
+    else:
       break
   f.close()
   return None
@@ -45,16 +47,22 @@ def copy_file(src, target):
     problem = "cannot copy file: %s" % format_exception_only(exctype, value)
     return 1
 
-def rsync_file(src, target):
+def rsync_file(src, user, password, host, path):
   global problem
   # FIXME: use --password-file?
-  f = os.popen("rsync --verbose --archive %s %s 2>&1 < /dev/null" % (src, target))
+  f = os.popen("RSYNC_PASSWORD='%s' rsync --verbose --archive %s %s@%s::%s 2>&1 < /dev/null" \
+                % (password, src, user, host, path))
   problem = f.read()
   return f.close()
   
 def send_file(src, target):
-  if re.match('rsync://.*', target):
-    return rsync_file(src, target)
+  log.notice("sending %s" % target)
+  m = re.match('rsync://([^@:]+):([^@]+)@([^/:]+)(:|/)(.*)', target)
+  if m:
+    return rsync_file(src, user = m.group(1), 
+                           password = m.group(2), 
+                           host = m.group(3),
+                           path = m.group(5))
   if target != "" and target[0] == '/':
     return copy_file(src, target)
   m = re.match('scp://([^@:]+@[^/:]+)(:|)(.*)', target)
@@ -77,20 +85,29 @@ def maybe_flush_queue(dir):
     os.unlink(dir + "retry-at")
   except:
     pass
+    
+  status.push("flushing %s" % dir)
 
   if flush_queue(dir):
     f = open(dir + "retry-at", "w")
-    idx = retries_times.find(retry_delay)
-    if idx < len(retries_times) - 1: idx += 1
-    f.write("%d\n%d\n" % time.time(), retries_times[idx])
+    if retry_delay in retries_times:
+      idx = retries_times.index(retry_delay)
+      if idx < len(retries_times) - 1: idx += 1
+    else:
+      idx = 0
+    f.write("%d\n%d\n" % (time.time(), retries_times[idx]))
     f.close()
+
+  status.pop()
 
 def flush_queue(dir):
   q = []
   for f in glob.glob(dir + "/*.desc"):
     d = read_name_val(f)
     if d != None: q.append(d)
-  q.sort(lambda (x, y): cmp(x['Time'], y['Time']))
+  def mycmp(x, y):
+    return cmp(x['Time'], y['Time'])
+  q.sort(mycmp)
   
   error = None
   remaining = q
@@ -98,8 +115,8 @@ def flush_queue(dir):
     if send_file(d['_file'], d['Target']):
       error = d
       break
-    if d.has_key['Store-desc'] and d['Store-desc'] == "yes":
-      if send_file(d['_desc'], d['Target'] . ".desc"):
+    if d.has_key('Store-desc') and d['Store-desc'] == "yes":
+      if send_file(d['_desc'], d['Target'] + ".desc"):
         error = d
         break
     os.unlink(d['_file'])

@@ -31,7 +31,10 @@ def builders_order():
     else:
       log.alert("found strange lock in got-lock: %s" % b)
 
-  bl.sort(lambda (b1, b2): cmp(bs[b1], bs[b2]))
+  def mycmp(b1, b2):
+    return cmp(bs[b1], bs[b2])
+    
+  bl.sort(mycmp)
 
   f.seek(0)
   f.truncate(0)
