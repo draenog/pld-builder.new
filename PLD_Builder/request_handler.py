@@ -59,6 +59,7 @@ def handle_group(r, user):
       if bld not in config.binary_builders:
         fail_mail("I (src rpm builder '%s') do not handle binary builder '%s', only '%s'" % \
                         (config.builder, bld, string.join(config.binary_builders)))
+        return
       if not user.can_do("binary", bld):
         fail_mail("user %s is not allowed to binary:%s" \
                         % (user.get_login(), bld))
