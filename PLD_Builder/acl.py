@@ -29,10 +29,10 @@ class User:
     if p.has_option(login, "privs"):
       for p in string.split(p.get(login, "privs")):
         l = string.split(p, ":")
+        if len(l) == 2:
+          p+=":*"
         if len(l) not in (2,3) or l[0] == "" or l[1] == "":
           log.panic("acl: invalid priv format: '%s' [%s]" % (p, login))
-        elif len(l) == 2:
-          p+=":*"
         else:
           self.privs.append(p)
     else:
