@@ -1,6 +1,9 @@
 from xml.dom.minidom import *
 import string
+import time
 
+__all__ = ['parse_request', 'parse_requests']
+  
 def text(e):
   if len(e.childNodes) == 0:
     return ""
@@ -13,8 +16,7 @@ def text(e):
     raise "xml: text expected: <%s>" % e.nodeName
 
 def attr(e, a):
-  return e.attributes[a]
-  #.getNamedItem(a)
+  return e.attributes[a].value
 
 def is_blank(e):
   return e.nodeType == Element.TEXT_NODE and string.strip(e.nodeValue) == ""
@@ -25,6 +27,7 @@ class Group:
     self.is_group = 1
     self.id = attr(e, "id")
     self.priority = 2
+    self.time = time.time()
     for c in e.childNodes:
       if is_blank(c): continue
       if c.nodeType != Element.ELEMENT_NODE:
@@ -35,12 +38,15 @@ class Group:
         self.requester = text(c)
       elif c.nodeName == "priority":
         self.priority = int(text(c))
+      elif c.nodeName == "time":
+        self.time = int(text(c))
       else:
         raise "xml: evil group child (%s)" % c.nodeName
 
   def dump(self):
    print "group: %s @%d" % (self.id, self.priority)
-   print "  from: %s" % (self.requester)
+   print "  from: %s" % self.requester
+   print "  time: %s" % time.asctime(time.localtime(self.time))
    for b in self.batches:
      b.dump()
 
@@ -86,7 +92,13 @@ def build_request(e):
   else:
     raise "xml: evil request <%s>" % e.nodeName
 
-def parse(str):
-  d = parseString(str)
+def parse_request(f):
+  d = parse(f)
   return build_request(d.documentElement)
   
+def parse_requests(f):
+  d = parse(f)
+  res = []
+  for r in d.documentElement.childNodes:
+    res.append(build_request(r))
+  return res
