@@ -3,6 +3,7 @@ import string
 
 import chroot
 import util
+import log
 
 hold = [ 
   'poldek',
