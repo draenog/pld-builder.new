@@ -30,9 +30,8 @@ def check_double_id(id):
 
   return 0
 
-def handle_group(r):
+def handle_group(r, user):
   lock("request")
-  user = r.acl_user
   if check_double_id(r.id):
     return
     
@@ -50,6 +49,7 @@ def handle_group(r):
         user.notify_about_failure(msg)
         return
 
+  r.requester = user.get_login()
   r.time = time.time()
   log.notice("queued %s from %s" % (r.id, user.get_login()))
   q = B_Queue(path.queue_file)
@@ -70,9 +70,8 @@ def handle_request(f):
     log.alert("invalid signature, or not in acl %s" % em)
     return
   r = request.parse_request(body)
-  r.acl_user = user
   if r.kind == 'group':
-    handle_group(r)
+    handle_group(r, user)
   else:
     msg = "%s: don't know how to handle requests of this kind '%s'" \
                 % (user.get_login(), r.kind)
