@@ -92,30 +92,34 @@ def send_report(r, is_src = False):
 
 def send_cia_report(r, is_src = False):
 
-  #if not is_src:
-  #  return
-
-  s_failed = ' '.join([b.spec for b in r.batches if b.build_failed])
-  s_ok = ' '.join([b.spec for b in r.batches if not b.build_failed])
-
-  if s_failed: s_failed = "ERRORS: %s" % s_failed
-  if s_ok: s_ok = "OK: %s" % s_ok
-
-  subject = 'Announce %s' % config.bot_channel
+  subject = 'DeliverXML'
   
   m = mailer.Message()
   m.set_headers(to = config.bot_email,
-                subject = subject[0:100])
+                subject = subject)
   m.set_header("Message-ID", "<%s@pld.src.builder>" % r.id)
+  m.set_header("X-mailer", "$Id$")
+  m.set_header("X-builder", "PLD")
 
+  # get header of xml message from file
+  f.open('cia-head.xml')
+  m.write(f.read())
+  f.close()
+
+  # write in iteration list and status of all processed files
   for b in r.batches:
-    if b.build_failed and b.logfile == None:
-      info = b.skip_reason
-    elif b.build_failed: 
-      info = "FAILED"
-    else: 
-      info = "OK"
     # Instead of hardcoded Ac information use some config variable
-    m.write("{red}Builder %s{normal} ({gray}%s{normal}): {light blue}%s{normal}:{yellow}%s{normal} {green}%s{normal}\n" % (config.builder, r.requester_email, b.spec, b.branch, info))
+    m.write('<package name="%s" arch="%s">\n' % (b.spec, b.branch))
+    if b.build_failed:
+	    m.write('<success/>\n')
+    else:
+	    m.write('<failed/>\n')
+    m.write('</package>\n')
+
+  # get footer of xml message from file
+  f.open('cia-foot.xml')
+  m.write(f.read())
+  f.close()
 	    
+  # send the e-mail
   m.send()
