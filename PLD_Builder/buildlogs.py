@@ -1,8 +1,10 @@
 import path
+import time
 import os
 
 from config import config
 import util
+from acl import acl
 
 class Buildlogs_Queue:
   def __init__(self):
@@ -24,8 +26,14 @@ class Buildlogs_Queue:
       if l['failed']: s = "FAIL"
       elif self.some_failed: s = "OKOF" # OK but Others Failed
       else: s = "OK"
-      return "Target: %s/%s\nBuilder: %s\nStatus: %s\nStore-desc: yes\nEND\n" % \
-                (config.buildlogs_url, l['name'], config.builder, s)
+      return """Target: %s/%s
+Builder: %s
+Status: %s
+Store-desc: yes
+Time: %d
+Requester: %s
+END
+""" % (config.buildlogs_url, l['name'], config.builder, s, time.time(), acl.current_user)
     
     for l in self.queue:
       f = open(path.buildlogs_queue_dir + l['id'] + ".desc", "w")
