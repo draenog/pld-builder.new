@@ -4,6 +4,7 @@ import time
 import os
 import StringIO
 import sys
+import fnmatch
 
 import gpg
 import request
@@ -54,8 +55,15 @@ def handle_group(r, user):
     fail_mail("user %s is not allowed to src:%s" \
                 % (user.get_login(), config.builder))
     return
-    
+
   for batch in r.batches:
+    for bld in batch.builders:
+      res = []
+      for my_bld in config.binary_builders:
+        if fnmatch.fnmatch(my_bld, bld):
+          res.append(my_bld)
+      if res != []:
+        batch.builders = res
     for bld in batch.builders:
       if bld not in config.binary_builders:
         fail_mail("I (src rpm builder '%s') do not handle binary builder '%s', only '%s'" % \
