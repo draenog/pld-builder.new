@@ -11,15 +11,12 @@ import report
 import log
 import buildlogs
 import status
+from config import config, init_conf
+
 
 def run_command(batch):
   if "no-chroot" in batch.command_flags:
-    user = "root"
-    if "as-builder" in batch.command_flags:
-      user = "builder"
-    return chroot.run(batch.command, logfile = batch.logfile, user = user)
-  else:
-    c = "%s >> %s 2>&1" % (batch.command, logfile)
+    c = "%s >> %s 2>&1" % (batch.command, batch.logfile)
     f = os.popen(c)
     for l in f.xreadlines():
       pass
@@ -28,6 +25,11 @@ def run_command(batch):
       return 0
     else:
       return r
+  else:
+    user = "root"
+    if "as-builder" in batch.command_flags:
+      user = "builder"
+    return chroot.run(batch.command, logfile = batch.logfile, user = user)
 
 def build_all(r, build_fnc):
   status.email = r.requester_email
@@ -49,7 +51,7 @@ def build_all(r, build_fnc):
         failed_dep = dep.spec
     
     if batch.is_command() and can_build:
-      batch.logfile = tmp + batch.spec + ".log"
+      batch.logfile = tmp + "command"
       if config.builder in batch.builders:
         log.notice("running %s" % batch.command)
         stopwatch.start()
