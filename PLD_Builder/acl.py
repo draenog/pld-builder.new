@@ -49,13 +49,16 @@ class User:
         priv = priv[1:]
       else:
         ret = 1
-      if fnmatch.fnmatch(action, priv):
-        return ret
+      pwhat,pwhere,pbranch=priv.split(":")
+      for pbranch in pbranch.split(","):
+        priv="%s:%s:%s" % (pwhat,pwhere,pbranch)
+        if fnmatch.fnmatch(action, priv):
+          return ret
     return 0
 
   def check_priority(self, prio, where):
     for priv in self.privs:
-      val,builder=priv.split(":")
+      val,builder=priv.split(":")[0:2]
       if fnmatch.fnmatch(where, builder):
 	try:
           val=int(val)
