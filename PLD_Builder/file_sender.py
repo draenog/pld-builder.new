@@ -4,6 +4,7 @@ import string
 import os
 import time
 import shutil
+import sys
 
 from config import config, init_conf
 import mailer
