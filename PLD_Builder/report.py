@@ -59,7 +59,7 @@ def send_report(r, is_src = False):
   if s_ok != []:
     subject += " OK: " + string.join(names(s_ok))
   
-  m = mailer.Message(is_src = False)
+  m = mailer.Message()
   m.set_headers(to = r.requester_email,
                 subject = subject[0:100])
   if is_src:
