@@ -41,3 +41,6 @@
   src.rpms, so we can build and fetch at the same time
 
 - unify buildlogs.py and ftp.py, both are file queues
+
+- ability to just copy src.rpm from ftp and make it the base for a request to
+  bin builders
