@@ -1,3 +1,15 @@
+- Write spec preprocessor, that processes given spec file and expands
+  macros. Next we should process the output, look for all BuildRequires:
+  lines, and install them, instead of running rpmbuild --nobuild to see
+  what's missing, since it chokes when stuff is used in %(...), on missing
+  includes and so on. 
+  
+  get_br.py is close, but doesn't handle:
+    %if foo
+    BuildRequires: ...
+    %endif
+  which in fact requires expression parser :<
+  
 - fix make-request.sh to be more user-friendly and configurable
 
 - add possibility of tagging stuff for source builder
