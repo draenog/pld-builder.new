@@ -70,7 +70,11 @@ class Builder_Conf:
         self.notify_email = get("notify_email")
         self.admin_email = get("admin_email")
         self.builder_list = get("builder_list", "")
-        self.generate_uploadinfo = get("generate_uploadinfo", "yes")
+        self.gen_upinfo = get("gen_upinfo", "yes")
+        if self.gen_upinfo == 'no':
+            self.gen_upinfo = False
+        else:
+            self.gen_upinfo = True
         status.admin = self.admin_email
         status.builder_list = self.builder_list
         self.email = self.admin_email
