@@ -2,7 +2,14 @@ import fcntl
 
 import path
 
-def lock(n):
+def lock(n, non_block = 0):
   f = open(path.lock_dir + n, "w")
-  fcntl.flock(f, fcntl.LOCK_EX)
+  if non_block:
+    try:
+      fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except:
+      f.close()
+      return None
+  else:
+    fcntl.flock(f, fcntl.LOCK_EX)
   return f

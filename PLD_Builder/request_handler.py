@@ -73,7 +73,7 @@ def handle_group(r, user):
 
 def handle_request(f):
   sio = StringIO.StringIO()
-  sio.write(f.read())
+  util.sendfile(f, sio)
   sio.seek(0)
   (em, body) = gpg.verify_sig(sio)
   user = acl.user_by_email(em)
