@@ -112,10 +112,8 @@ def check_load():
   except:
     pass
 
-def main():
-  if len(sys.argv) < 2:
-    raise "fatal: need to have builder name as first arg"
-  init_conf(sys.argv[1])
+def main_for(builder):
+  init_conf(builder)
   # allow only one build in given builder at once
   if not lock.lock("building-rpm-for-%s" % config.builder, non_block = 1):
     return
@@ -156,4 +154,10 @@ def main():
   handle_request(r)
   status.pop()
   
-wrap.wrap(main)
+def main():
+  if len(sys.argv) < 2:
+    raise "fatal: need to have builder name as first arg"
+  return main_for(sys.argv[1])
+  
+if __name__ == '__main__':
+  wrap.wrap(main)

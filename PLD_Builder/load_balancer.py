@@ -60,4 +60,5 @@ def main():
   except:
     pass
 
-wrap.wrap(main)
+if __name__ == '__main__':
+  wrap.wrap(main)
