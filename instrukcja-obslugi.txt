@@ -42,3 +42,32 @@ bin_builder ALL = NOPASSWD: \
 Skrypty *musz±* byæ w ~/pld-builder.new/, checkoutniête z CVS.
 
 [[...]]
+
+
+100. cron jobs
+
+srpms_builder:
+  src-builder.sh
+  file-sender.sh
+
+bin_builder:
+  request-fetcher.sh
+  load-balancer.sh
+  file-sender.sh
+
+101. procmail
+
+srpms_builder:
+
+:0
+* ^X-New-PLD-Builder:
+|~/pld-builder.new/bin/request-handler.sh
+
+:0
+!admin@somehere
+
+bin_builder
+
+:0
+!admin@somwhere
+
