@@ -1,3 +1,5 @@
+- send email from util.wrap in case of problems
+
 - store rpms in /spool/ready/ in chroot? (rpm_builder.py)
 
 - deps install/uninstall machinery (hard stuff -- building deps tree already 

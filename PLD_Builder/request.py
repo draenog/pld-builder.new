@@ -264,8 +264,8 @@ class Notification:
       if c.nodeType != Element.ELEMENT_NODE:
         raise "xml: evil notification child %d" % c.nodeType
       if c.nodeName == "batch":
-        id = attr(e, "id")
-        status = attr(e, "status")
+        id = attr(c, "id")
+        status = attr(c, "status")
         if status != "OK" and status != "FAIL" and status != "SKIP":
           raise "xml notification: bad status: %s" % self.status
         self.batches[id] = status
