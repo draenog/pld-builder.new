@@ -48,7 +48,6 @@ def pick_request(q):
       return pri_diff
   q.requests.sort(mycmp)
   ret = q.requests[0]
-  q.requests = q.requests[1:]
   return ret
 
 def fetch_src(r, b):
@@ -188,9 +187,9 @@ def main_for(builder):
   q.lock(0)
   q.read()
   if q.requests == []:
+    q.unlock()
     return
-  r = pick_request(q)
-  q.write()
+  req = pick_request(q)
   q.unlock()
   status.pop()
 
@@ -203,11 +202,26 @@ def main_for(builder):
   l.close()
   
   msg = "handling request %s (%d) for %s from %s" \
-        % (r.id, r.no, config.builder, r.requester)
+        % (req.id, req.no, config.builder, req.requester)
   log.notice(msg)
   status.push(msg)
-  handle_request(r)
+  handle_request(req)
   status.pop()
+
+  def otherreqs(r):
+    if r.no==req.no:
+      return False
+    else:
+      return True
+
+  q = B_Queue(path.queue_file + "-" + config.builder)
+  q.lock(0)
+  q.read()
+  previouslen=len(q.requests)
+  q.requests=filter(otherreqs, q.requests)
+  if len(q.requests)<previouslen:
+    q.write()
+  q.unlock()
   
 def main():
   if len(sys.argv) < 2:
