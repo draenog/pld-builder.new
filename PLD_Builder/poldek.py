@@ -13,6 +13,8 @@ def get_poldek_requires():
   req_rx = re.compile(r" req .* --> (.*)\n")
   pkg_name_rx = re.compile(r"([^\s]+)-[^-]+-[^-]+")
 
+  # todo: if a and b are sets, then use sets module
+  # and intersection method on set object
   def intersect(a, b):
     r = []
     for x in a: 
