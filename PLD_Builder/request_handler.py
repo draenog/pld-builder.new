@@ -56,6 +56,16 @@ def handle_group(r, user):
                 % (user.get_login(), config.builder))
     return
 
+  if not "test-build" in r.flags and not user.can_do("ready", config.builder):
+    fail_mail("user %s is not allowed to build to ready (ready:%s)" \
+                % (user.get_login(), config.builder))
+    return
+
+  if not "upgrade" in r.flags and not user.can_do("upgrade", config.builder):
+    fail_mail("user %s is not allowed to upgrade:%s" \
+                % (user.get_login(), config.builder))
+    return
+
   for batch in r.batches:
     batch.expand_builders(config.binary_builders)
     if not batch.is_command() and config.builder in batch.builders:
