@@ -11,9 +11,12 @@ class FTP_Queue:
     self.some_failed = 0
 
   def add(self, file):
+    # if /dev/null, say bye bye
+    if config.ftp_url == "/dev/null":
+      return
     name = os.path.basename(file)
     id = util.uuid()
-    shutil.copy(file, config.ftp_queue_dir + id)
+    shutil.copy(file, path.ftp_queue_dir + id)
     self.queue.append({'name': name, 'id': id})
 
   def flush(self):
