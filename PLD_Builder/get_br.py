@@ -53,7 +53,7 @@ def get_build_requires(spec, bconds_with, bconds_without):
 
   macros["__perl"] = "/usr/bin/perl"
   macros["_bindir"] = "/usr/bin"
-  macros["_sbindir"] = "/usr/bin"
+  macros["_sbindir"] = "/usr/sbin"
   macros["kgcc_package"] = "gcc"
 
   build_req = []
