@@ -112,3 +112,7 @@ bin_builder
 :0
 !admin@somwhere
 
+102. httpd
+
+Katalog ~/pld-builder.new/www/ z konta srpm_builder musi byæ dostêpny po
+http pod url podanym jako control_url w konfiguracji bin-builderów.
