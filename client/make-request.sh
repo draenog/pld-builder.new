@@ -5,7 +5,7 @@ if [ -f "$HOME/.requestrc" ]; then
 	. $HOME/.requestrc
 else
 	echo "Creating config file ~/.requestrc. You *must* edit it."
-	cat <<EOF >$HOME/.requestrc
+	cat >$HOME/.requestrc <<EOF
 priority=2
 requester=deviloper
 default_key=deviloper@pld-linux.org
