@@ -60,11 +60,7 @@ class Message:
     for k, v in self.headers.items():
       f.write("%s: %s\n" % (k, v))
     f.write("\n")
-    try:
-        self.body.seek(0)
-    except UnicodeDecodeError:
-        self.body.decode('iso-8859-2')
-        self.body.seek(0)
+    self.body.seek(0)
     util.sendfile(self.body, f)
 
   def send(self):
