@@ -61,7 +61,7 @@ def handle_group(r, user):
                 % (user.get_login(), config.builder))
     return
 
-  if not "upgrade" in r.flags and not user.can_do("upgrade", config.builder):
+  if "upgrade" in r.flags and not user.can_do("upgrade", config.builder):
     fail_mail("user %s is not allowed to upgrade:%s" \
                 % (user.get_login(), config.builder))
     return
