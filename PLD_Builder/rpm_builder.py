@@ -48,7 +48,7 @@ def fetch_src(r, b):
       good=True
       f = urllib.urlopen(src_url)
     except IOError, error:
-      if error[1][0] == 60 or error[1][0] == 110 or error[1][0] == -3:
+      if error[1][0] == 60 or error[1][0] == 110 or error[1][0] == -3 or error[1][0] == 111:
         good=False
         b.log_line("connection timeout... trying again")
       else:
