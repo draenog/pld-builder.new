@@ -101,10 +101,17 @@ class Batch:
     print "  batch: %s/%s" % (self.src_rpm, self.spec)
     print "    info: %s" % self.info
     print "    branch: %s" % self.branch
-    print "    with: %s" % string.join(self.bconds_with)
-    print "    without: %s" % string.join(self.bconds_without)
+    print "    bconds: %s" % self.bconds_string()
     print "    for: %s" % string.join(self.builders)
 
+  def bconds_string(self):
+    r = ""
+    for b in self.bconds_with:
+      r = r + " --with " + b
+    for b in self.bconds_without:
+      r = r + " --without " + b
+    return r
+    
   def write_to(self, f):
     f.write("""
          <batch>

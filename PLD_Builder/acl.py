@@ -57,6 +57,7 @@ class ACL_Conf:
       user = User(p, login)
       for e in user.emails:
         self.users[e] = user
+      self.users[login] = user
   
   def user(self, ems):
     for e in ems:
