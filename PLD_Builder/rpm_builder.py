@@ -146,7 +146,7 @@ def build_rpm(r, b):
         c=c + "END\n"
         return c
 
-    if b.files != [] and 'test-build' not in b.command_flags:
+    if b.files != [] and 'test-build' not in r.flags:
         fname = r.tmp_dir + b.src_rpm + ".uploadinfo"
         f = open(fname, "w")
         f.write(uploadinfo(b))
