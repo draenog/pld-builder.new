@@ -101,6 +101,12 @@ while [ $# -gt 0 ] ; do
   shift
 done
 
+specs=`for s in $specs ; do
+  case "$s" in
+    *.spec:* ) echo "$s" ;;
+    * ) echo "$s" | sed -e 's/:/.spec:/' ;;
+  esac
+done`
 
 if [ "$builders" = "" ] ; then
   builders="$default_builders"
