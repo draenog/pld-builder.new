@@ -48,6 +48,22 @@ class User:
         return ret
     return 0
 
+  def check_priority(self, prio, where):
+    action = "*:%s" % (where,)
+    for priv in self.privs:
+      if fnmatch.fnmatch(action, priv):
+	try:
+          val=int(priv.split(":")[0])
+        except ValueError:
+          continue
+        if prio>=val:
+          return prio
+  	else:
+	  return val
+    if prio<10:
+      prio=10
+    return prio
+
   def mail_to(self):
     return self.mailto
 

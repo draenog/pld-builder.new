@@ -89,7 +89,8 @@ def handle_group(r, user):
           fail_mail("user %s is not allowed to binary-%s:%s" \
                         % (user.get_login(), pkg, bld))
           return
-
+  
+  r.priority = user.check_priority(r.priority,config.builder)
   r.requester = user.get_login()
   r.requester_email = user.mail_to()
   r.time = time.time()
