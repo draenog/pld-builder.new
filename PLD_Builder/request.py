@@ -132,7 +132,7 @@ class Batch:
         self.gb_id = ""
         self.b_id = attr(e, "id")
         self.depends_on = string.split(attr(e, "depends-on"))
-        self.upgraded = False
+        self.upgraded = True
         for c in e.childNodes:
             if is_blank(c): continue
             if c.nodeType != Element.ELEMENT_NODE:
