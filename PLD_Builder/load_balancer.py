@@ -42,7 +42,7 @@ def builders_order():
   return bl
 
 def run_rpm_builder(b):
-  prog = path.root_dir + "binary_builder/rpm-builder.sh"
+  prog = path.root_dir + "bin/rpm-builder.sh"
   os.spawnl(os.P_NOWAIT, prog, prog, b)
 
 def main():
