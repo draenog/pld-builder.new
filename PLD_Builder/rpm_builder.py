@@ -129,7 +129,7 @@ def build_rpm(r, b):
             ll("test-build: not copying to /spools/ready/")
         ll("Begin-PLD-Builder-Info")
         if "upgrade" in r.flags:
-            r.upgraded = upgrade.upgrade_from_batch(r, b)
+            b.upgraded = upgrade.upgrade_from_batch(r, b)
         else:
             ll("not upgrading")
         ll("End-PLD-Builder-Info")
