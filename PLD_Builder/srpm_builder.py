@@ -76,7 +76,7 @@ def transfer_file(r, b):
 
   fname = path.srpms_dir + r.id + "/" + b.src_rpm + ".uploadinfo"
   f = open(fname, "w")
-  f.write("info:buildid:%s\ninfo:requester:%s\ninfo:requester_email:%s\nfile:SRPMS:%s\nEND\n" % (b.gb_id, b.requester, b.requester_email, b.src_rpm))
+  f.write("info:build:%s:requester:%s\ninfo:build:%s:requester_email:%s\nfile:SRPMS:%s\nEND\n" % (b.gb_id, b.requester, b.gb_id, b.requester_email, b.src_rpm))
   f.close()
   ftp.add(fname, "uploadinfo")
 
