@@ -10,6 +10,7 @@ import request
 import log
 import path
 import util
+import status
 from acl import acl
 from lock import lock
 from bqueue import B_Queue
@@ -80,6 +81,7 @@ def handle_request(f):
     # FIXME: security email here
     log.alert("invalid signature, or not in acl %s" % em)
     return
+  status.push("email from %s" % user.login)
   r = request.parse_request(body)
   if r.kind == 'group':
     handle_group(r, user)
@@ -91,10 +93,13 @@ def handle_request(f):
     m.set_headers(subject = "unknown request")
     m.write_line(msg)
     m.send()
+  status.pop()
 
 def main():
   init_conf("src")
+  status.push("handling email request")
   handle_request(sys.stdin)
+  status.pop()
   sys.exit(0)
 
 util.wrap(main)

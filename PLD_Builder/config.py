@@ -4,6 +4,7 @@ import os
 
 import path
 import log
+import status
 
 class Builder_Conf:
   def __init__(self):
@@ -35,4 +36,6 @@ config = Builder_Conf()
 
 def init_conf(builder):
   os.environ['LC_ALL'] = "C"
+  status.push("reading builder config")
   config.read(builder)
+  status.pop()

@@ -15,6 +15,8 @@ import path
 import util
 import chroot
 import buildlogs
+import ftp
+import status
 
 from acl import acl
 from lock import lock
@@ -47,6 +49,7 @@ def collect_files(log):
 
 def handle_request(r):
   def build_srpm(b):
+    status.push("building %s" % b.spec)
     b.src_rpm = ""
     builder_opts = "-nu --clean --nodeps"
     cmd = "cd rpm/SPECS; ./builder %s -bs %s -r %s %s 2>&1" % \
@@ -67,6 +70,7 @@ def handle_request(r):
       util.append_to(spec_log, "error: No files produced.")
       res = 1
     buildlogs.add(logfile = spec_log, failed = res)
+    status.pop()
     return res
 
   tmp = path.spool_dir + r.id + "/"
@@ -96,7 +100,7 @@ def handle_request(r):
     local = path.srpms_dir + r.id + "/" + batch.src_rpm
     f = batch.src_rpm_file
     chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
-    # FIXME: copy files to ftp
+    ftp.add(local)
 
   # store new queue and counter for binary builders
   cnt_f = open(path.counter_file, "r+")
@@ -115,10 +119,12 @@ def handle_request(r):
   cnt_f.close()
   # FIXME: send notification?
   buildlogs.flush()
+  ftp.flush()
 
 def main():
   init_conf("src")
   lock("building-srpm")
+  status.push("srpm: processing queue")
   q = B_Queue(path.queue_file)
   if not q.lock(1): return
   q.read()
@@ -126,6 +132,9 @@ def main():
   r = pick_request(q)
   q.write()
   q.unlock()
+  status.pop()
+  status.push("srpm: handling request from %s" % r.requester)
   handle_request(r)
+  status.pop()
 
 util.wrap(main)
