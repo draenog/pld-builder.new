@@ -9,7 +9,12 @@ www_dir = root_dir + "www/"
 acl_conf = conf_dir + "acl.conf"
 builder_conf = conf_dir + "builder.conf"
 
+# spool/
 queue_file = spool_dir + "queue"
+req_queue_file = spool_dir + "req_queue"
 processed_ids_file = spool_dir + "processed_ids"
-counter_file = spool_dir + "counter"
-srpms_dir = spool_dir + "srpms/"
+
+# www/
+srpms_dir = www_dir + "srpms/"
+req_queue_signed_file = www_dir + "queue.gz"
+counter_file = www_dir + "counter"
