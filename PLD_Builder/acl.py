@@ -81,7 +81,7 @@ class ACL_Conf:
   def current_user_login(self):
     if self.current_user != None:
       return self.current_user.login
-    else
+    else:
       return ""
 
 acl = ACL_Conf()
