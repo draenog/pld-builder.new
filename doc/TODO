@@ -28,3 +28,5 @@
 
 - fetch src.rpm once for all builders on this account, separate fetching 
   src.rpms, so we can build and fetch at the same time
+  
+- unify buildlogs.py and ftp.py, both are file queues
