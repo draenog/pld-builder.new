@@ -145,6 +145,7 @@ chr "useradd -c 'PLD $chroot_name builder' -d /home/users/builder -m -g users -s
 chr "cat > /etc/resolv.conf" < /etc/resolv.conf
 chr "cat > /etc/mtab" < /dev/null
 chr "mkdir -p /spools/ready/" < /dev/null
+chr "mkdir -p /spools/poldek/" < /dev/null
 
 install_SPECS_builder () {
   cat >install-specs <<EOF
