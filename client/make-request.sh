@@ -142,4 +142,4 @@ $(gen_req | gpg --clearsign --default-key $default_key)
 EOF
 }
 
-gen_email #| $mailer
+gen_email | $mailer
