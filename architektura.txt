@@ -155,7 +155,13 @@ Z crona:
 
 --------------------------------------------------------------------------
 
-Wszêdzie s/arch/linia? builder? cokolwiek. My¶lê, ¿e mog³by byæ osobny 
-,,arch'' do sec-updates, który by np. nie mia³ w ¼ród³ach w poldku local-ready/
-czy ready/.
+Wszêdzie s/arch/linia? builder? cokolwiek.
 
+My¶lê, ¿e mog³by byæ osobny ,,arch'' do sec-updates, który by np. nie
+mia³ w ¼ród³ach w poldku local-ready/ czy ready/.
+
+Dodatkowo mo¿na by pomy¶leæ o osobnym builderze do budowañ testowych a osobnym
+do produkcyjnych. Bo flage test-build jednak nie bardzo widzê.
+
+Taki builder z doinstalowywalnymi zale¿no¶ciami jest oczywi¶cie chudszy ni¿
+tradycyjny statyczny, wiêc mo¿na z tego skorzystaæ.
