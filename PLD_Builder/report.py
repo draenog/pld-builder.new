@@ -89,3 +89,33 @@ def send_report(r, is_src = False):
       m.write("\n\n")
       
   m.send()
+
+def send_cia_report(r, is_src = False):
+
+  if not is_src:
+    return
+
+  s_failed = ' '.join([b.spec for b in r.batches if b.build_failed])
+  s_ok = ' '.join([b.spec for b in r.batches if not b.build_failed])
+
+  if s_failed: s_failed = "ERRORS: %s" % s_failed
+  if s_ok: s_ok = "OK: %s" % s_ok
+
+  subject = 'Announce %s' % config.bot_channel
+  
+  m = mailer.Message()
+  m.set_headers(to = config.bot_email,
+                subject = subject[0:100])
+  m.set_header("Message-ID", "<%s@pld.src.builder>" % r.id)
+
+  for b in r.batches:
+    if b.build_failed and b.logfile == None:
+      info = b.skip_reason
+    elif b.build_failed: 
+      info = "FAILED"
+    else: 
+      info = "OK"
+    # Instead of hardcoded Ac information use some config variable
+    m.write("{red}Builder Ac src{normal} ({gray}%s{normal}): {light blue}%s{normal}:{yellow}%s{normal} {green}%s{normal}\n" % (r.requester_email, b.spec, b.branch, info)
+	    
+  m.send()
