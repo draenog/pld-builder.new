@@ -10,6 +10,9 @@ class Buildlogs_Queue:
     self.some_failed = 0
 
   def add(self, logfile, failed):
+    # if /dev/null, don't even bother to store it
+    if config.buildlogs_url == "/dev/null":
+      return
     name = os.path.basename(logfile) + ".bz2"
     id = util.uuid()
     os.system("bzip2 --best --force < %s > %s" \
