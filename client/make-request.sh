@@ -39,6 +39,38 @@ die () {
   exit 1
 }
 
+usage() {
+  echo "Usage: make-request.sh [OPTION] ... [SPECFILE] ...."
+  echo ""
+  echo "Mandatory arguments to long options are mandatory for short options too."
+  echo "  -b BUILDER,BUILDER,...  --builder=BUILDER,BUILDER,..."
+  echo "       Sends request to given builders"
+  echo "  --with VALUE --without VALUE"
+  echo "       Build package with(out) a given bcond"
+  echo "  -t   --test-build"
+  echo "       Performs a 'test-build'. Package will be uploaded to test/ tree"
+  echo "       and won't be upgraded on builders"
+  echo "  -r   --ready-build"
+  echo "       Build and upgrade package and upload it to ready/ tree"
+  echo "  -u   --upgrade"
+  echo "       Forces pacakge upgrade (for use with -t)"
+  echo "  -n   --no-upgrade"
+  echo "       Disables package upgrade (for use with -r)"
+  echo "  -ni  -no-install-br"
+  echo "       Do not install missing BuildRequires (--nodeps)"
+  echo "  -f   --flag"
+  echo "  -cf  --command-flag"
+  echo "       Not yet documented"
+  echo "  -c   --command"
+  echo "       Executes a given command on builders"
+  echo "       --cvsup"
+  echo "       Updates builders infrastructure (outside chroot)"
+  echo "  -h   --help"
+  echo "       Displays this help message"
+  exit 0;
+}
+
+
 while [ $# -gt 0 ] ; do
   case "$1" in
     --builder | -b )
@@ -96,6 +128,10 @@ while [ $# -gt 0 ] ; do
 	  command_flags="no-chroot"
 	  command="cvs up"
 	  ;;
+	  
+    --help | -h )
+      usage
+      ;;
       
     -* )
       die "unknown knob: $1"
