@@ -35,13 +35,14 @@ def has_new(control_url):
     try:
         signal.alarm(240)
         f = urllib.urlopen(control_url + "/max_req_no")
+        count = int(string.strip(f.readline()))
         signal.alarm(0)
     except:
         signal.alarm(0)
         log.error("can't fetch %s" % (control_url + "/max_req_no"))
         sys.exit(1)
     res = 0
-    if int(string.strip(f.readline())) != last_count:
+    if count != last_count:
         res = 1
     f.close()
     return res
