@@ -1,15 +1,18 @@
 #!/usr/bin/python
 
 import sys
-from PLD_Builder.squeue import *
+import time
+from PLD_Builder.bqueue import *
 from PLD_Builder.request import *
 from PLD_Builder.gpg import *
 
-q = Src_Queue("src-queue")
-#q.read()
+q = B_Queue("src-queue")
+q.lock(0)
+q.read()
 (em, b) = gpg.verify_sig(open("req.txt"))
 q.add(parse_request(b))
 q.write()
+q.unlock()
 
 for r in q.value():
   r.dump()
