@@ -62,11 +62,11 @@ def build_rpm(r, b):
   res = chroot.run("rpm -U %s" % b.src_rpm, logfile = b.logfile)
   chroot.run("rm -f %s" % b.src_rpm, logfile = b.logfile)
   b.files = []
+  tmpdir = "/tmp/B." + b.b_id[0:6]
   if res:
     b.log_line("error: installing src rpm failed")
     res = 1
   else:
-    tmpdir = "/tmp/B." + b.b_id[0:6]
     chroot.run("install -m 700 -d %s" % tmpdir)
     rpmbuild_opt = "%s --target %s-pld-linux" % (b.bconds_string(), config.arch)
     cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild -bb %s %s" % \
