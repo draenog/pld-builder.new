@@ -85,7 +85,7 @@ def handle_notification(r, user):
   r.apply_to(q)
   for r in not_fin:
     if r.is_done():
-      clean_tmp(path.srpms_dir + r.id)
+      util.clean_tmp(path.srpms_dir + r.id)
   now = time.time()
   def leave_it(r):
     return not r.is_done() or r.time + 4 * 24 * 60 * 60 > now

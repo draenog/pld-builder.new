@@ -9,6 +9,7 @@ import fcntl
 import gpg
 import request
 import util
+import log
 
 class B_Queue:
   def __init__(self, filename):
@@ -53,6 +54,7 @@ class B_Queue:
     self.fd.seek(0)
     self.fd.truncate(0)
     self._write_to(self.fd)
+    self.fd.flush()
 
   def lock(self, no_block):
     self._open()
