@@ -101,6 +101,7 @@ def build_srpm(r, b):
     transfer_file(r, b)
   if res == 0:
     for pref in config.tag_prefixes:
+      util.append_to(b.logfile, "tagging: %s" % pref)
       chroot.run("cd rpm/SPECS; ./builder -r %s -Tp %s -Tv %s" % \
                   (b.branch, pref, b.spec), logfile = b.logfile)
   chroot.run("cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
