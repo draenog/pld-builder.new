@@ -49,6 +49,7 @@ class Group:
     self.priority = 2
     self.time = time.time()
     self.requester = ""
+    self.flags = string.split(attr(e, "flags", ""))
     for c in e.childNodes:
       if is_blank(c): continue
       if c.nodeType != Element.ELEMENT_NODE:
@@ -80,6 +81,7 @@ class Group:
   def dump(self, f):
     f.write("group: %d (id=%s pri=%d)\n" % (self.no, self.id, self.priority))
     f.write("  from: %s\n" % self.requester)
+    f.write("  flags: %s\n" % string.join(self.flags))
     f.write("  time: %s\n" % time.asctime(time.localtime(self.time)))
     for b in self.batches:
       b.dump(f)
@@ -87,10 +89,10 @@ class Group:
 
   def write_to(self, f):
     f.write("""
-       <group id="%s" no="%d">
+       <group id="%s" no="%d" flags="%s">
          <requester>%s</requester>
          <time>%d</time>
-         <priority>%d</priority>\n""" % (self.id, self.no, 
+         <priority>%d</priority>\n""" % (self.id, self.no, string.join(self.flags),
                 escape(self.requester), self.time, self.priority))
     for b in self.batches:
       b.write_to(f)

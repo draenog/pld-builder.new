@@ -90,6 +90,7 @@ def handle_request(r):
 
   r.build_all(build_rpm)
 
+  ftp.init(r)
   for b in r.batches:
     if not b.build_failed: 
       for f in b.files:

@@ -9,12 +9,19 @@ from acl import acl
 
 class FTP_Queue:
   def __init__(self):
-    self.queue = []
+    self.queue = None
     self.some_failed = 0
 
+  def init(self, g):
+    self.queue = []
+    if "test-build" in g.flags:
+      self.url = config.test_ftp_url
+    else:
+      self.url = config.ftp_url
+    
   def add(self, file):
     # if /dev/null, say bye bye
-    if config.ftp_url == "/dev/null":
+    if self.url == "/dev/null":
       return
     name = os.path.basename(file)
     id = util.uuid()
@@ -24,7 +31,7 @@ class FTP_Queue:
   def flush(self):
     def desc(l):
       return "Target: %s/%s\nBuilder: %s\nTime: %d\nRequester: %s\nEND\n" % \
-                (config.ftp_url, l['name'], config.builder, time.time(), 
+                (self.url, l['name'], config.builder, time.time(), 
                  acl.current_user_login())
     
     for l in self.queue:
@@ -46,3 +53,6 @@ def flush():
   
 def kill():
   queue.kill()
+
+def init(r):
+  queue.init(r)
