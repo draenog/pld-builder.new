@@ -36,6 +36,7 @@ class Buildlogs_Queue:
       return """Target: %s/%s
 Builder: %s
 Time: %d
+Type: buildlog
 Requester: %s
 END
 """ % (config.buildlogs_url, l['name'], config.builder, time.time(), self.requester_email)

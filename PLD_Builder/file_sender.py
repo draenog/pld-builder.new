@@ -120,7 +120,11 @@ def flush_queue(dir):
     d = read_name_val(f)
     if d != None: q.append(d)
   def mycmp(x, y):
-    return cmp(x['Time'], y['Time'])
+    rc = cmp(x['Time'], y['Time'])
+    if (rc == 0):
+      return cmp(x['Type'], y['Type'])
+    else:
+      return rc
   q.sort(mycmp)
   
   error = None

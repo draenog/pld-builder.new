@@ -119,7 +119,20 @@ def build_rpm(r, b):
     local = r.tmp_dir + os.path.basename(f)
     chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
     ftp.add(local)
-        
+
+  def uploadinfo(b):
+    c="arch:SRPMS:%s\n" % b.src_rpm
+    for f in b.files:
+	c=c + "arch:ARCH:%s\n" % os.path.basename(f)
+    c=c + "END\n"
+    return c
+
+  fname = r.tmp_dir + b.src_rpm + ".uploadinfo"
+  f = open(fname, "w")
+  f.write(uploadinfo(b))
+  f.close()
+  ftp.add(fname, "uploadinfo")
+
   status.pop()
 
   return res
