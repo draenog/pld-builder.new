@@ -17,6 +17,16 @@ Roadmap:
   go.py -- testing script, don't touch
 
   src_builder/ -- scripts for srpms builder
+  
+    request-handler.sh
+      Script to be run from procmail. It process incoming request, 
+      authorizes it and stores in spool/queue.
+
+    src-builder.sh
+      Script to be run from cron. It looks for new requests in spool/queue,
+      gets them from there, builds SRPM, and stores request for binary
+      builders in spool/req_queue (which is mirrored in www/ directory,
+      signed and compressed). SRPMS and buildlogs are queued for transmission.
 
 Working directories:
   lock/
