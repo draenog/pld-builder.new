@@ -34,7 +34,9 @@ X-PLD-Builder: fatal error report
 %s
 
 during: %s
-""" % (status.admin, status.email, time.asctime(), s.getvalue(), status.get()))
+""" % (status.admin, status.email, \
+       time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()), \
+       s.getvalue(), status.get()))
     f.close()
 
     sys.exit(1)
