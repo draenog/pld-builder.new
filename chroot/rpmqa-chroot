@@ -1,0 +1,11 @@
+#!/bin/sh
+# generate rpm -qa without locking database
+
+set -e
+umask 077
+dir=`mktemp -d /tmp/db-XXXXXX`
+cp /var/lib/rpm/Packages $dir
+cp /var/lib/rpm/Name $dir
+rpm --dbpath $dir -qa | sort
+rm -rf $dir
+
