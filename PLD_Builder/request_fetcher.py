@@ -37,7 +37,11 @@ def has_new(control_url):
   return res
 
 def fetch_queue(control_url):
-  f = urllib.urlopen(control_url + "/queue.gz")
+  try:
+    f = urllib.urlopen(control_url + "/queue.gz")
+  except:
+    log.error("can't fetch %s" % (control_url + "/queue.gz"))
+    sys.exit(1)
   sio = StringIO.StringIO()
   util.sendfile(f, sio)
   f.close()
