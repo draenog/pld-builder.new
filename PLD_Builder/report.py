@@ -118,7 +118,7 @@ def send_cia_report(r, is_src = False):
     m.write('</package>\n')
 
   # get footer of xml message from file
-  f.open(path.root_dir + 'PLD_Builder/cia-foot.xml')
+  f = open(path.root_dir + 'PLD_Builder/cia-foot.xml')
   m.write(f.read())
   f.close()
 	    
