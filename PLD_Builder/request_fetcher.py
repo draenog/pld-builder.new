@@ -1,4 +1,5 @@
 import string
+import signal
 import os
 import urllib
 import StringIO
