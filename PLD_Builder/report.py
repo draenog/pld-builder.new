@@ -2,7 +2,7 @@ import string
 
 import ftp
 import stopwatch
-from acl import acl
+import mailer
 
 def unpackaged_files(b):
   msg = "warning: Installed (but unpackaged) file(s) found:\n"
@@ -59,8 +59,9 @@ def send_report(r):
   if s_ok != []:
     subject += " OK: " + string.join(names(s_ok))
   
-  m = acl.user(r.requester).message_to()
-  m.set_headers(subject = subject[0:100])
+  m = mailer.Message()
+  m.set_headers(to = r.requester_email,
+                subject = subject[0:100])
 
   for b in r.batches:
     if b.build_failed and b.logfile == None:

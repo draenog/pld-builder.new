@@ -5,7 +5,6 @@ import time
 
 from config import config
 import util
-from acl import acl
 
 class FTP_Queue:
   def __init__(self):
@@ -15,6 +14,7 @@ class FTP_Queue:
 
   def init(self, g):
     self.queue = []
+    self.requester_email = g.requester_email
     if "test-build" in g.flags:
       self.url = config.test_ftp_url
     else:
@@ -35,7 +35,7 @@ class FTP_Queue:
     def desc(l):
       return "Target: %s/%s\nBuilder: %s\nTime: %d\nRequester: %s\nEND\n" % \
                 (self.url, l['name'], config.builder, time.time(), 
-                 acl.current_user_login())
+                 self.requester_email)
     
     for l in self.queue:
       f = open(path.ftp_queue_dir + l['id'] + ".desc", "w")

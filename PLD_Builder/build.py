@@ -2,7 +2,6 @@ import string
 import os
 import atexit
 
-from acl import acl
 import notify
 import path
 import util
@@ -11,9 +10,10 @@ import stopwatch
 import report
 import log
 import buildlogs
+import status
 
 def build_all(r, build_fnc):
-  acl.set_current_user(acl.user(r.requester))
+  status.email = r.requester_email
   notify.begin(r)
   tmp = path.spool_dir + util.uuid() + "/"
   r.tmp_dir = tmp

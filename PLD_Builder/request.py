@@ -5,19 +5,17 @@ import xml.sax.saxutils
 
 import util
 import log
+from acl import acl
 
 __all__ = ['parse_request', 'parse_requests']
   
 def text(e):
-  if len(e.childNodes) == 0:
-    return ""
-  elif len(e.childNodes) == 1:
-    n = e.childNodes[0]
+  res = ""
+  for n in e.childNodes:
     if n.nodeType != Element.TEXT_NODE:
-      raise "xml: text expected: <%s>" % e.nodeName
-    return n.nodeValue
-  else:
-    raise "xml: text expected: <%s>" % e.nodeName
+      log.panic("xml: text expected in <%s>, got %d" % (e.nodeName, n.nodeType))
+    res += n.nodeValue
+  return res
 
 def attr(e, a, default = None):
   try:
@@ -42,21 +40,23 @@ class Group:
     self.priority = 2
     self.time = time.time()
     self.requester = ""
+    self.requester_email = ""
     self.flags = string.split(attr(e, "flags", ""))
     for c in e.childNodes:
       if is_blank(c): continue
       if c.nodeType != Element.ELEMENT_NODE:
-        raise "xml: evil group child %d" % c.nodeType
+        log.panic("xml: evil group child %d" % c.nodeType)
       if c.nodeName == "batch":
         self.batches.append(Batch(c))
       elif c.nodeName == "requester":
         self.requester = text(c)
+        self.requester_email = attr(c, "email", "")
       elif c.nodeName == "priority":
         self.priority = int(text(c))
       elif c.nodeName == "time":
         self.time = int(text(c))
       else:
-        raise "xml: evil group child (%s)" % c.nodeName
+        log.panic("xml: evil group child (%s)" % c.nodeName)
     # note that we also check that group is sorted WRT deps
     m = {}
     for b in self.batches:
@@ -68,8 +68,10 @@ class Group:
           if id(m[dep]) != id(b):
             deps.append(m[dep])
         else:
-          raise "xml: dependency not found in group"
+          log.panic("xml: dependency not found in group")
       b.depends_on = deps
+    if self.requester_email == "" and self.requester != "":
+      self.requester_email = acl.user(self.requester).mail_to()
 
   def dump(self, f):
     f.write("group: %d (id=%s pri=%d)\n" % (self.no, self.id, self.priority))
@@ -95,10 +97,11 @@ class Group:
   def write_to(self, f):
     f.write("""
        <group id="%s" no="%d" flags="%s">
-         <requester>%s</requester>
+         <requester email='%s'>%s</requester>
          <time>%d</time>
          <priority>%d</priority>\n""" % (self.id, self.no, string.join(self.flags),
-                escape(self.requester), self.time, self.priority))
+                escape(self.requester_email), escape(self.requester), 
+                self.time, self.priority))
     for b in self.batches:
       b.write_to(f)
     f.write("       </group>\n\n")
@@ -125,7 +128,7 @@ class Batch:
     for c in e.childNodes:
       if is_blank(c): continue
       if c.nodeType != Element.ELEMENT_NODE:
-        raise "xml: evil batch child %d" % c.nodeType
+        log.panic("xml: evil batch child %d" % c.nodeType)
       if c.nodeName == "src-rpm":
         self.src_rpm = text(c)
       elif c.nodeName == "spec":
@@ -142,7 +145,7 @@ class Batch:
       elif c.nodeName == "without":
         self.bconds_without.append(text(c))
       else:
-        raise "xml: evil batch child (%s)" % c.nodeName
+        log.panic("xml: evil batch child (%s)" % c.nodeName)
  
   def is_done(self):
     ok = 1
@@ -222,15 +225,15 @@ class Notification:
     for c in e.childNodes:
       if is_blank(c): continue
       if c.nodeType != Element.ELEMENT_NODE:
-        raise "xml: evil notification child %d" % c.nodeType
+        log.panic("xml: evil notification child %d" % c.nodeType)
       if c.nodeName == "batch":
         id = attr(c, "id")
         status = attr(c, "status")
         if status != "OK" and status != "FAIL" and status != "SKIP":
-          raise "xml notification: bad status: %s" % self.status
+          log.panic("xml notification: bad status: %s" % self.status)
         self.batches[id] = status
       else:
-        raise "xml: evil notification child (%s)" % c.nodeName
+        log.panic("xml: evil notification child (%s)" % c.nodeName)
 
   def apply_to(self, q):
     for r in q.requests:
@@ -241,7 +244,7 @@ class Notification:
 
 def build_request(e):
   if e.nodeType != Element.ELEMENT_NODE:
-    raise "xml: evil request element"
+    log.panic("xml: evil request element")
   if e.nodeName == "group":
     return Group(e)
   elif e.nodeName == "notification":
@@ -250,7 +253,7 @@ def build_request(e):
     # FIXME
     return Command(e)
   else:
-    raise "xml: evil request <%s>" % e.nodeName
+    log.panic("xml: evil request <%s>" % e.nodeName)
 
 def parse_request(f):
   d = parse(f)
