@@ -10,7 +10,7 @@ def verify_sig(buf):
   where signer-emails is lists of strings, and signed-body is StringIO
   object.
   """
-  (gpg_out, gpg_in, gpg_err) = popen2.popen3("LC_ALL=C gpg --decrypt")
+  (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --decrypt")
   gpg_in.write(buf.read())
   gpg_in.close()
   body = StringIO.StringIO()
@@ -28,7 +28,7 @@ def verify_sig(buf):
   return (emails, body)
 
 def sign(buf):
-  (gpg_out, gpg_in, gpg_err) = popen2.popen3("LC_ALL=C gpg --clearsign --default-key builder")
+  (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --clearsign --default-key builder")
   gpg_in.write(buf.read())
   gpg_in.close()
   body = StringIO.StringIO()
@@ -38,3 +38,5 @@ def sign(buf):
   gpg_out.close()
   gpg_err.close()
   return body
+
+locale.sanitize()
