@@ -121,9 +121,9 @@ def build_rpm(r, b):
     ftp.add(local)
 
   def uploadinfo(b):
-    c="arch:SRPMS:%s\n" % b.src_rpm
+    c="file:SRPMS:%s\n" % b.src_rpm
     for f in b.files:
-	c=c + "arch:ARCH:%s\n" % os.path.basename(f)
+	c=c + "file:ARCH:%s\n" % os.path.basename(f)
     c=c + "END\n"
     return c
 
