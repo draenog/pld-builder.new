@@ -8,7 +8,7 @@ USAGE: $0 name1=val2 name2=val2 ...
 Variables:
   chroot_type=src or chroot_type=bin 	 (required)
   chroot_dir=/path/to/chroot 		 (required)
-  dist_url=ftp://ftp.nest.pld-linux.org/ (required)
+  dist_url=ftp://ftp.nest.pld-linux.org (required)
   arch=i386 				 (required)
   cvs_root=:pserver:<user>:<password>@<host>:<cvsroot>
   					 (required in src builder)
