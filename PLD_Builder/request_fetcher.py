@@ -12,7 +12,7 @@ import lock
 import util
 import gpg
 import request
-import wrap
+import loop
 from acl import acl
 from bqueue import B_Queue
 from config import config, init_conf
@@ -71,7 +71,7 @@ def handle_reqs(builder, reqs):
   q.unlock()
 
 def main():
-  lock.lock("request_fetcher")
+  lck = lock.lock("request_fetcher")
   init_conf("")
   
   status.push("fetching requests")
@@ -90,6 +90,9 @@ def main():
     f.write("%d\n" % max_no)
     f.close()
   status.pop()
+  lck.close()
   
 if __name__ == '__main__':
-  wrap.wrap(main)
+  # http connection is established (and few bytes transferred through it) 
+  # each $secs seconds.
+  loop.run_loop(main, secs = 10)

@@ -9,7 +9,7 @@ from bqueue import B_Queue
 from acl import acl
 import lock
 import util
-import wrap
+import loop
 import path
 import status
 import log
@@ -105,12 +105,15 @@ def handle_request(r):
   notify.send()
 
 def check_load():
+  do_exit = 0
   try:
     f = open("/proc/loadavg")
     if float(string.split(f.readline())[2]) > config.max_load:
-      sys.exit(0)
+      do_exit = 1
   except:
     pass
+  if do_exit:
+    sys.exit(0)
 
 def main_for(builder):
   init_conf(builder)
@@ -160,4 +163,4 @@ def main():
   return main_for(sys.argv[1])
   
 if __name__ == '__main__':
-  wrap.wrap(main)
+  loop.run_loop(main)

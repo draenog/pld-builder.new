@@ -13,7 +13,7 @@ import request
 import log
 import path
 import util
-import wrap
+import loop
 import chroot
 import buildlogs
 import ftp
@@ -131,4 +131,4 @@ def main():
   status.pop()
 
 if __name__ == '__main__':
-  wrap.wrap(main)
+  loop.run_loop(main)
