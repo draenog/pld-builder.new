@@ -1,5 +1,8 @@
 #!/bin/sh
 
+DIST="th"
+DISTTAG="PLD 3.0 (Th)"
+
 die () {
   echo "$0: $*" 1>&2
   cat 1>&2 <<EOF
@@ -8,12 +11,11 @@ USAGE: $0 name1=val2 name2=val2 ...
 Variables:
   chroot_type=src or chroot_type=bin 	 (required)
   chroot_dir=/path/to/chroot 		 (required)
-  dist_url=ftp://ftp.nest.pld-linux.org (required)
   arch=i386 				 (required)
   cvs_root=:pserver:<user>:<password>@<host>:<cvsroot>
   					 (required in src builder)
   builder_uid=2000 			 (optional, uid of builder user 
-  					  in chroot)
+  					  in chroot; defaults to current uid)
 EOF
   exit 1
 }
@@ -35,7 +37,8 @@ default_config () {
 check_conf () {
   test "$chroot_dir" || die "no chroot_dir"
   test "$arch" || die "no arch"
-  test "$dist_url" || die "no dist_url"
+#  test "$dist_url" || die "no dist_url"
+  dist_url="ftp://ftp.$DIST.pld-linux.org"
   
   case "$chroot_type" in
   src )
@@ -49,26 +52,21 @@ check_conf () {
   esac
 }
 
-eval "$*" || usage
-default_config
-eval "$*"
-check_conf
-
 poldek_src () {
   if test "$1" ; then
     echo "source = local,pri=1 /spools/ready/"
   fi
   cat <<EOF
-source = main-test,noauto,pri=2 $dist_url/dists/ac/test/$arch/
-source = main-ready,pri=3 $dist_url/dists/ac/ready/$arch/
-source = main-ug,pri=4 $dist_url/dists/ac/updates/general/$arch/
-source = main-us,pri=5 $dist_url/dists/ac/updates/security/$arch/
-source = main,pri=6 $dist_url/dists/ac/PLD/$arch/PLD/RPMS/
+source = main-test,noauto,pri=2 $dist_url/dists/$DIST/test/$arch/RPMS/
+source = main-ready,pri=3 $dist_url/dists/$DIST/ready/$arch/RPMS/
+source = main-ug,pri=4 $dist_url/dists/$DIST/updates-general/$arch/RPMS/
+source = main-us,pri=5 $dist_url/dists/$DIST/updates-security/$arch/RPMS/
+source = main,pri=6 $dist_url/dists/$DIST/$arch/RPMS/
 EOF
 }
 
 common_poldek_opt () {
-cat <<EOF
+  cat <<EOF
 particle_install = no
 greedy = yes
 rpmdef = _excludedocs 1
@@ -82,6 +80,46 @@ chr() {
 chb() {
   sudo chroot $chroot_dir su - builder -c "$*"
 }
+
+install_SPECS_builder () {
+  cat >install-specs <<EOF
+set -x
+rm -rf rpm
+mkdir rpm
+cvs -d $cvs_root login
+cd rpm
+cvs -d $cvs_root co SPECS/builder
+cvs -d $cvs_root co SOURCES/.cvsignore
+mkdir SRPMS RPMS BUILD
+cd SPECS
+cvs up additional-md5sums mirrors
+EOF
+  chb "sh" < install-specs
+  rm install-specs
+}
+
+install_build_tree () {
+  cat >install-bt <<EOF
+set -x
+rm -rf rpm
+mkdir rpm
+cd rpm
+mkdir SPECS SOURCES SRPMS RPMS BUILD
+echo "%packager       PLD bug tracking system ( http://bugs.pld-linux.org/ )">.rpmmacros
+echo "%vendor         PLD">>.rpmmacros
+echo "%distribution   $DISTTAG">>rpmmacros
+EOF
+  chb "sh" < install-bt
+  rm install-bt
+}
+
+
+
+
+eval "$*" || usage
+default_config
+eval "$*"
+check_conf
 
 rm -rf tmp-chroot
 mkdir tmp-chroot
@@ -147,34 +185,6 @@ chr "cat > /etc/mtab" < /dev/null
 chr "mkdir -p /spools/ready/" < /dev/null
 chr "mkdir -p /spools/poldek/" < /dev/null
 
-install_SPECS_builder () {
-  cat >install-specs <<EOF
-set -x
-rm -rf rpm
-mkdir rpm
-cvs -d $cvs_root login
-cd rpm
-cvs -d $cvs_root co SPECS/builder
-cvs -d $cvs_root co SOURCES/.cvsignore
-mkdir SRPMS RPMS BUILD
-cd SPECS
-cvs up additional-md5sums mirrors
-EOF
-  chb "sh" < install-specs
-  rm install-specs
-}
-
-install_build_tree () {
-  cat >install-bt <<EOF
-set -x
-rm -rf rpm
-mkdir rpm
-cd rpm
-mkdir SPECS SOURCES SRPMS RPMS BUILD
-EOF
-  chb "sh" < install-bt
-  rm install-bt
-}
 
 case $chroot_type in
   src )
