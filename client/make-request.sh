@@ -8,11 +8,17 @@ flags=
 command=
 command_flags=
 
-if [ -f "$HOME/.requestrc" ]; then
-	. $HOME/.requestrc
+if [ -n "$HOME_ETC" ]; then
+	USER_CFG=$HOME_ETC/.requestrc
 else
-	echo "Creating config file ~/.requestrc. You *must* edit it."
-	cat >$HOME/.requestrc <<EOF
+	USER_CFG=$HOME/.requestrc
+fi;
+
+if [ -f "$USER_CFG" ]; then
+	. $USER_CFG
+else
+	echo "Creating config file $USER_CFG. You *must* edit it."
+	cat >$USER_CFG <<EOF
 priority=2
 requester=deviloper@pld-linux.org
 default_key=deviloper@pld-linux.org
