@@ -129,13 +129,15 @@ case "$ans" in
     exit 1
 esac
 
+chr "ldconfig"
+
 echo "OK"
 echo "installing conf..."
 cat >poldek.conf <<EOF
 $(poldek_src local)
 $(common_poldek_opt)
 cachedir = /spools/poldek
-keep_downloads = yes
+keep_downloads = no
 EOF
 
 chr "cat > /etc/poldek.conf" < poldek.conf
