@@ -1,5 +1,6 @@
 import ConfigParser
 import string
+import fnmatch
 
 import path
 import log
@@ -24,22 +25,20 @@ class User:
         if len(l) != 2 or l[0] == "" or l[1] == "":
           log.alert("acl: invalid priv format: '%s' [%s]" % (p, login))
         else:
-          self.privs.append((l[0], l[1]))
+          self.privs.append(p)
     else:
       log.alert("acl: [%s] has no privs" % login)
 
   def can_do(self, what, where):
-    # TODO: use fnmatch
-    for (pwhat, pwhere) in self.privs:
-      if pwhat[0] == "!":
+    action = "%s:%s" % (what, where)
+    for priv in self.privs:
+      if priv[0] == "!":
         ret = 0
-        pwhat = pwhat[1:]
+        priv = priv[1:]
       else:
         ret = 1
-      if pwhat == "*" or pwhat == what:
-        if pwhere == "*" or pwhere == where:
-          return ret
-
+      if fnmatch.fnmatch(action, priv):
+        return ret
     return 0
 
   def mail_to(self):
