@@ -28,13 +28,14 @@ class Builder_Conf:
     self.control_url = get("control_url")
     self.queue_signed_by = get("queue_signed_by")
     self.admin_email = get("admin_email")
+    self.email = self.admin_email
+    self.builder = builder
 
     if builder == "all":
       return
 
     if builder not in p.sections():
       log.panic("builder %s not in config file" % builder)
-    self.builder = builder
     self.arch = get("arch")
     self.chroot = get("chroot")
     self.email = get("email")
