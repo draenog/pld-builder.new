@@ -2,6 +2,7 @@ import re
 import string
 
 import chroot
+import util
 
 hold = [ 
   'poldek',
