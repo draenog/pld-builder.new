@@ -37,16 +37,6 @@ def pick_request(q):
   q.requests = q.requests[1:]
   return ret
 
-def collect_files(log):
-  f = open(log)
-  rx = re.compile(r"^Wrote: (/home.*\.rpm)$")
-  files = []
-  for l in f.xreadlines():
-    m = rx.search(l)
-    if m:
-      files.append(m.group(1))
-  return files
-
 def handle_request(r):
   def build_srpm(b):
     status.push("building %s" % b.spec)
@@ -57,7 +47,7 @@ def handle_request(r):
     spec_log = tmp + b.spec + ".log"
     util.append_to(spec_log, "Building SRPM using: %s\n" % cmd)
     res = chroot.run(cmd, logfile = spec_log)
-    files = collect_files(spec_log)
+    files = util.collect_files(spec_log)
     if len(files) > 0:
       if len(files) > 1:
         util.append_to(spec_log, "error: More then one file produced: %s" % files)

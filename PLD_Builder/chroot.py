@@ -11,8 +11,8 @@ def command(cmd, user = "builder"):
 def command_sh(cmd):
   return "sudo chroot %s /bin/sh -c \"export LC_ALL=C; %s\"" % (config.chroot, quote(cmd))
 
-def popen(cmd, user = "builder"):
-  f = os.popen(command(cmd, user))
+def popen(cmd, user = "builder", mode = "r"):
+  f = os.popen(command(cmd, user), mode)
   return f
   
 def run(cmd, user = "builder", logfile = None):

@@ -8,6 +8,7 @@ import status
 
 class Builder_Conf:
   def __init__(self):
+    self.done = 0
     pass
 
   def read(self, builder):
@@ -34,11 +35,13 @@ class Builder_Conf:
     self.job_slots = int(get("job_slots"))
     self.max_load = float(get("max_load"))
     self.control_url = get("control_url")
+    self.done = 1
 
 config = Builder_Conf()
 
 def init_conf(builder):
   os.environ['LC_ALL'] = "C"
   status.push("reading builder config")
+  log.builder = builder
   config.read(builder)
   status.pop()

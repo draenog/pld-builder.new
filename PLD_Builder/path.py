@@ -16,6 +16,7 @@ processed_ids_file = spool_dir + "processed_ids"
 buildlogs_queue_dir = spool_dir + "buildlogs/"
 ftp_queue_dir = spool_dir + "ftp/"
 last_req_no_file = spool_dir + "last_req_no"
+got_lock_file = spool_dir + "got_lock"
 
 # www/
 srpms_dir = www_dir + "srpms/"

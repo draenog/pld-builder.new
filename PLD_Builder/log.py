@@ -1,7 +1,9 @@
 import sys
 
+builder = ""
+
 def log(s):
-  sys.stderr.write("LOG: %s\n" % s)
+  sys.stderr.write("LOG[%s]: %s\n" % (builder, s))
   
 def alert(s):
   log("alert: %s" % s) 
