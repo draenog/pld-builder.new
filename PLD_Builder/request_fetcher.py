@@ -75,7 +75,9 @@ def handle_reqs(builder, reqs):
   q.unlock()
 
 def main():
-  lck = lock.lock("request_fetcher")
+  lck = lock.lock("request_fetcher", non_block = True)
+  if lck == None:
+    sys.exit(1)
   init_conf("")
   
   status.push("fetching requests")
