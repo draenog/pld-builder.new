@@ -80,6 +80,7 @@ class Builder_Conf:
     self.job_slots = int(get("job_slots"))
     self.max_load = float(get("max_load"))
     self.control_url = get("control_url")
+    self.builder_user = get("builder_user", "builder")
     
     f = get("syslog", "")
     if f != "":

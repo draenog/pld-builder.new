@@ -5,7 +5,9 @@ from config import config
 def quote(cmd):
   return re.sub("([\"\\\\$`])", r"\\\1", cmd)
   
-def command(cmd, user = "builder"):
+def command(cmd, user = None):
+  if user == None:
+    user = config.builder_user
   return "sudo chroot %s su - %s -c \"export LC_ALL=C; %s\"" % (config.chroot, user, quote(cmd))
   
 def command_sh(cmd):
