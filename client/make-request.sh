@@ -85,6 +85,11 @@ while [ $# -gt 0 ] ; do
       command="$2"
       shift
       ;;
+
+	--cvsup )
+	  command_flags="no-chroot"
+	  command="cvs up"
+	  ;;
       
     -* )
       die "unknown knob: $1"
