@@ -116,7 +116,7 @@ def handle_request(r):
   ftp.init(r)
   buildlogs.init(r)
   build.build_all(r, build_rpm)
-  report.send_report(r)
+  report.send_report(r, is_src = False)
   ftp.flush()
   notify.send()
 

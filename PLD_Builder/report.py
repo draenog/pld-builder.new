@@ -49,7 +49,7 @@ def info_from_log(b, target):
       else:
         target.write(l)
   
-def send_report(r):
+def send_report(r, is_src = False):
   def names(l): return map(lambda (b): b.spec, l)
   s_failed = filter(lambda (x): x.build_failed, r.batches)
   s_ok = filter(lambda (x): not x.build_failed, r.batches)
@@ -62,6 +62,11 @@ def send_report(r):
   m = mailer.Message()
   m.set_headers(to = r.requester_email,
                 subject = subject[0:100])
+  if is_src:
+    m.set_header("Message-ID", "<%s@pld.src.builder>" % r.id)
+  else:
+    m.set_header("References", "<%s@pld.src.builder>" % r.id)
+    m.set_header("In-Reply-To", "<%s@pld.src.builder>" % r.id)
 
   for b in r.batches:
     if b.build_failed and b.logfile == None:
