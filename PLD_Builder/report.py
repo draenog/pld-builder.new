@@ -116,6 +116,6 @@ def send_cia_report(r, is_src = False):
     else: 
       info = "OK"
     # Instead of hardcoded Ac information use some config variable
-    m.write("{red}Builder Ac src{normal} ({gray}%s{normal}): {light blue}%s{normal}:{yellow}%s{normal} {green}%s{normal}\n" % (r.requester_email, b.spec, b.branch, info)
+    m.write("{red}Builder Ac src{normal} ({gray}%s{normal}): {light blue}%s{normal}:{yellow}%s{normal} {green}%s{normal}\n" % (r.requester_email, b.spec, b.branch, info))
 	    
   m.send()
