@@ -21,7 +21,7 @@ EOF
 }
 
 default_config () {
-  builder_pkgs="rpm-build poldek shadow net-tools which rpm-perlprov rpm-php-pearprov rpm-pythonprov"
+  builder_pkgs="rpm-build poldek shadow net-tools which rpm-perlprov rpm-php-pearprov rpm-pythonprov bash"
   builder_uid=`id -u`
   dist_url="ftp://ftp.$DIST.pld-linux.org"
 
@@ -179,11 +179,12 @@ keep_downloads = no
 EOF
 
 chr "cat > /etc/poldek.conf" < poldek.conf
-chr "useradd -u "$builder_uid" -c 'PLD $chroot_name builder' -d /home/users/builder -m -g users -s /bin/sh builder"
+chr "useradd -u "$builder_uid" -c 'PLD $chroot_name builder' -d /home/users/builder -m -g users -s /bin/bash builder"
 chr "cat > /etc/resolv.conf" < /etc/resolv.conf
 chr "cat > /etc/mtab" < /dev/null
 chr "mkdir -p /spools/ready/" < /dev/null
 chr "mkdir -p /spools/poldek/" < /dev/null
+chr "sed -e 's,^\(root:.*\)/bin/sh$,\1/bin/bash,' -i~ /etc/passwd"
 
 
 case $chroot_type in
