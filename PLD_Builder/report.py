@@ -96,6 +96,9 @@ def send_cia_report(r, is_src = False):
   subject = 'DeliverXML'
   
   m = mailer.Message()
+  if (len(config.bot_email) == 0):
+    return
+
   m.set_headers(to = config.bot_email,
                 subject = subject)
   m.set_header("Message-ID", "<%s@pld.src.builder>" % r.id)
