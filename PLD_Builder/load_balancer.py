@@ -15,7 +15,7 @@ from config import config, init_conf
 def builders_order():
   bs = {}
   bl = []
-  for b in config.builders:
+  for b in config.binary_builders:
     bs[b] = 0
     bl.append(b)
     

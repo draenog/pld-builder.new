@@ -22,14 +22,14 @@ class Builder_Conf:
         return d
       else:
         log.panic("cannot find %s::%s" % (builder, o))
-        
-    if builder == "src":
-      self.builder = get("src_builder", builder)
-    else
-      self.builder = builder
-
+    
     p.readfp(open(path.builder_conf))
-    self.builders = string.split(get("builders"))
+
+    if builder == "src":
+      builder = get("src_builder", builder)
+    self.builder = builder
+
+    self.binary_builders = string.split(get("binary_builders"))
     self.control_url = get("control_url")
     self.queue_signed_by = get("queue_signed_by")
     self.notify_email = get("notify_email")

@@ -64,6 +64,6 @@ class Message:
     util.sendfile(self.body, f)
 
   def send(self):
-    f = os.popen("/usr/sbin/sendmail -t")
+    f = os.popen("/usr/sbin/sendmail -t", "w")
     self.write_to(f)
     f.close()

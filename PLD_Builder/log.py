@@ -7,7 +7,7 @@ builder = ""
 
 def log(s):
   f = open(path.log_file, "a")
-  f.stderr.write("%s [%s]: %s\n" % (time.asctime(), builder, s))
+  f.write("%s [%s]: %s\n" % (time.asctime(), builder, s))
   f.close()
   
 def alert(s):

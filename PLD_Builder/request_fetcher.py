@@ -84,7 +84,7 @@ def main():
         max_no = r.no
       if r.no > last_count:
         q_new.append(r)
-    for b in config.builders:
+    for b in config.binary_builders:
       handle_reqs(b, q_new)
     f = open(path.last_req_no_file, "w")
     f.write("%d\n" % max_no)

@@ -26,9 +26,13 @@ def text(e):
     raise "xml: text expected: <%s>" % e.nodeName
 
 def attr(e, a, default = None):
-  if default != None and not e.attributes.has_key(a):
-    return default
-  return e.attributes[a].value
+  try:
+    return e.attributes[a].value
+  except:
+    if default != None:
+      return default
+    # get the same exception
+    return e.attributes[a].value
 
 def escape(s):
   return xml.sax.saxutils.escape(s)
@@ -174,6 +178,7 @@ class Batch:
     self.bconds_with = []
     self.bconds_without = []
     self.builders = []
+    self.builders_status = {}
     self.branch = ""
     self.src_rpm = ""
     self.info = ""

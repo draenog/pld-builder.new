@@ -138,6 +138,7 @@ def flush_queue(dir):
     m.write("there were problems sending files from queue %s:\n" % dir)
     m.write("problem: %s\n" % problem)
     m.send()
+    log.error("error sending files from %s: %s" % (dir, problem))
     return 1
 
   return 0
