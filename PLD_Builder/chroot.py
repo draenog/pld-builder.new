@@ -8,10 +8,12 @@ def quote(cmd):
 def command(cmd, user = None):
   if user == None:
     user = config.builder_user
-  return "sudo chroot %s su - %s -c \"export LC_ALL=C; %s\"" % (config.chroot, user, quote(cmd))
+  return "%s sudo chroot %s su - %s -c \"export LC_ALL=C; %s\"" \
+                % (config.sudo_chroot_wrapper, config.chroot, user, quote(cmd))
   
 def command_sh(cmd):
-  return "sudo chroot %s /bin/sh -c \"export LC_ALL=C; %s\"" % (config.chroot, quote(cmd))
+  return "%s sudo chroot %s /bin/sh -c \"export LC_ALL=C; %s\"" \
+        % (config.sudo_chroot_wrapper, config.chroot, quote(cmd))
 
 def popen(cmd, user = "builder", mode = "r"):
   f = os.popen(command(cmd, user), mode)
