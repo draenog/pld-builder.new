@@ -24,6 +24,13 @@ class Builder_Conf:
         log.panic("cannot find %s::%s" % (builder, o))
         
     p.readfp(open(path.builder_conf))
+    self.builders = string.split(get("builders"))
+    self.control_url = get("control_url")
+    self.queue_signed_by = get("queue_signed_by")
+
+    if builder == "all":
+      return
+
     if builder not in p.sections():
       log.panic("builder %s not in config file" % builder)
     self.builder = builder
@@ -43,5 +50,6 @@ def init_conf(builder):
   os.environ['LC_ALL'] = "C"
   status.push("reading builder config")
   log.builder = builder
+  if builder == "": builder = "all"
   config.read(builder)
   status.pop()
