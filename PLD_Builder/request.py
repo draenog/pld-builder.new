@@ -28,11 +28,12 @@ def is_blank(e):
 class Group:
   def __init__(self, e):
     self.batches = []
-    self.is_group = 1
+    self.kind = 'group'
     self.id = attr(e, "id")
     self.no = int(attr(e, "no"))
     self.priority = 2
     self.time = time.time()
+    self.requester = None
     for c in e.childNodes:
       if is_blank(c): continue
       if c.nodeType != Element.ELEMENT_NODE:
@@ -47,6 +48,8 @@ class Group:
         self.time = int(text(c))
       else:
         raise "xml: evil group child (%s)" % c.nodeName
+    if self.requester == None:
+      raise "xml: no requester"
 
   def dump(self):
     print "group: %s @%d" % (self.id, self.priority)
@@ -71,6 +74,10 @@ class Batch:
     self.bconds_with = []
     self.bconds_without = []
     self.builders = []
+    self.branch = ""
+    self.src_rpm = ""
+    self.info = ""
+    self.spec = ""
     for c in e.childNodes:
       if is_blank(c): continue
       if c.nodeType != Element.ELEMENT_NODE:
@@ -81,6 +88,8 @@ class Batch:
         self.spec = text(c)
       elif c.nodeName == "info":
         self.info = text(c)
+      elif c.nodeName == "branch":
+        self.branch = text(c)
       elif c.nodeName == "builder":
         self.builders.append(text(c))
       elif c.nodeName == "with":
@@ -93,6 +102,7 @@ class Batch:
   def dump(self):
     print "  batch: %s/%s" % (self.src_rpm, self.spec)
     print "    info: %s" % self.info
+    print "    branch: %s" % self.branch
     print "    with: %s" % string.join(self.bconds_with)
     print "    without: %s" % string.join(self.bconds_without)
     print "    for: %s" % string.join(self.builders)
@@ -102,14 +112,13 @@ class Batch:
          <batch>
            <src-rpm>%s</src-rpm>
            <spec>%s</spec>
-           <info>%s</info>\n\n""" % (escape(self.src_rpm), 
-                                   escape(self.spec), escape(self.info)))
+           <branch>%s</branch>
+           <info>%s</info>\n""" % (escape(self.src_rpm), 
+             escape(self.spec), escape(self.branch), escape(self.info)))
     for b in self.bconds_with:
       f.write("           <with>%s</with>\n" % escape(b))
-    f.write("\n")
     for b in self.bconds_without:
       f.write("           <without>%s</without>\n" % escape(b))
-    f.write("\n")
     for b in self.builders:
       f.write("           <builder>%s</builder>\n" % escape(b))
     f.write("         </batch>\n")
