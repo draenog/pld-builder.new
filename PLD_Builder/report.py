@@ -117,9 +117,9 @@ def send_cia_report(r, is_src = False):
     m.write('</package>\n')
 
   # get footer of xml message from file
-  f.open('cia-foot.xml')
-  m.write(f.read())
-  f.close()
+  #f.open('cia-foot.xml')
+  #m.write(f.read())
+  #f.close()
 	    
   # send the e-mail
   m.send()
