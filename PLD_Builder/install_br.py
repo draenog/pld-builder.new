@@ -25,4 +25,4 @@ def install_br(r, b):
              logfile = b.logfile)
   if res != 0:
     b.log_line("error: BR installation failed")
-  return re
+  return res
