@@ -63,10 +63,13 @@ class ACL_Conf:
         self.users[e] = user
       self.users[login] = user
   
-  def user(self, ems):
+  def user_by_email(self, ems):
     for e in ems:
       if self.users.has_key(e):
         return self.users[e]
     return None
+
+  def user(self, l):
+    return self.users[l]
 
 acl = ACL_Conf()

@@ -11,11 +11,11 @@ def command(cmd, user = "builder"):
 def command_sh(cmd):
   return "sudo chroot %s /bin/sh -c \"export LC_ALL=C; %s\"" % (config.chroot, quote(cmd))
 
-def popen(cmd, user = None):
+def popen(cmd, user = "builder"):
   f = os.popen(command(cmd, user))
   return f
   
-def run(cmd, user = None, logfile = None)
+def run(cmd, user = "builder", logfile = None):
   c = command(cmd, user)
   if logfile != None:
     c = "%s >> %s 2>&1" % (c, logfile)
@@ -25,5 +25,5 @@ def run(cmd, user = None, logfile = None)
   r = f.close()
   if r == None:
     return 0
-  else
+  else:
     return r

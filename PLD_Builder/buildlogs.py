@@ -1,10 +1,10 @@
 
-def add(logfile, failed)
+def add(logfile, failed):
   "Add new buildlog with specified status."
   # FIXME
   pass
 
-def flush()
+def flush():
   "Send buildlogs to server."
   # FIXME
   pass

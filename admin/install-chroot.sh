@@ -15,7 +15,7 @@ default_config () {
 
   case "$1" in
   src* )
-    builder_arch_pkgs="cvs wget"
+    builder_arch_pkgs="cvs wget rpm-perlprov rpm-php-pearprov rpm-pythonprov"
     ;;
   esac
 }

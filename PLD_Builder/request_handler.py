@@ -74,7 +74,7 @@ def handle_request(f):
   sio.write(f.read())
   sio.seek(0)
   (em, body) = gpg.verify_sig(sio)
-  user = acl.user(em)
+  user = acl.user_by_email(em)
   if user == None:
     # FIXME: security email here
     log.alert("invalid signature, or not in acl %s" % em)
