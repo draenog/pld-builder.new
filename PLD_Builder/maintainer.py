@@ -12,9 +12,9 @@ def clean_dir(path, max):
     for i in os.listdir(path):
         if curtime - os.path.getmtime(path+'/'+i) > max:
             if os.path.isdir(path+'/'+i):
-                print "rmdir: %s" % path+'/'+i
+                util.clean_tmp(path+'/'+i)
             else:
-                print "rmfile: %s" % path+'/'+i
+                os.unlink(path+'/'+i)
 
 def handle_src():
     clean_dir(path.www_dir+'srpms', 2592000) # a month
@@ -32,7 +32,7 @@ def handle_bin():
         if curtime - mtime > config.max_keep_time:
             rmpkgs.append(pkgname)
     if rmpkgs:
-        print ' '.join(rmpkgs)
+        chroot.run("cd /spools/ready; rm %s" % ' '.join(rmpkgs))
     f.close()
 
 if __name__ == '__main__':
