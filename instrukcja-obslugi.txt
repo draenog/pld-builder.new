@@ -41,6 +41,47 @@ bin_builder ALL = NOPASSWD: \
 
 Skrypty *musz±* byæ w ~/pld-builder.new/, checkoutniête z CVS.
 
+4. instalacja kolejek etc.
+
+cd ~/pld-builder.new
+./admin/fresh-queue.sh y
+
+5. konfiguracje chrootów
+
+poldek.conf:
+
+source = local,pri=1 /spools/ready/
+source = main-test,noauto,pri=2 ftp://ftp.pld-linux.org/dists/ac/test/athlon/
+source = main-ready,pri=3 ftp://ftp.pld-linux.org/dists/ac/ready/athlon/
+source = main-ug,pri=4 ftp://ftp.pld-linux.org/dists/ac/updates/general/athlon/
+source = main-us,pri=5 ftp://ftp.pld-linux.org/dists/ac/updates/security/athlon/
+source = main,pri=6 ftp://ftp.pld-linux.org/dists/ac/PLD/athlon/RPMS/
+particle_install = no
+greedy = yes
+rpmdef = _excludedocs 1
+cachedir = /spools/poldek/
+keep_downloads = yes
+
+Pakiety preinstalowane:
+
+bin_builder:
+  rpm-build poldek shadow net-tools which
+
+srpms_builder:
+  bin_builder+
+  cvs wget rpm-perlprov rpm-php-pearprov rpm-pythonprov
+
+oba: user builder
+
+oba: ~builder/rpm/{SPECS,SOURCES,RPMS,SRPMS,BUILD}
+
+srpms_builder dodatkowo musi mieæ SPECS i SOURCES checkoutniête z CVS,
+w SPECS musi mieæ builder, additional-md5sums i mirrors.
+
+oba: katalogi /spools/poldek/ /spools/ready/
+
+Wszystko to robi automagicznie admin/install-chroot.sh
+
 [[...]]
 
 
