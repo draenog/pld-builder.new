@@ -9,11 +9,14 @@ def install_br(r, b):
   f = chroot.popen(cmd)
   rx = re.compile("^\s*([^\s]+) .* is needed by")
   needed = {}
+  b.log_line("checking BR")
   for l in f.xreadlines():
+    b.log_line("rpm: %s" % l)
     m = rx.search(l)
     if m: needed[m.group(1)] = 1
   f.close()
   if len(needed) == 0:
+    b.log_line("no BR needed")
     return
   br = string.join(needed.keys())
   b.log_line("installing BR: %s" % br)
