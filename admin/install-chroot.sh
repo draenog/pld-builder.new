@@ -179,7 +179,7 @@ keep_downloads = no
 EOF
 
 chr "cat > /etc/poldek.conf" < poldek.conf
-chr "useradd -u "$builder_uid" -c 'PLD $chroot_name builder' -d /home/users/builder -m -g users -s /bin/bash builder"
+chr "useradd -u "$builder_uid" -c 'PLD $chroot_name builder' -d /home/users/builder -m -g users -s /bin/sh builder"
 chr "cat > /etc/resolv.conf" < /etc/resolv.conf
 chr "cat > /etc/mtab" < /dev/null
 chr "mkdir -p /spools/ready/" < /dev/null
