@@ -28,6 +28,7 @@ def has_new(control_url):
   try:
     f = urllib.urlopen(control_url + "/max_req_no")
   except:
+    log.panic("can't fetch %s" % (control_url + "/max_req_no"))
     return 0
   res = 0
   if int(string.strip(f.readline())) != last_count:
