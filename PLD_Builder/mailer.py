@@ -50,9 +50,8 @@ class Message:
 
   def set_std_headers(self):
     self.headers["Date"] = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
-    if is_src == False:
-      self.headers["Message-ID"] = "<pld-builder.%f.%d@%s>" \
-          % (time.time(), os.getpid(), os.uname()[1])
+    self.headers["Message-ID"] = "<pld-builder.%f.%d@%s>" \
+        % (time.time(), os.getpid(), os.uname()[1])
     self.headers["From"] = "PLD %s builder <%s>" \
         % (config.builder, config.email)
     self.headers["X-PLD-Builder"] = config.builder
