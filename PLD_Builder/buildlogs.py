@@ -1,6 +1,7 @@
 import path
 import time
 import os
+import re
 
 from config import config
 import util
@@ -17,7 +18,7 @@ class Buildlogs_Queue:
     # if /dev/null, don't even bother to store it
     if config.buildlogs_url == "/dev/null":
       return
-    name = os.path.basename(logfile) + ".bz2"
+    name = re.sub(r"\.spec\.log", os.path.basename(logfile)) + ".bz2"
     id = util.uuid()
     os.system("bzip2 --best --force < %s > %s" \
                 % (logfile, path.buildlogs_queue_dir + id))
