@@ -59,17 +59,25 @@ Skutek bêdzie taki, ¿e pakiet siê zbuduje, ale nie zostanie automatycznie
 zupgrejdowany na builderach, a zamiast w ready wyl±duje w test (póki co
 cieciwa u¿ywa tego do budowania sobie w spokoju jajek 2.6).
 
+Zasady puszczania do Ac:
 
-Ja tego nie powiedzia³em: w chwili obecnej nie jest ustawiona blokada na
-puszczanie pakietów o tej samej rel mimo zmiany np. speca. S³u¿y to
-³atwiejszemu poprawianiu pakietów na okoliczno¶æ nie budowania siê na
-niektórych arch (tzn. póki pakiet le¿y w ready to spokojnie mo¿na mu dodaæ
-jeszcze parê poprawek i pu¶ciæ na brakuj±ce arch nie podbijaj±c rel). W
-pierwszej kolejno¶ci do g³ównego drzewka przenoszê pakiety buduj±ce siê na
-wszystkich arch, tak¿e ma siê zawsze ten dzieñ-dwa na powiedzenie mi, cobym
-siê wstrzyma³ (lub poprawienie). Ten 'workaround' zostanie utrzymany do
-osi±gniêcia oko³o 70-80% stanu pakietów z Ra, czyli jeszcze trochê. W ka¿dym
-razie nie nale¿y siê tym póki co martwiæ, bo jak przyjdzie pora, to bêdê
-tr±bi³ co siê zmienia i jak.
+- Puszczamy zawsze z HEAD i bez bcondów. Odstêpstwa od tej zasady s±
+  akceptowalne tylko i wy³±cznie w dobrze uzasadnionych przypadkach. HEAD ma
+  na celu ³atwiejsz± orientacjê w zawarto¶ci ftpa. Natomiast brak bcondów jest
+  wedle zasady "src.rpm ma siê budowaæ w ¶rodowisku, jakie jest dostêpne na
+  ftpie (wyj±tek to oczywi¶cie java) i nie oczekujmy wiedzy tajemnej (jakiego
+  bconda u¿yæ) od wszystkich, którzy chc± dany pakiet zbudowaæ".
+
+- Ja tego nie powiedzia³em: w chwili obecnej nie jest ustawiona blokada na
+  puszczanie pakietów o tej samej rel mimo zmiany np. speca. S³u¿y to
+  ³atwiejszemu poprawianiu pakietów na okoliczno¶æ nie budowania siê na
+  niektórych arch (tzn. póki pakiet le¿y w ready to spokojnie mo¿na mu dodaæ
+  jeszcze parê poprawek i pu¶ciæ na brakuj±ce arch nie podbijaj±c rel). W
+  pierwszej kolejno¶ci do g³ównego drzewka przenoszê pakiety buduj±ce siê na
+  wszystkich arch, tak¿e ma siê zawsze ten dzieñ-dwa na powiedzenie mi, cobym
+  siê wstrzyma³ (lub poprawienie). Ten 'workaround' zostanie utrzymany do
+  osi±gniêcia oko³o 70-80% stanu pakietów z Ra, czyli jeszcze trochê. W ka¿dym
+  razie nie nale¿y siê tym póki co martwiæ, bo jak przyjdzie pora, to bêdê
+  tr±bi³ co siê zmienia i jak.
 
 
