@@ -14,7 +14,7 @@ else
 	echo "Creating config file ~/.requestrc. You *must* edit it."
 	cat >$HOME/.requestrc <<EOF
 priority=2
-requester=deviloper
+requester=deviloper@pld-linux.org
 default_key=deviloper@pld-linux.org
 builder_email=builder-ac@pld-linux.org
 mailer="/usr/sbin/sendmail -t"
@@ -113,6 +113,10 @@ specs=`for s in $specs ; do
   esac
 done`
 
+if [[ "$requester" != *@* ]] ; then
+    requester="$requester@pld-linux.org"
+fi
+
 if [ "$builders" = "" ] ; then
   builders="$default_builders"
 fi
@@ -194,7 +198,7 @@ gen_req() {
 
 gen_email () {
 cat <<EOF
-From: $requester@pld-linux.org
+From: $requester
 To: $builder_email
 Subject: build request
 Message-Id: <$id@$(hostname)>
