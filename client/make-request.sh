@@ -39,7 +39,7 @@ while [ $# -gt 0 ] ; do
       builders="$builders $2"
       shift
       ;;
-    
+
     --with )
       with="$with $2"
       shift
@@ -71,11 +71,21 @@ while [ $# -gt 0 ] ; do
       flags="$flags $2"
       shift
       ;;
+
+    --command-flags | -cf )
+      command_flags="$2"
+      shift
+      ;;
+
+    --command | -c )
+      command="$2"
+      shift
+      ;;
       
     -* )
       die "unknown knob: $1"
       ;;
-      
+
     *:* )
       specs="$specs $1"
       ;;
@@ -109,7 +119,13 @@ for s in $specs ; do
 done
 
 if [ "$ok" = "" ] ; then
-  die "no specs passed"
+  if [ "$command" = "" ] ; then
+    die "no specs passed"
+  fi
+else
+  if [ "$command" != "" ] ; then
+    die "cannot pass specs and --command"
+  fi
 fi
 
 id=$(uuidgen)
@@ -120,6 +136,17 @@ gen_req() {
   echo "  <priority>$priority</priority>"
   echo
 
+  if [ "$command" != "" ] ; then
+    bid=$(uuidgen)
+    echo "  <batch id='$bid' depends-on=''>"
+    echo "     <command flags='$command_flags'>$command</command>"
+    echo "     <info></info>"
+    for b in $builders ; do
+      echo "     <builder>$b</builder>"
+    done
+    echo "  </batch>"
+  else
+  
   # first id:
   fid=
   for s in $specs ; do
@@ -144,6 +171,8 @@ gen_req() {
     done
     echo "  </batch>"
   done
+
+  fi
   
   echo "</group>"
 }
