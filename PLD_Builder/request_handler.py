@@ -67,9 +67,13 @@ def handle_group(r, user):
                         (config.builder, bld, string.join(config.binary_builders)))
         return
       if not user.can_do("binary", bld):
-        fail_mail("user %s is not allowed to binary:%s" \
-                        % (user.get_login(), bld))
-        return
+        pkg = batch.spec
+        if pkg.endswith(".spec"):
+          pkg = pkg[:-5]
+        if not user.can_do("binary-" + pkg, bld):
+          fail_mail("user %s is not allowed to binary-%s:%s" \
+                        % (user.get_login(), pkg, bld))
+          return
 
   r.requester = user.get_login()
   r.requester_email = user.mail_to()
