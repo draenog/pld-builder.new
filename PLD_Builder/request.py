@@ -80,6 +80,18 @@ class Group:
       b.dump(f)
     f.write("\n")
 
+  def dump_html(self, f):
+    f.write("<p><b>%d</b>. %s from %s <small>%s, %d, %s</small><br/>\n" % \
+                (self.no,
+                 escape(time.strftime("%Y.%m.%d %H:%M:%S", time.localtime(self.time))),
+                 escape(self.requester),
+                 self.id, self.priority, string.join(self.flags)))
+    f.write("<ul>\n")
+    for b in self.batches:
+      b.dump_html(f)
+    f.write("</ul>\n")
+    f.write("</p>\n")
+
   def write_to(self, f):
     f.write("""
        <group id="%s" no="%d" flags="%s">
@@ -149,6 +161,24 @@ class Batch:
     for b in self.builders:
       builders.append("%s:%s" % (b, self.builders_status[b]))
     f.write("    builders: %s\n" % string.join(builders))
+
+  def dump_html(self, f):
+    f.write("<li>\n")
+    f.write("%s (%s -R %s %s) <small>[" % \
+        (self.src_rpm, self.spec, self.branch, self.bconds_string()))
+    builders = []
+    for b in self.builders:
+      s = self.builders_status[b]
+      if s == "OK":
+        c = "green"
+      elif s == "FAIL":
+        c = "red"
+      elif s == "SKIP":
+        c = "blue"
+      else:
+        c = "black"
+      builders.append("<font color='%s'><b>%s:%s</b></font>" % (c, b, s))
+    f.write("%s]</small></li>\n" % string.join(builders))
 
   def bconds_string(self):
     r = ""
