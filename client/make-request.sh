@@ -2,6 +2,7 @@
 
 # FIXME: set with options
 priority=2
+requester=malekith
 default_key=builder
 builder_email=srpms_builder@roke.freak
 mailer="/usr/sbin/sendmail -t"

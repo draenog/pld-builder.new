@@ -3,6 +3,8 @@ import string
 
 import path
 import log
+from mailer import Message
+from config import config
 
 class User:
   def __init__(self, p, login):
@@ -42,10 +44,11 @@ class User:
   def mail_to(self):
     return self.emails[0]
 
-  def notify_about_failure(self, msg):
-    # FIXME: send email here
-    print "mailto %s: %s" % (self.mail_to(), msg)
-    
+  def message_to(self):
+    m = Message()
+    m.set_headers(to = self.mail_to())
+    return m
+
   def get_login(self):
     return self.login
 

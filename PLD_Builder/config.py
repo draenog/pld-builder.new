@@ -1,11 +1,15 @@
 import ConfigParser
 import string
+import os
 
 import path
 import log
 
 class Builder_Conf:
-  def __init__(self, builder):
+  def __init__(self):
+    pass
+
+  def read(self, builder):
     p = ConfigParser.ConfigParser()
     def get(o, d = None):
       if p.has_option(builder, o):
@@ -23,8 +27,10 @@ class Builder_Conf:
     self.builder = builder
     self.arch = get("arch")
     self.chroot = get("chroot")
+    self.email = get("email")
 
-config = None
+config = Builder_Conf()
 
 def init_conf(builder):
-  config = Builder_Conf(builder)
+  os.environ['LC_ALL'] = "C"
+  config.read(builder)

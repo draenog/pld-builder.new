@@ -12,6 +12,7 @@ import path
 from acl import acl
 from lock import lock
 from bqueue import B_Queue
+from config import config, init_conf
 
 def check_double_id(id):
   id_nl = id + "\n"
@@ -19,8 +20,8 @@ def check_double_id(id):
   ids = open(path.processed_ids_file)
   for i in ids.xreadlines():
     if i == id_nl:
-      # FIXME: security email here
-      log.alert("request %s already processed" % r.id)
+      # FIXME: security email here?
+      log.alert("request %s already processed" % id)
       return 1
   ids.close()
   
@@ -31,22 +32,31 @@ def check_double_id(id):
   return 0
 
 def handle_group(r, user):
+  def fail_mail(msg):
+    if len(r.batches) >= 1:
+      spec = r.batches[0].spec
+    else:
+      spec = "None.spec"
+    log.error("%s: %s" % (spec, msg))
+    m = user.message_to()
+    m.set_headers(subject = "building %s failed" % spec)
+    m.write_line(msg)
+    m.send()
+  
   lock("request")
   if check_double_id(r.id):
     return
     
-  if not user.can_do("src", "src"):
-    msg ="user %s is not allowed to src:src" % (user.get_login())
-    log.error(msg)
-    user.notify_about_failure(msg)
+  if not user.can_do("src", config.builder):
+    fail_mail("user %s is not allowed to src:%s" \
+                % (user.get_login(), config.builder))
     return
     
   for batch in r.batches:
     for bld in batch.builders:
       if not user.can_do("binary", bld):
-        msg ="user %s is not allowed to binary:%s" % (user.get_login(), bld)
-        log.error(msg)
-        user.notify_about_failure(msg)
+        fail_mail("user %s is not allowed to binary:%s" \
+                        % (user.get_login(), bld))
         return
 
   r.requester = user.get_login()
@@ -76,9 +86,13 @@ def handle_request(f):
     msg = "%s: don't know how to handle requests of this kind '%s'" \
                 % (user.get_login(), r.kind)
     log.alert(msg)
-    user.notify_about_failure(msg)
+    m = user.message_to()
+    m.set_headers(subject = "unknown request")
+    m.write_line(msg)
+    m.send()
 
 def main():
+  init_conf("src")
   handle_request(sys.stdin)
   sys.exit(0)
 

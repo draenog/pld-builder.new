@@ -27,5 +27,3 @@ def run(cmd, user = None, logfile = None)
     return 0
   else
     return r
-    
-locale.sanitize()

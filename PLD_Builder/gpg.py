@@ -38,5 +38,3 @@ def sign(buf):
   gpg_out.close()
   gpg_err.close()
   return body
-
-locale.sanitize()
