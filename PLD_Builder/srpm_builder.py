@@ -74,6 +74,12 @@ def transfer_file(r, b):
   os.chmod(local, 0644)
   ftp.add(local)
 
+  fname = path.srpms_dir + r.id + "/" + b.src_rpm + ".uploadinfo"
+  f = open(fname, "w")
+  f.write("arch:SRPMS:%s\nEND\n" % b.src_rpm)
+  f.close()
+  ftp.add(fname, "uploadinfo")
+
 def build_srpm(r, b):
   status.push("building %s" % b.spec)
   b.src_rpm = ""
