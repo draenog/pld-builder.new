@@ -96,6 +96,13 @@ bin_builder:
   load-balancer.sh
   file-sender.sh
 
+Poza tym *bardzo* dobrym pomys³em jest wywo³ywanie dla ka¿dego buildera
+tmpwatcha. Powinno to wygl±daæ mniej wiêcej tak:
+5 3 * * * sudo chroot $HOME/chroots/chroot-i686/ tmpwatch -m 200 /spools/ready/
+(autentyczny przyk³ad). Oczywi¶cie trzeba taki wpis ustawiæ dla ka¿dego
+chroota znajduj±cego siê na koncie, a wewn±trz musi byæ zainstalowany tmpwatch.
+W przeciwnym przypadku trzeba to czy¶ciæ rêcznie.
+
 101. procmail
 
 srpms_builder:
