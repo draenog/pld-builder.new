@@ -1,0 +1,7 @@
+#!/bin/sh
+chroot_name="src"
+chroot_dir="/adm/chroot-src"
+arch="athlon"
+# default for src*
+# builder_arch_pkgs="cvs wget"
+cvs_root=":pserver:builder:foo123@roke.freak:/home/services/cvsroot"
