@@ -7,7 +7,7 @@ def install_br(r, b):
   cmd = "cd rpm/SPECS; TMPDIR=$HOME/%s rpmbuild --nobuild %s %s 2>&1" \
         % (b.b_id, b.bconds_string(), b.spec)
   f = chroot.popen(cmd)
-  rx = re.compile("^\s*([^\s]+) .* is needed by")
+  rx = re.compile(r"^\s*([^\s]+) .* is needed by")
   needed = {}
   b.log_line("checking BR")
   for l in f.xreadlines():
