@@ -3,6 +3,7 @@ import string
 import time
 import xml.sax.saxutils
 import fnmatch
+import binascii, md5
 
 import util
 import log
@@ -184,6 +185,12 @@ class Batch:
         (self.src_rpm, self.spec, self.branch, self.bconds_string())
     f.write("%s <small>[" % desc)
     builders = []
+    bl_archs = {
+      "ac-SRPMS":0 "ac-i386":1 "ac-i586":2 "ac-i686":3 "ac-athlon":4 "ac-amd64":5
+      "ac-alpha":6 "ac-sparc":7 "ac-ppc":8 "ra-i386":9 "ra-i586":10 "ra-i686":11
+      "ra-alpha":12 "ra-sparc":13 "ra-ppc":14 "nest-i386":15 "nest-i586":16 "nest-i686":17
+      "nest-athlon":18 "nest-alpha":19 "nest-ppc":20
+    }
     for b in self.builders:
       s = self.builders_status[b]
       if s == "OK":
@@ -194,7 +201,16 @@ class Batch:
         c = "blue"
       else:
         c = "black"
-      builders.append("<font color='%s'><b>%s:%s</b></font>" % (c, b, s))
+      link_pre = ""
+      link_post = ""
+      if bl_archs.has_key(b) and (s == "OK" or s == "FAIL") and len(self.spec) > 5:
+        path = "/%s/%s/%s.bz2" % (b.replace('-','/'), s, self.spec[:len(self.spec)-5])
+        is_ok = 0
+        if s == "OK": is_ok = 1
+        link_pre = "<!-- from %s --><a href=\"http://buildlogs.pld-linux.org/index.php?idx=%d&ok=%d&id=%s\">" \
+                % (path, bl_archs[b], is_ok, binascii.b2a_hex(md5.new("/ac/ppc/FAIL/kernel.bz2").digest()))
+        link_post = "</a>"
+      builders.append(link_pre + ("<font color='%s'><b>%s:%s</b></font>" % (c, b, s)) + link_post)
     f.write("%s]</small></li>\n" % string.join(builders))
 
   def bconds_string(self):
