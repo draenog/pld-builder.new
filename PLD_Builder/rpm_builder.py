@@ -67,8 +67,9 @@ def build_rpm(r, b):
     res = 1
   else:
     chroot.run("install -m 700 -d $HOME/%s" % b.b_id)
+    rpmbuild_opt = "%s --target %s-pld-linux" % (b.bconds_string(), config.arch)
     cmd = "cd rpm/SPECS; TMPDIR=$HOME/%s rpmbuild -bb %s %s" % \
-        (b.b_id, b.bconds_string(), b.spec)
+        (b.b_id, rpmbuild_opt, b.spec)
     if install_br.install_br(r, b):
       res = 1
     else:
