@@ -71,9 +71,9 @@ class B_Queue:
     sio = gpg.sign(sio)
     if os.access(name, os.F_OK): os.unlink(name)
     if re.search(r"\.gz$", name):
-      f = gzip.open(self.name, "w", 6)
+      f = gzip.open(name, "w", 6)
     else:
-      f = open(self.name, "w")
+      f = open(name, "w")
     f.write(sio.read())
     f.close()
 

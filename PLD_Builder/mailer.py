@@ -41,7 +41,7 @@ class Message:
       f = open(log)
       line_cnt = 0
       for l in f.xreadlines():
-        line_cnt++
+        line_cnt += 1
       f.seek(0)
       line = 0
       for l in f.xreadlines():
@@ -49,7 +49,7 @@ class Message:
           self.body.write(l)
         if line == line_cnt - 100:
           self.body.write("\n\n[...]\n\n")
-        line++
+        line += 1
     else:
       sendfile(open(log), self.body)
 
