@@ -1,26 +1,24 @@
+- sending reports from binary to src builder, so it can update its queue and
+  clean srpms that ain't needed anymore
+  
+- store rpms in /spool/ready/ in chroot? (rpm_builder.py)
+
+- deps install/uninstall machinery (hard stuff -- building deps tree already 
+  done)
+
 - make mailer.py actually send mail (easy)
 
 - fix make-request.sh to be more user-friendly and configurable
 
 - report time consumed by build
 
----- current builders functionality ends here ----
-
-- store rpms in /spool/ready/ in chroot? (rpm_builder.py)
-
-- sending reports from binary to src builder, so it can update its queue and
-  clean srpms that ain't needed anymore
-  
-- deps install/uninstall machinery (hard stuff -- building deps tree already 
-  done)
+- add possibility of tagging stuff for source builder
 
 - if magic comment found in spec: single-build -- aquire all job-slots
 
 - allow blocking some packages
 
-- add possibility of tagging stuff for source builder
-
 - fetch src.rpm once for all builders on this account, separate fetching 
   src.rpms, so we can build and fetch at the same time
-  
+
 - unify buildlogs.py and ftp.py, both are file queues
