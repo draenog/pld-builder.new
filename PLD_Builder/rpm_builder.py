@@ -80,8 +80,8 @@ def build_rpm(r, b):
   else:
     chroot.run("install -m 700 -d %s" % tmpdir)
     rpmbuild_opt = "%s --target %s-pld-linux" % (b.bconds_string(), config.arch)
-    cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild -bb %s %s" % \
-          (tmpdir, rpmbuild_opt, b.spec)
+    cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb %s %s" % \
+          (tmpdir, config.nice, rpmbuild_opt, b.spec)
     if ("no-install-br" not in r.flags) and install_br.install_br(r, b):
       res = 1
     else:
