@@ -66,10 +66,11 @@ def build_rpm(r, b):
     b.log_line("error: installing src rpm failed")
     res = 1
   else:
-    chroot.run("install -m 700 -d $HOME/%s" % b.b_id)
+    tmpdir = "/tmp/B." + b.b_id[0:6]
+    chroot.run("install -m 700 -d %s" % tmpdir)
     rpmbuild_opt = "%s --target %s-pld-linux" % (b.bconds_string(), config.arch)
-    cmd = "cd rpm/SPECS; TMPDIR=$HOME/%s rpmbuild -bb %s %s" % \
-        (b.b_id, rpmbuild_opt, b.spec)
+    cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild -bb %s %s" % \
+          (tmpdir, rpmbuild_opt, b.spec)
     if ("no-install-br" not in r.flags) and install_br.install_br(r, b):
       res = 1
     else:
@@ -82,9 +83,9 @@ def build_rpm(r, b):
         b.log_line("error: No files produced.")
         res = 1 # FIXME: is it error?
       b.files = files
-  chroot.run("rm -rf $HOME/%s; cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
+  chroot.run("rm -rf %s; cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
              "--clean --rmspec --rmsource %s" % \
-             (b.b_id, b.spec), logfile = b.logfile)
+             (tmpdir, b.b_id, b.spec), logfile = b.logfile)
   chroot.run("rm -rf $HOME/rpm/BUILD/*")
 
   def ll(l):
