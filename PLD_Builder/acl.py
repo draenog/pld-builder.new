@@ -12,12 +12,19 @@ class User:
   def __init__(self, p, login):
     self.login = login
     self.privs = []
-    self.emails = []
+    self.gpg_emails = []
+    self.mailto = ""
     
-    if p.has_option(login, "emails"):
-      self.emails = string.split(p.get(login, "emails"))
+    if p.has_option(login, "gpg_emails"):
+      self.gpg_emails = string.split(p.get(login, "gpg_emails"))
     else:
-      log.alert("acl: [%s] has no emails" % login)
+      log.alert("acl: [%s] has no gpg_emails" % login)
+      
+    if p.has_option(login, "mailto"):
+      self.mailto = p.get(login, "mailto")
+    else:
+      if len(self.gpg_emails) > 0:
+        self.mailto = self.gpg_emails[0]
       
     if p.has_option(login, "privs"):
       for p in string.split(p.get(login, "privs")):
@@ -42,7 +49,7 @@ class User:
     return 0
 
   def mail_to(self):
-    return self.emails[0]
+    return self.mailto
 
   def message_to(self):
     m = Message()
@@ -60,9 +67,16 @@ class ACL_Conf:
     p.readfp(open(path.acl_conf))
     self.users = {}
     for login in p.sections():
+      if self.users.has_key(login):
+        log.alert("acl: duplicate login: %s" % login)
+        continue
       user = User(p, login)
-      for e in user.emails:
-        self.users[e] = user
+      for e in user.gpg_emails:
+        if self.users.has_key(e):
+          log.alert("acl: user email colision %s <-> %s" % \
+                                (self.users[e].login, login))
+        else:
+          self.users[e] = user
       self.users[login] = user
     status.pop()
   
