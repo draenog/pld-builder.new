@@ -81,6 +81,7 @@ class Builder_Conf:
     self.max_load = float(get("max_load"))
     self.control_url = get("control_url")
     self.builder_user = get("builder_user", "builder")
+    self.sudo_chroot_wrapper = get("sudo_chroot_wrapper", "")
     
     f = get("syslog", "")
     if f != "":
