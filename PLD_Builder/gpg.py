@@ -12,7 +12,7 @@ def verify_sig(buf):
   where signer-emails is lists of strings, and signed-body is StringIO
   object.
   """
-  (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --decrypt")
+  (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --decrypt")
   body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
   rx = re.compile("^gpg: Good signature from .*<([^>]+)>")
   emails = []
@@ -24,7 +24,7 @@ def verify_sig(buf):
   return (emails, body)
 
 def sign(buf):
-  (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --clearsign")
+  (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --clearsign")
   body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
   gpg_err.close()
   return body
