@@ -5,6 +5,7 @@ import os
 import time
 import shutil
 import sys
+import traceback
 
 from config import config, init_conf
 import mailer
@@ -45,7 +46,7 @@ def copy_file(src, target):
   except:
     global problem
     exctype, value = sys.exc_info()[:2]
-    problem = "cannot copy file: %s" % format_exception_only(exctype, value)
+    problem = "cannot copy file: %s" % traceback.format_exception_only(exctype, value)
     return 1
 
 def rsync_file(src, target, host):
