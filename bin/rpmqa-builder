@@ -9,7 +9,7 @@ for arch in ${ARCH_LIST} ; do
 	file=`mktemp /tmp/rpmqa-XXXXXX`
 	sudo chroot $CHROOT$arch /bin/su - builder bin/rpmqa-chroot > $file
 	chmod 644 $file
-	scp -B -p $file ${FTP_HOST}:${FTP_PATH}/rpmqa-$arch.txt
+	scp -B -p $file ${FTP_HOST}:${FTP_PATH}/`hostname`/rpmqa-$arch.txt
 	rm -f $file
 done
 
