@@ -15,8 +15,9 @@ import status
 import log
 import chroot
 import ftp
-import buildlogs
 import notify
+import build
+import report
 
 # this code is duplicated in srpm_builder, but we
 # might want to handle some cases differently here
@@ -34,73 +35,63 @@ def pick_request(q):
   q.requests = q.requests[1:]
   return ret
 
-def handle_request(r):
-  def log_line(l):
-    log.notice(l)
-    util.append_to(spec_log, l)
-  
-  def fetch_src(b):
-    src_url = config.control_url + "/srpms/" + r.id + "/" + b.src_rpm
-    log_line("fetching %s" % src_url)
-    start = time.time()
-    f = urllib.urlopen(src_url)
-    o = chroot.popen("cat > %s" % b.src_rpm, mode = "w")
-    bytes = util.sendfile(f, o)
-    f.close()
-    o.close()
-    t = time.time() - start
-    if t == 0:
-      log_line("fetched %d bytes" % bytes)
-    else:
-      log_line("fetched %d bytes, %.1f K/s" % (bytes, bytes / 1024.0 / t))
+def fetch_src(r, b):
+  src_url = config.control_url + "/srpms/" + r.id + "/" + b.src_rpm
+  b.log_line("fetching %s" % src_url)
+  start = time.time()
+  f = urllib.urlopen(src_url)
+  o = chroot.popen("cat > %s" % b.src_rpm, mode = "w")
+  bytes = util.sendfile(f, o)
+  f.close()
+  o.close()
+  t = time.time() - start
+  if t == 0:
+    b.log_line("fetched %d bytes" % bytes)
+  else:
+    b.log_line("fetched %d bytes, %.1f K/s" % (bytes, bytes / 1024.0 / t))
 
-  def build_rpm(r, b):
-    global spec_log
-    spec_log = b.logfile
-    status.push("building %s" % b.spec)
-    log_line("request from: %s" % r.requester)
-    log_line("started at: %s" % time.asctime())
-    fetch_src(b)
-    log_line("installing srpm: %s" % b.src_rpm)
-    res = chroot.run("rpm -U %s" % b.src_rpm, logfile = b.logfile)
-    chroot.run("rm -f %s" % b.src_rpm, logfile = b.logfile)
-    if res:
-      log_line("error: installing src rpm failed")
+def build_rpm(r, b):
+  status.push("building %s" % b.spec)
+  b.log_line("request from: %s" % r.requester)
+  b.log_line("started at: %s" % time.asctime())
+  fetch_src(r, b)
+  b.log_line("installing srpm: %s" % b.src_rpm)
+  res = chroot.run("rpm -U %s" % b.src_rpm, logfile = b.logfile)
+  chroot.run("rm -f %s" % b.src_rpm, logfile = b.logfile)
+  if res:
+    b.log_line("error: installing src rpm failed")
+    res = 1
+  else:
+    cmd = "install -m 700 -d $HOME/%s; cd rpm/SPECS; " \
+          "TMPDIR=$HOME/%s rpmbuild -bb %s" % \
+          (b.b_id, b.b_id, b.spec)
+    b.log_line("building RPM using: %s" % cmd)
+    res = chroot.run(cmd, logfile = b.logfile)
+    files = util.collect_files(b.logfile)
+    if len(files) > 0:
+      r.chroot_files.extend(files)
+    else:
+      # FIXME: is it error?
+      b.log_line("error: No files produced.")
       res = 1
-    else:
-      cmd = "install -m 700 -d $HOME/%s; cd rpm/SPECS; " \
-            "TMPDIR=$HOME/%s rpmbuild -bb %s" % \
-            (b.b_id, b.b_id, b.spec)
-      log_line("building RPM using: %s" % cmd)
-      res = chroot.run(cmd, logfile = b.logfile)
-      files = util.collect_files(b.logfile)
-      if len(files) > 0:
-        r.chroot_files.extend(files)
-      else:
-        # FIXME: is it error?
-        log_line("error: No files produced.")
-        res = 1
-      b.files = files
-    chroot.run("rm -rf $HOME/%s; cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
-               "--clean --rmspec --rmsource %s" % \
-               (b.b_id, b.spec), logfile = b.logfile)
-    buildlogs.add(logfile = b.logfile, failed = res)
-    status.pop()
-    return res
+    b.files = files
+  chroot.run("rm -rf $HOME/%s; cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
+             "--clean --rmspec --rmsource %s" % \
+             (b.b_id, b.spec), logfile = b.logfile)
+  
+  for f in b.files:
+    local = r.tmp_dir + os.path.basename(f)
+    chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
+    ftp.add(local)
+        
+  status.pop()
 
-  r.build_all(build_rpm)
+  return res
 
+def handle_request(r):
   ftp.init(r)
-  for b in r.batches:
-    if not b.build_failed: 
-      for f in b.files:
-        local = r.tmp_dir + os.path.basename(f)
-        chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
-        ftp.add(local)
-
-  r.clean_files()
-  r.send_report()
-  buildlogs.flush()
+  build.build_all(r, build_rpm)
+  report.send_report(r)
   ftp.flush()
   notify.send()
 

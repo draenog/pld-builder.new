@@ -5,10 +5,6 @@
 
 - fix make-request.sh to be more user-friendly and configurable
 
-- report time consumed by build
-
-- extract needed information from buildlog and send with OK report
-
 - add possibility of tagging stuff for source builder
 
 - if magic comment found in spec: single-build -- aquire all job-slots

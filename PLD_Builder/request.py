@@ -1,16 +1,10 @@
 from xml.dom.minidom import *
 import string
 import time
-import os
-import atexit
 import xml.sax.saxutils 
 
-import log
-import path
 import util
-import chroot
-from acl import acl
-import notify
+import log
 
 __all__ = ['parse_request', 'parse_requests']
   
@@ -97,77 +91,6 @@ class Group:
       b.write_to(f)
     f.write("       </group>\n\n")
 
-  def build_all(r, build_fnc):
-    acl.set_current_user(acl.user(r.requester))
-    notify.begin(r)
-    tmp = path.spool_dir + util.uuid() + "/"
-    r.tmp_dir = tmp
-    os.mkdir(tmp)
-    atexit.register(util.clean_tmp, tmp)
-  
-    log.notice("started processing %s" % r.id)
-    r.chroot_files = []
-    r.some_ok = 0
-    for batch in r.batches:
-      can_build = 1
-      failed_dep = ""
-      for dep in batch.depends_on:
-        if dep.build_failed:
-          can_build = 0
-          failed_dep = dep.spec
-          
-      if can_build:
-        log.notice("building %s" % batch.spec)
-        batch.logfile = tmp + batch.spec + ".log"
-        batch.build_failed = build_fnc(r, batch)
-        if batch.build_failed:
-          log.notice("building %s FAILED" % batch.spec)
-          notify.add_batch(batch, "FAIL")
-        else:
-          r.some_ok = 1
-          log.notice("building %s OK" % batch.spec)
-          notify.add_batch(batch, "OK")
-      else:
-        batch.build_failed = 1
-        batch.skip_reason = "SKIPED [%s failed]" % failed_dep
-        batch.logfile = None
-        log.notice("building %s %s" % (batch.spec, batch.skip_reason))
-        notify.add_batch(batch, "SKIP")
-
-  def clean_files(r):
-    chroot.run("rm -f %s" % string.join(r.chroot_files))
-
-  def send_report(r):
-    def names(l): return map(lambda (b): b.spec, l)
-    s_failed = filter(lambda (x): x.build_failed, r.batches)
-    s_ok = filter(lambda (x): not x.build_failed, r.batches)
-    subject = ""
-    if s_failed != []:
-      subject += " ERRORS: " + string.join(names(s_failed))
-    if s_ok != []:
-      subject += " OK: " + string.join(names(s_ok))
-    
-    m = acl.user(r.requester).message_to()
-    m.set_headers(subject = subject[0:100])
-
-    for b in r.batches:
-      if b.build_failed and b.logfile == None:
-        info = b.skip_reason
-      elif b.build_failed: 
-        info = "FAILED"
-      else: 
-        info = "OK"
-      m.write("%s (%s): %s\n" % (b.spec, b.branch, info))
-    
-    for b in r.batches:
-      # FIXME: include unpackaged files section
-      if b.build_failed and b.logfile != None:
-        m.write("\n\n*** buildlog for %s\n" % b.spec)
-        m.append_log(b.logfile)
-        m.write("\n\n")
-        
-    m.send()
-
   def is_done(self):
     ok = 1
     for b in self.batches:
@@ -253,6 +176,11 @@ class Batch:
       f.write("           <builder status='%s'>%s</builder>\n" % \
                         (escape(self.builders_status[b]), escape(b)))
     f.write("         </batch>\n")
+    
+  def log_line(self, l):
+    log.notice(l)
+    if self.logfile != None:
+      util.append_to(self.logfile, l)
 
 class Notification:
   def __init__(self, e):
