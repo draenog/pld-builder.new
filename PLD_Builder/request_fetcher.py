@@ -19,15 +19,22 @@ from config import config, init_conf
 
 last_count = 0
 
+def alarmalarm(signum, frame):
+  raise IOError, 'TCP connection hung'
+
 def has_new(control_url):
   global last_count
   cnt_f = open(path.last_req_no_file)
   last_count = int(string.strip(cnt_f.readline()))
   cnt_f.close()
   f = None
+  signal.signal(signal.SIGALRM, alarmalarm)
   try:
+    signal.alarm(240)
     f = urllib.urlopen(control_url + "/max_req_no")
+    signal.alarm(0)
   except:
+    signal.alarm(0)
     log.error("can't fetch %s" % (control_url + "/max_req_no"))
     sys.exit(1)
   res = 0
@@ -37,9 +44,13 @@ def has_new(control_url):
   return res
 
 def fetch_queue(control_url):
+  signal.signal(signal.SIGALRM, alarmalarm)
   try:
+    signal.alarm(240)
     f = urllib.urlopen(control_url + "/queue.gz")
+    signal.alarm(0)
   except:
+    signal.alarm(0)
     log.error("can't fetch %s" % (control_url + "/queue.gz"))
     sys.exit(1)
   sio = StringIO.StringIO()
