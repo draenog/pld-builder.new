@@ -99,6 +99,9 @@ def build_srpm(r, b):
     res = 1
   if res == 0:
     transfer_file(r, b)
+  chroot.run("cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
+             "--clean --rmspec --rmsource %s" % \
+             b.spec, logfile = b.logfile)
   status.pop()
   return res
 
