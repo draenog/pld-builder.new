@@ -102,7 +102,7 @@ def send_cia_report(r, is_src = False):
   m.set_header("X-builder", "PLD")
 
   # get header of xml message from file
-  f.open('cia-head.xml')
+  f = open('cia-head.xml')
   m.write(f.read())
   f.close()
 
