@@ -60,13 +60,14 @@ def handle_request(r):
     log_line("started at: %s" % time.asctime())
     fetch_src(b)
     log_line("installing srpm: %s" % b.src_rpm)
-    res = chroot.run("rpm -U %s && rm -f %s" % (b.src_rpm, b.src_rpm), 
-                     logfile = b.logfile)
+    res = chroot.run("rpm -U %s" % b.src_rpm, logfile = b.logfile)
+    chroot.run("rm -f %s" % b.src_rpm, logfile = b.logfile)
     if res:
       log_line("error: installing src rpm failed")
       res = 1
     else:
-      cmd = "cd rpm/SPECS; rpmbuild -bb %s" % b.spec
+      cmd = "install -m 700 -d $HOME/%s; cd rpm/SPECS; TMPDIR=$HOME/%s rpmbuild -bb %s" % \
+        (b.b_id, b.b_id, b.spec)
       log_line("building RPM using: %s" % cmd)
       res = chroot.run(cmd, logfile = b.logfile)
       files = util.collect_files(b.logfile)
@@ -77,6 +78,8 @@ def handle_request(r):
         log_line("error: No files produced.")
         res = 1
       b.files = files
+    chroot.run("rm -rf $HOME/%s; cd rpm/SPECS; rpmbuild --clean --rmspec --rmsource %s" % \
+               (b.b_id, b.spec), logfile = b.logfile)
     buildlogs.add(logfile = b.logfile, failed = res)
     status.pop()
     return res
