@@ -16,6 +16,7 @@ import util
 import gpg
 import request
 import loop
+import socket
 from acl import acl
 from bqueue import B_Queue
 from config import config, init_conf
@@ -31,6 +32,7 @@ def has_new(control_url):
     last_count = int(string.strip(cnt_f.readline()))
     cnt_f.close()
     f = None
+    socket.setdefaulttimeout(240)
     signal.signal(signal.SIGALRM, alarmalarm)
     signal.alarm(300)
     try:
@@ -49,6 +51,7 @@ def has_new(control_url):
 
 def fetch_queue(control_url):
     signal.signal(signal.SIGALRM, alarmalarm)
+    socket.setdefaulttimeout(240)
     signal.alarm(300)
     try:
         f = urllib.urlopen(control_url + "/queue.gz")
