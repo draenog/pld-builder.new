@@ -32,8 +32,8 @@ def has_new(control_url):
     cnt_f.close()
     f = None
     signal.signal(signal.SIGALRM, alarmalarm)
+    signal.alarm(300)
     try:
-        signal.alarm(240)
         f = urllib.urlopen(control_url + "/max_req_no")
         count = int(string.strip(f.readline()))
         signal.alarm(0)
@@ -49,8 +49,8 @@ def has_new(control_url):
 
 def fetch_queue(control_url):
     signal.signal(signal.SIGALRM, alarmalarm)
+    signal.alarm(300)
     try:
-        signal.alarm(240)
         f = urllib.urlopen(control_url + "/queue.gz")
         signal.alarm(0)
     except:
