@@ -93,6 +93,9 @@ cvs -d $cvs_root co SOURCES/.cvsignore
 mkdir SRPMS RPMS BUILD
 cd SPECS
 cvs up additional-md5sums mirrors
+echo "%packager       PLD bug tracking system ( http://bugs.pld-linux.org/ )">~/.rpmmacros
+echo "%vendor         PLD">>~/.rpmmacros
+echo "%distribution   $DISTTAG">>~/.rpmmacros
 EOF
   chb "sh" < install-specs
   rm install-specs
