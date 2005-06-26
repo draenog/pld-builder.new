@@ -22,12 +22,13 @@ else
 priority=2
 requester=deviloper@pld-linux.org
 default_key=deviloper@pld-linux.org
-builder_email=builder-th@pld-linux.org
+builder_email=builder-ac@pld-linux.org
 mailer="/usr/sbin/sendmail -t"
-default_builders="th-*"
+default_builders="ac-*"
 
 # defaults:
-f_upgrade=yes
+build_mode=test
+f_upgrade=no
 
 EOF
 exit
@@ -47,11 +48,11 @@ usage() {
   echo "  --with VALUE --without VALUE"
   echo "       Build package with(out) a given bcond"
   echo "  -t   --test-build"
-  echo "       Performs a test build. No upgrades on builders, no tagging,"
-  echo "       rpms will get uploaded to '.test-builds' dir on ftp and removed"
-  echo "       after a couple of days."
+  echo "       Performs a test build. No upgrades on builders, no tagging."
+  echo "  -r   --ready-build"
+  echo "       Ac compatibility. \"Ready\" build"
   echo "  -u   --upgrade"
-  echo "       Forces pacakge upgrade"
+  echo "       Forces package upgrade"
   echo "  -n   --no-upgrade"
   echo "       Disables package upgrade"
   echo "  -ni  -no-install-br"
@@ -91,6 +92,11 @@ while [ $# -gt 0 ] ; do
 	--test-build | -t )
 	  build_mode=test
 	  f_upgrade=no
+	  ;;
+
+	--ready-build | -r )
+	  build_mode=ready
+	  f_upgrade=yes
 	  ;;
 
     --priority | -p )
