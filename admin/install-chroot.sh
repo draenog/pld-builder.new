@@ -60,8 +60,8 @@ poldek_src () {
 source = main-test,noauto,pri=2 $dist_url/dists/$DIST/test/$arch/RPMS/
 source = main-test,noauto,pri=2 $dist_url/dists/$DIST/test/noarch/RPMS/
 #source = main-ready,pri=3 $dist_url/dists/$DIST/ready/$arch/RPMS/
-source = main-ug,pri=4 $dist_url/dists/$DIST/updates-general/$arch/RPMS/
-source = main-us,pri=5 $dist_url/dists/$DIST/updates-security/$arch/RPMS/
+#source = main-ug,pri=4 $dist_url/dists/$DIST/updates-general/$arch/RPMS/
+#source = main-us,pri=5 $dist_url/dists/$DIST/updates-security/$arch/RPMS/
 source = main,pri=6 $dist_url/dists/$DIST/PLD/$arch/RPMS/
 source = main,pri=6 $dist_url/dists/$DIST/PLD/noarch/RPMS/
 EOF
