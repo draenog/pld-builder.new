@@ -1,6 +1,7 @@
 # vi: encoding=utf-8 ts=8 sts=4 sw=4 et
 
 import os
+import sys
 import time
 
 from config import config, init_conf
@@ -62,6 +63,7 @@ if __name__ == '__main__':
             pass
         else:
             handle_src()
+            sys.exit(0)
     for b in bb:
         try:
             init_conf(b)
