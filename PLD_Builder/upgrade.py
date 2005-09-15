@@ -66,8 +66,11 @@ def upgrade_from_batch(r, b):
             b.log_line("upgrade would need removal of %s" % k)
             return False
     b.log_line("upgrading packages")
-    res = chroot.run("rpm -Fvh %s" % string.join(b.files), user = "root")
-    if res != 0:
+    res = chroot.run("rpm -Fvh %s" % string.join(b.files), user = "root", logstdout = True)
+    if res:
+        for line in res:
+            b.log_line(line)
+    else:
         b.log_line("package upgrade failed")
         return False
     return True

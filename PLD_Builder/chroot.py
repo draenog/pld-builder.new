@@ -21,15 +21,20 @@ def popen(cmd, user = "builder", mode = "r"):
     f = os.popen(command(cmd, user), mode)
     return f
     
-def run(cmd, user = "builder", logfile = None):
+def run(cmd, user = "builder", logfile = None, logstdout = False):
     c = command(cmd, user)
     if logfile != None:
-        c = "%s >> %s 2>&1" % (c, logfile)
+        if logstdout:
+            c = "%s 2>&1 | tee %s" % (c, logfile)
+        else:
+            c = "%s >> %s 2>&1" % (c, logfile)
     f = os.popen(c)
-    for l in f.xreadlines():
-        pass
+    lines = f.xreadlines()
     r = f.close()
-    if r == None:
-        return 0
+    if r:
+        if logstdout:
+            return lines
+        else:
+            return r
     else:
-        return r
+        return 0
