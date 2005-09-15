@@ -33,10 +33,10 @@ def run(cmd, user = "builder", logfile = None, logstdout = False):
     for l in f:
         lines += l
     r = f.close()
-    if r:
+    if r == None:
         if logstdout:
             return lines
         else:
-            return r
+            return True
     else:
-        return 0
+        return False
