@@ -28,8 +28,10 @@ def run(cmd, user = "builder", logfile = None, logstdout = False):
             c = "%s 2>&1 | tee %s" % (c, logfile)
         else:
             c = "%s >> %s 2>&1" % (c, logfile)
+    lines = ""
     f = os.popen(c)
-    lines = f.xreadlines()
+    for l in f:
+        lines += l
     r = f.close()
     if r:
         if logstdout:
