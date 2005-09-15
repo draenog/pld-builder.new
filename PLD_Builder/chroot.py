@@ -37,6 +37,6 @@ def run(cmd, user = "builder", logfile = None, logstdout = False):
         if logstdout:
             return lines
         else:
-            return True
+            return 0
     else:
-        return False
+        return r
