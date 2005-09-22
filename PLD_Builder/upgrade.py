@@ -2,6 +2,7 @@
 
 import re
 import string
+import StringIO
 
 import chroot
 import util
@@ -66,14 +67,13 @@ def upgrade_from_batch(r, b):
             b.log_line("upgrade would need removal of %s" % k)
             return False
     b.log_line("upgrading packages")
-    res = chroot.run("rpm -Fvh %s" % string.join(b.files), user = "root", logstdout = True)
-    if hasattr(res, '__int__'):
-        if res != 0:
-            b.log_line("package upgrade failed")
-            return False
-        return True
-    if res:
-        for line in res:
-            b.log_line(line)
-            return True
-    return False
+    logbuf = StringIO.StringIO()
+    res = chroot.run("rpm -Fvh %s" % string.join(b.files), user = "root", logstdout = logbuf)
+    if res != 0:
+        b.log_line("package upgrade failed")
+        b.log_line(logbuf.getvalue())
+        logbuf.close()
+        return False
+    b.log_line(logbuf.getvalue())
+    logbuf.close()
+    return True
