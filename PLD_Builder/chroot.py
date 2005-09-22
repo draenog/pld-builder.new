@@ -21,22 +21,19 @@ def popen(cmd, user = "builder", mode = "r"):
     f = os.popen(command(cmd, user), mode)
     return f
     
-def run(cmd, user = "builder", logfile = None, logstdout = False):
+def run(cmd, user = "builder", logfile = None, logstdout = None):
     c = command(cmd, user)
     if logfile != None:
-        if logstdout:
-            c = "%s 2>&1 | tee %s" % (c, logfile)
+        if logstdout != None:
+            c = "%s 2>&1 | /usr/bin/tee -a %s" % (c, logfile)
         else:
             c = "%s >> %s 2>&1" % (c, logfile)
-    lines = ""
     f = os.popen(c)
     for l in f:
-        lines += l
+        if logstdout != None:
+            logstdout.write(l)
     r = f.close()
     if r == None:
-        if logstdout:
-            return lines
-        else:
-            return 0
+        return 0
     else:
         return r
