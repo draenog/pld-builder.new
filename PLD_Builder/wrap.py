@@ -26,7 +26,7 @@ def wrap(main):
         log.alert("during: %s" % status.get())
         
         # don't use mailer.py; it safer this way
-        f = os.popen("/usr/sbin/sendmail -t", "w")
+        f = os.popen("/usr/sbin/sendmail -i -t", "w")
         f.write("""Subject: builder failure
 To: %s
 Cc: %s, %s
