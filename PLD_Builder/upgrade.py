@@ -45,7 +45,7 @@ def close_killset(killset):
 def upgrade_from_batch(r, b):
     f = chroot.popen("rpm --test -F %s 2>&1" % string.join(b.files), user = "root")
     killset = {}
-    rx = re.compile(r' ([^\s]+)-[^-]+-[^-]+$')
+    rx = re.compile(r' \(installed\) ([^\s]+)-[^-]+-[^-]+$')
     for l in f.xreadlines():
         m = rx.search(l)
         if m: killset[m.group(1)] = 1
