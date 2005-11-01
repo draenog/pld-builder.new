@@ -252,7 +252,7 @@ To: $builder_email
 Subject: build request
 Message-Id: <$id@$(hostname)>
 X-New-PLD-Builder: request
-X-Requester-Version: $Id$
+X-Requester-Version: \$Id$
 
 $(gen_req | gpg --clearsign --default-key $default_key)
 EOF
