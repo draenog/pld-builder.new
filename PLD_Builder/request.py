@@ -212,8 +212,8 @@ class Batch:
                     is_ok = 1
                 bld = b.split('-')
                 if bld[0] == "noauto":
-                    bld[1] = bld[2]
                     bld[0] = bld[1]
+                    bld[1] = bld[2]
                 link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&id=%s\">" \
                      % (bld[0], bld[1], is_ok, binascii.b2a_hex(md5.new(path).digest()))
                 link_post = "</a>"
