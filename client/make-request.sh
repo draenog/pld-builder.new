@@ -43,7 +43,7 @@ usage() {
   echo "Usage: make-request.sh [OPTION] ... [SPECFILE] ...."
   echo ""
   echo "Mandatory arguments to long options are mandatory for short options too."
-  echo "  -b BUILDER,BUILDER,...  --builder=BUILDER,BUILDER,..."
+  echo "  -b 'BUILDER BUILDER ...'  --builder='BUILDER BUILDER ...'"
   echo "       Sends request to given builders"
   echo "  --with VALUE --without VALUE"
   echo "       Build package with(out) a given bcond"
