@@ -206,14 +206,12 @@ class Batch:
                     bl_name = "command"
                 else:
                     bl_name = self.spec[:len(self.spec)-5]
-                path = "/%s/%s/%s.bz2" % (b.replace('-','/'), s, bl_name)
+                lin_ar = b.replace('noauto-','')
+                path = "/%s/%s/%s.bz2" % (lin_ar.replace('-','/'), s, bl_name)
                 is_ok = 0
                 if s == "OK":
                     is_ok = 1
-                bld = b.split('-')
-                if bld[0] == "noauto":
-                    bld[0] = bld[1]
-                    bld[1] = bld[2]
+                bld = lin_ar.split('-')
                 link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&id=%s\">" \
                      % (bld[0], bld[1], is_ok, binascii.b2a_hex(md5.new(path).digest()))
                 link_post = "</a>"
