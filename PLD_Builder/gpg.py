@@ -16,12 +16,12 @@ def verify_sig(buf):
     """
     (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --decrypt")
     body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
-    rx = re.compile("^gpg: Good signature from .*<([^>]+)>")
+    rx = re.compile("^gpg: (Good signature from|                aka) .*<([^>]+)>")
     emails = []
     for l in gpg_err.xreadlines():
         m = rx.match(l)
         if m:
-            emails.append(m.group(1))
+            emails.append(m.group(2))
     gpg_err.close()
     return (emails, body)
 
