@@ -20,15 +20,14 @@ else
 	echo "Creating config file $USER_CFG. You *must* edit it."
 	cat >$USER_CFG <<EOF
 priority=2
-requester=deviloper@pld-linux.org
+requester=deviloper
 default_key=deviloper@pld-linux.org
-builder_email=builder-ac@pld-linux.org
+builder_email=builderth@ep09.pld-linux.org
 mailer="/usr/sbin/sendmail -t"
-default_builders="ac-*"
+default_builders="th-*"
 
 # defaults:
-build_mode=test
-f_upgrade=no
+f_upgrade=yes
 
 EOF
 exit
