@@ -1,0 +1,79 @@
+# -*- mode: sh -*-
+
+# CHROOTS=/mnt/hda9/adm/builders/pld/{ac/{athlon,i586},actw/{athlon,i586},th/{athlon,i486}}
+
+# pld_builder_start ()
+# {
+# local RET
+# echo
+# for CHROOT in $CHROOTS ; do
+# echo -n "chroot: $CHROOT "
+# RET=$(chroot $CHROOT mount /proc > /dev/null 2>&1 ; echo $?)
+# [ $RET -eq 0 ] && ok || fail
+# done
+
+# cat <<EOF | VISUAL='ed -s' crontab -u srpms_builder -e
+# a
+# SHELL=/bin/sh
+# MAIL=srpms_builder
+
+# * * * * * ~/pld-builder.new/bin/src-builder.sh
+# * * * * * ~/pld-builder.new/bin/file-sender.sh
+# .
+# wq
+# EOF
+
+# cat <<EOF | VISUAL='ed -s' crontab -u bin_builder -e
+# a
+# SHELL=/bin/sh
+# MAIL=bin_builder
+
+# * * * * * ~/pld-builder.new/bin/request-fetcher.sh
+# * * * * * ~/pld-builder.new/bin/load-balancer.sh
+# * * * * * ~/pld-builder.new/bin/file-sender.sh
+# .
+# wq
+# EOF
+
+# cat <<EOF | VISUAL='ed -s' crontab -u ftpac -e
+# a
+# SHELL=/bin/sh
+# MAIL=ftpac
+
+# 1 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/ready/SRPMS"
+# 2 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/ready/athlon"
+# 3 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/ready/i586"
+# 4 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/test/SRPMS"
+# 5 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/test/athlon"
+# 6 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/test/i586"
+# .
+# wq
+# EOF
+# }
+
+# pld_builder_stop ()
+# {
+# local RET
+# echo
+# for CHROOT in $CHROOTS ; do
+# echo -n "chroot: $CHROOT "
+# RET=$(chroot $CHROOT umount /proc > /dev/null 2>&1 ; echo $?)
+# [ $RET -eq 0 ] && ok || fail
+# done
+# crontab -u srpms_builder -r
+# crontab -u bin_builder -r
+# crontab -u ftpac -r
+# }
+
+# pld_builder_status ()
+# {
+# local RET
+# echo
+# for CHROOT in $CHROOTS ; do
+# echo -n "chroot: $CHROOT "
+# RET=$((chroot $CHROOT mount -v 2> /dev/null) | grep -q 'none.*/proc' ; echo $? )
+# [ $RET -eq 0 ] && ok || fail
+# done
+# }
+
+# vi:syntax=sh:ts=4:sw=4

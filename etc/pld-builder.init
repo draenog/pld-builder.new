@@ -1,0 +1,95 @@
+#!/bin/sh
+#
+# pld-builder	perform adminstrator's tasks for pld-builder
+#
+# chkconfig:	345 99 01
+#
+# description:	perform adminstrator's tasks for pld-builder
+
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# define shell functions listed below on your own in /etc/sysconfig/pld-builder
+pld_builder_start () :
+pld_builder_reload () :
+pld_builder_restart () :
+pld_builder_status () :
+pld_builder_stop () :
+
+# Get service config - may override defaults
+[ -f /etc/sysconfig/pld-builder ] && . /etc/sysconfig/pld-builder
+
+# See how we were called.
+case "$1" in
+  start)
+	# Check if the service is already running?
+	if [ ! -f /var/lock/subsys/pld-builder ]; then
+		# show "Starting %s service" pld-builder
+		msg_starting pld-builder
+		busy
+		pld_builder_start
+		RETVAL=0
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/pld-builder
+	else
+		# show "%s service is already running." pld-builder
+		msg_already_running pld-builder
+	fi
+	;;
+  stop)
+	if [ -f /var/lock/subsys/pld-builder ]; then
+		# Stop daemons.
+		# show "Stopping %s service" pld-builder
+		msg_stopping pld-builder
+		busy
+		pld_builder_stop
+		RETVAL=0
+		rm -f /var/lock/subsys/pld-builder
+	else
+		# show "%s service is not running." pld-builder
+		msg_not_running pld-builder
+	fi
+	;;
+  restart)
+	pld_builder_stop
+	pld_builder_start
+	exit $?
+	;;
+  reload)
+	if [ -f /var/lock/subsys/pld-builder ]; then
+		# show "Reload %s service" pld-builder
+		msg_reloading pld-builder
+		pld_builder_reload
+		RETVAL=$?
+	else
+		# show "%s service is not running." pld-builder
+		msg_not_running pld-builder >&2
+		RETVAL=7
+	fi
+	;;
+  force-reload)
+	# if program allows reloading without stopping
+	pld_builder_reload
+	exit $?
+	;;
+  status)
+	pld_builder_status
+	RETVAL=$?
+	;;
+  *)
+	# show "Usage: %s {start|stop|restart|reload|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
+	exit 3
+	;;
+esac
+
+unset -f pld_builder_start
+unset -f pld_builder_restart
+unset -f pld_builder_reload
+unset -f pld_builder_status
+unset -f pld_builder_stop
+
+exit $RETVAL
+
+# This must be last line !
+# vi:syntax=sh
