@@ -1,79 +1,115 @@
+#!/bin/sh without shebang autoindentation doesn't work (vim-7.0-0.c02.1.3)
 # -*- mode: sh -*-
 
+# BEGIN
+# 
 # CHROOTS=/mnt/hda9/adm/builders/pld/{ac/{athlon,i586},actw/{athlon,i586},th/{athlon,i486}}
-
+# FTPDIRS=/mnt/hda9/adm/builders/pld/ftp/ftp/{{ac,actw}/{ready,test}/{SRPMS,athlon,i586},th/{ready,test}/{SRPMS,athlon,i486}}
+# 
+# NICE="nice -n 19"
+# 
+# bin_builder_tmpwatch_cron_jobs ()
+# {
+# 	local hour=0
+# 	for CHROOT in $CHROOTS ; do
+# 		[ $hour -gt 23 ] && hour=0			
+# 		echo "0 $hour * * * sudo chroot $CHROOT $NICE tmpwatch -m 240 /spool/poldek"
+# 		hour=$(( $hour + 1 ))
+# 	done
+# }
+# 
+# ftp_update_indexes_cron_jobs ()
+# {
+# 	local minute=0
+# 	for FTPDIR in $FTPDIRS ; do
+# 		[ $minute -gt 59 ] && minute=0
+# 		echo "$minute * * * * /bin/sh -c \"umask 022 ; $NICE /usr/bin/poldek --mkidx -s $FTPDIR\""
+# 		minute=$(( $minute + 1 ))
+# 	done
+# }
+# 
 # pld_builder_start ()
 # {
-# local RET
-# echo
-# for CHROOT in $CHROOTS ; do
-# echo -n "chroot: $CHROOT "
-# RET=$(chroot $CHROOT mount /proc > /dev/null 2>&1 ; echo $?)
-# [ $RET -eq 0 ] && ok || fail
-# done
-
-# cat <<EOF | VISUAL='ed -s' crontab -u srpms_builder -e
-# a
-# SHELL=/bin/sh
-# MAIL=srpms_builder
-
-# * * * * * ~/pld-builder.new/bin/src-builder.sh
-# * * * * * ~/pld-builder.new/bin/file-sender.sh
-# .
-# wq
-# EOF
-
-# cat <<EOF | VISUAL='ed -s' crontab -u bin_builder -e
-# a
-# SHELL=/bin/sh
-# MAIL=bin_builder
-
-# * * * * * ~/pld-builder.new/bin/request-fetcher.sh
-# * * * * * ~/pld-builder.new/bin/load-balancer.sh
-# * * * * * ~/pld-builder.new/bin/file-sender.sh
-# .
-# wq
-# EOF
-
-# cat <<EOF | VISUAL='ed -s' crontab -u ftpac -e
-# a
-# SHELL=/bin/sh
-# MAIL=ftpac
-
-# 1 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/ready/SRPMS"
-# 2 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/ready/athlon"
-# 3 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/ready/i586"
-# 4 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/test/SRPMS"
-# 5 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/test/athlon"
-# 6 * * * * /bin/sh -c "umask 022 ; /usr/bin/poldek --mkidx -s /mnt/hda9/adm/builders/pld/ftp/ftp/ac/test/i586"
-# .
-# wq
-# EOF
+# 	# mount /proc in chroots
+# 	local RET
+# 	echo
+# 	for CHROOT in $CHROOTS ; do
+# 		show "chroot: %s mount /proc" "$CHROOT"
+# 		RET=$(chroot $CHROOT mount /proc > /dev/null 2>&1 ; echo $?)
+# 	[ $RET -eq 0 ] && ok || fail
+# 	done
+# 
+# 	# set up crontab for srpms_builder
+# 	show "setting up crontab for srpms_builder"
+# 	crontab -u srpms_builder -r > /dev/null 2>&1
+# 	cat <<- EOF | VISUAL='ed -s' crontab -u srpms_builder -e > /dev/null 2>&1 && ok || fail
+# 	a
+# 	SHELL=/bin/sh
+# 	MAIL=srpms_builder
+# 	
+# 	* * * * * $NICE ~/pld-builder.new/bin/src-builder.sh
+# 	* * * * * $NICE ~/pld-builder.new/bin/file-sender.sh
+# 	.
+# 	wq
+# 	EOF
+# 	
+# 	# set up crontab for bin_builder
+# 	show "setting up crontab for bin_builder"
+# 	crontab -u bin_builder -r > /dev/null 2>&1
+# 	cat <<- EOF | VISUAL='ed -s' crontab -u bin_builder -e > /dev/null 2>&1 && ok || fail
+# 	a
+# 	SHELL=/bin/sh
+# 	MAIL=bin_builder
+# 	
+# 	* * * * * $NICE ~/pld-builder.new/bin/request-fetcher.sh
+# 	* * * * * $NICE ~/pld-builder.new/bin/load-balancer.sh
+# 	* * * * * $NICE ~/pld-builder.new/bin/file-sender.sh
+# 	.
+# 	wq
+# 	EOF
+# 	
+# 	# set up crontab for ftpac
+# 	show "setting up crontab for ftp"
+# 	crontab -u ftpac -r > /dev/null 2>&1
+# 	cat <<- EOF | VISUAL='ed -s' crontab -u ftpac -e > /dev/null 2>&1 && ok || fail
+# 	a
+# 	SHELL=/bin/sh
+# 	MAIL=ftpac
+# 	
+# 	$(bin_builder_tmpwatch_cron_jobs)
+# 	$(ftp_update_indexes_cron_jobs)
+# 	.
+# 	wq
+# 	EOF
 # }
-
+# 
 # pld_builder_stop ()
 # {
-# local RET
-# echo
-# for CHROOT in $CHROOTS ; do
-# echo -n "chroot: $CHROOT "
-# RET=$(chroot $CHROOT umount /proc > /dev/null 2>&1 ; echo $?)
-# [ $RET -eq 0 ] && ok || fail
-# done
-# crontab -u srpms_builder -r
-# crontab -u bin_builder -r
-# crontab -u ftpac -r
+# 	local RET
+# 	echo
+# 	for CHROOT in $CHROOTS ; do
+# 		show "chroot: %s umount /proc" "$CHROOT"
+# 		RET=$(chroot $CHROOT umount /proc > /dev/null 2>&1 ; echo $?)
+# 		[ $RET -eq 0 ] && ok || fail
+# 	done
+# 	
+# 	for u in srpms_builder bin_builder ftpac ; do
+# 		show "removing crontab for %s" "$u"
+# 		crontab -u $u -r > /dev/null 2>&1 && ok || fail
+# 	done
 # }
-
+# 
 # pld_builder_status ()
 # {
-# local RET
-# echo
-# for CHROOT in $CHROOTS ; do
-# echo -n "chroot: $CHROOT "
-# RET=$((chroot $CHROOT mount -v 2> /dev/null) | grep -q 'none.*/proc' ; echo $? )
-# [ $RET -eq 0 ] && ok || fail
-# done
+# 	local RET
+# 	echo
+# 	for CHROOT in $CHROOTS ; do
+# 		echo -n "chroot: $CHROOT "
+# 		show "chroot: %s is /proc mounted?" "$CHROOT"
+# 		RET=$((chroot $CHROOT mount -v 2> /dev/null) | grep -q 'none.*/proc' ; echo $? )
+# 		[ $RET -eq 0 ] && ok || fail
+# 	done
 # }
+# END
 
 # vi:syntax=sh:ts=4:sw=4
