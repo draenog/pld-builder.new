@@ -11,11 +11,11 @@
 . /etc/rc.d/init.d/functions
 
 # define shell functions listed below on your own in /etc/sysconfig/pld-builder
-pld_builder_start () :
-pld_builder_reload () :
-pld_builder_restart () :
+pld_builder_start () ok
+pld_builder_reload () ok
+pld_builder_restart () ok
 pld_builder_status () :
-pld_builder_stop () :
+pld_builder_stop () ok
 
 # Get service config - may override defaults
 [ -f /etc/sysconfig/pld-builder ] && . /etc/sysconfig/pld-builder
@@ -47,7 +47,11 @@ case "$1" in
 	fi
 	;;
   restart)
+	msg_starting pld-builder
+	busy
 	pld_builder_stop
+	msg_stopping pld-builder
+	busy
 	pld_builder_start
 	exit $?
 	;;
