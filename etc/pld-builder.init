@@ -25,28 +25,24 @@ case "$1" in
   start)
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/pld-builder ]; then
-		# show "Starting %s service" pld-builder
 		msg_starting pld-builder
 		busy
 		pld_builder_start
 		RETVAL=0
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/pld-builder
 	else
-		# show "%s service is already running." pld-builder
 		msg_already_running pld-builder
 	fi
 	;;
   stop)
 	if [ -f /var/lock/subsys/pld-builder ]; then
 		# Stop daemons.
-		# show "Stopping %s service" pld-builder
 		msg_stopping pld-builder
 		busy
 		pld_builder_stop
 		RETVAL=0
 		rm -f /var/lock/subsys/pld-builder
 	else
-		# show "%s service is not running." pld-builder
 		msg_not_running pld-builder
 	fi
 	;;
@@ -57,12 +53,10 @@ case "$1" in
 	;;
   reload)
 	if [ -f /var/lock/subsys/pld-builder ]; then
-		# show "Reload %s service" pld-builder
 		msg_reloading pld-builder
 		pld_builder_reload
 		RETVAL=$?
 	else
-		# show "%s service is not running." pld-builder
 		msg_not_running pld-builder >&2
 		RETVAL=7
 	fi
@@ -77,7 +71,6 @@ case "$1" in
 	RETVAL=$?
 	;;
   *)
-	# show "Usage: %s {start|stop|restart|reload|force-reload|status}"
 	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
 	exit 3
 	;;
