@@ -12,7 +12,7 @@ NICE="nice -n 19"
 bin_builder_tmpwatch_cron_jobs ()
 {
 	local hour=0
-	for CHROOT in $CHROOTS ; do
+	for CHROOT in $CHROOTS; do
 		[ $hour -gt 23 ] && hour=0
 		echo "0 $hour * * * sudo chroot $CHROOT $NICE tmpwatch -m 240 /spool/poldek"
 		hour=$(( $hour + 1 ))
@@ -22,7 +22,7 @@ bin_builder_tmpwatch_cron_jobs ()
 ftp_update_indexes_cron_jobs ()
 {
 	local minute=0
-	for FTPDIR in $FTPDIRS ; do
+	for FTPDIR in $FTPDIRS; do
 		[ $minute -gt 59 ] && minute=0
 		echo "$minute * * * * /bin/sh -c \"umask 022 ; $NICE /usr/bin/poldek --mkidx -s $FTPDIR\""
 		minute=$(( $minute + 1 ))
@@ -78,11 +78,11 @@ pld_builder_stop ()
 	echo
 	for CHROOT in $CHROOTS; do
 		show "chroot: %s umount /proc" "$CHROOT"
-		RET=$(chroot $CHROOT umount /proc > /dev/null 2>&1 ; echo $?)
+		RET=$(chroot $CHROOT umount /proc > /dev/null 2>&1; echo $?)
 		[ $RET -eq 0 ] && ok || fail
 	done
 
-	for u in srpms_builder bin_builder ftpac ; do
+	for u in srpms_builder bin_builder ftpac; do
 		show "removing crontab for %s" "$u"
 		crontab -u $u -r > /dev/null 2>&1 && ok || fail
 	done
@@ -94,7 +94,7 @@ pld_builder_status ()
 	echo
 	for CHROOT in $CHROOTS; do
 		show "chroot: %s is /proc mounted?" "$CHROOT"
-		RET=$((chroot $CHROOT mount -v 2> /dev/null) | grep -q 'none.*/proc' ; echo $? )
+		RET=$( (chroot $CHROOT mount -v 2> /dev/null) | grep -q 'none.*/proc' ; echo $? )
 		[ $RET -eq 0 ] && ok || fail
 	done
 }
