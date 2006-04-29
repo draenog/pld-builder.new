@@ -47,12 +47,8 @@ case "$1" in
 	fi
 	;;
   restart)
-	msg_starting pld-builder
-	busy
-	pld_builder_stop
-	msg_stopping pld-builder
-	busy
-	pld_builder_start
+	$0 stop
+	$0 start
 	exit $?
 	;;
   reload)
