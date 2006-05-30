@@ -57,7 +57,7 @@ case "$1" in
 		pld_builder_reload
 		RETVAL=$?
 	else
-		msg_not_running pld-builder >&2
+		msg_not_running pld-builder
 		RETVAL=7
 	fi
 	;;
