@@ -68,12 +68,10 @@ def upgrade_from_batch(r, b):
             return False
     b.log_line("upgrading packages")
     logbuf = StringIO.StringIO()
-    res = chroot.run("rpm -Fvh %s" % string.join(b.files), user = "root", logstdout = logbuf)
+    res = chroot.run("rpm -Fvh %s" % string.join(b.files), user = "root", logfile = b.logfile)
     if res != 0:
         b.log_line("package upgrade failed")
-        b.log_line(logbuf.getvalue())
         logbuf.close()
         return False
-    b.log_line(logbuf.getvalue())
     logbuf.close()
     return True
