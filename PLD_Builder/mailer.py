@@ -8,6 +8,12 @@ import StringIO
 from config import config
 import util
 
+def recode(s):
+    if s.__class__ == ''.__class__:
+        return s.decode('iso-8859-1', 'replace').encode('us-ascii', 'replace')
+    else:
+        return s.encode('us-ascii', 'replace')
+
 class Message:
     def __init__(self):
         self.headers = {}
@@ -26,10 +32,10 @@ class Message:
             self.set_header("Subject", subject)
 
     def write_line(self, l):
-        self.body.write("%s\n" % l)
+        self.body.write(recode("%s\n" % l))
 
     def write(self, s):
-        self.body.write(s)
+        self.body.write(recode(s))
 
     def append_log(self, log):
         s = os.stat(log)
@@ -43,7 +49,7 @@ class Message:
             line = 0
             for l in f.xreadlines():
                 if line < 100 or line > line_cnt - 100:
-                    self.body.write(l)
+                    self.body.write(recode(l))
                 if line == line_cnt - 100:
                     self.body.write("\n\n[...]\n\n")
                 line += 1
