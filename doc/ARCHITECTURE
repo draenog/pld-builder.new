@@ -1,0 +1,165 @@
+0. ABSTRACT
+
+Below is a description of the way the builder infrastructure works. You should 
+read it in order to be able to understand what's exactly going on when you try 
+to build a package.
+
+(It assumes you have a basic understanding of how RPM packages are created.)
+
+1. OVERVIEW
+
+The builder infrastructure is divided into three parts:
+- the client
+- the source builder
+- the binary builders
+
+The basic idea is to allow developers (requesters) to easily specify which 
+package they want built, and have the rest of the system take care of building 
+and upgrading packages, uploading them where appropriate and reporting back to 
+the developers on the results (were there errors, how long it took to build, 
+etc.).
+
+What follows is a more detailed description of what each part is supposed to 
+do.
+
+1.1 NOTES ON UPLOADING
+
+When talking of uploading packages and logs it is meant as placing them 
+somewhere on the original system (via a simple 'cp'; this also includes copying 
+to /dev/null), or placing them on a remote system via the scp or rsync 
+protocols.
+
+1.2 TOOLS USED
+
+99% of the system is written in python, with remaining parts using shell 
+scripts (POSIX shell is assumed, bashisms are to be shot at sight and their 
+authors beheaded in a public display). The presence of various helper tools is 
+assumed. They are: gpg, rsync and scp command line utilities.
+
+2. SHORT DIAGRAM
+
+Below are complete basics of how data is tossed around. Only the most relevant 
+transfers are presented.
+
+         status info          status info
+       +--------------+<--+------------------+
+       |    build     |   |                  |
+       V   request    |   V       src.rpm    |
+requester ---------> src.builder ---------> bin.builders
+                          |                  |
+                          | arch.rpms        |
+           FTP server <---+------------------+
+
+3. CLIENT
+
+Main task: sending build requests to source builders.
+
+This is the simplest part. It consists of a shell script (make-request.sh), 
+which, based on the way it's configured and on the cmdline parameters given to 
+it, generates an xml-formated build request, which it then signs with the 
+requester's PGP key (using the gpg utility) and then sends it to the source 
+builder via a sendmail compatible command line application (by default invoking 
+"sendmail -t").
+
+Two modes of operation are:
+- sending requests to build chosen package(s) on a specified group of builders
+- sending a chosen command to be executed on a specified group of builders
+
+See HOWTO-CLIENT for a hands-on approach to setting yourself up for being able 
+to send out build requests.
+
+4. SOURCE BUILDER (AKA SRC.BUILDER)
+
+Main task: building src.rpm packages and serving them to binary builders.
+Additional tasks: reporting back to the requester about the status of the build 
+and uploading generated src.rpm packages where appropriate. Also -- tagging,
+access control, uploading buildlogs and keeping the 'queue.html' file in sync.
+
+The source builder is the central place for managing access rights for 
+requesters. Upon receiving a request (via email), it first checks the pgp 
+signature with which the request was signed, against the pgp key currently 
+assigned to the requester (all done with the 'gpg' command). After verifying 
+that the requester name/requester pgp signature pair match, it then checks if 
+the requester is actually allowed to perform the actions she wants to perform.  
+That is: does she have access to a specified binary builder, is she allowed to 
+specify the 'upgrade' flag or not, is she allowed to use the priority she set 
+for the request and even if she is allowed to request building of a given 
+package.
+
+Once a request passes all verifications, the src.builder uses its own chroot 
+equipped with a basic build environment to fetch the sources of a given 
+package, tag them if configured to do so and create a src.rpm out of them (all 
+done by invoking the 'builder' script as found in the SPECS module of the PLD 
+cvs repository (see http://www.pld-linux.org/Repositories for details)).
+
+After finishing the build procedure the src.builder reports (via email) to the 
+requester on the status of the build (OK/FAIL), updates the 'queue.html' file 
+with that information (urls for PLD2.0 and 3.0 queues: 
+http://ep09.pld-linux.org/~buildsrc/queue.html and
+http://ep09.pld-linux.org/~builderth/queue.html) and, if configured to do so, 
+uploads the complete log of the whole procedure (called the buildlog) 
+somewhere, most likely to our PLD buildlogs system 
+(http://buildlogs.pld-linux.org).
+
+If the build procedure was successful, the resulting src.rpm file is most 
+likely uploaded somewhere (if configured to do so; in our case it's our FTP 
+server) and, what is most important, it's being served via a http server for 
+the binary builders to download. An xml-formated (and pgp signed) 'queue.gz' 
+and a small 'max_req_no' files are also updated with relevant information, in 
+order for the bin.builders to be able to notice new requests and figure out 
+which are addressed to which builders.
+
+The last matter taken care of by the src.builder is receiving (gpg signed) 
+emails from bin.builders with status information regarding what happened to 
+various builds (whether they succeeded or failed) and updating the 'queue.html' 
+file accordingly.
+
+See the HOWTO-BUILDERS file for a hands-on approach on setting up builders. All 
+of the technical details are there.
+
+5. BINARY BUILDERS (AKA BIN.BUILDERS)
+
+Main task: building arch.rpm packages and uploading them where appropriate.
+Additional tasks: reporting back to the requester and the source builder on the 
+status of the build. Also -- uploading buildlogs.
+
+Upon noticing that a new request has been published by the src.builder and 
+verifying the appropriate gpg signatures, binary builders download the relevant 
+src.rpm files and use their build-environment-equipped chroots to start 
+building them (by invoking the 'rpmbuild' command). Once a build is completed 
+(meaning arch.rpm files are produced, or the whole procedure is interrupted for 
+whatever reason), the status of the build (OK/FAIL) is sent via email both to 
+the requester and to the src.builder.
+
+Procedure for uploading the produced arch.rpms and buildlogs is the same as 
+with the src.builder.
+
+Bin.builders however need to deal with one thing src.builders are mostly not 
+affected by -- managing the build environments inside their chroots. That means 
+installing new packages if required by a given build (using the 'poldek' 
+package manager; http://poldek.pld-linux.org/), upgrading older packages for 
+much the same reasons, downgrading from time to time and locally caching newly 
+built files for short periods of times.
+
+All of this, along with lots of quirks and obscure details is explained in the 
+HOWTO-BUILDERS file.
+
+6. Q/A
+
+Q: What's this 'tagging' all about with the src.builder?
+A: When a src.rpm is created and arch.rpms built based on it, it is sometimes 
+useful to be able to check which sources were used to build them. Casual users 
+might be satisfied with just extracting everything from the src.rpm (that is 
+what they are uploaded to the ftp server for), but the old ones aren't always 
+available and even if they are, developers require source control in order to 
+work efficiently. Hence all sources used to build a given src.rpm for a given 
+line are tagged appropriately in the PLD CVS repository, for example trying to 
+build cthulu.spec on the 2.0 (codename Ac) line of our distro might result in a 
+tag looking something like this being set -- 'auto-ac-cthulu-6.6-6'.
+(Technically the previous sentence is not 100% correct due to (a) the way our 
+DISTFILES infrastructure impacts which sources are and aren't in the CVS repo 
+and hence are subject to tagging and (b) specific policies regarding tagging 
+for each distro line; for the latter refer to appropriate policies.)
+
+
+# vi: language=english formatoptions=aw expandtab
