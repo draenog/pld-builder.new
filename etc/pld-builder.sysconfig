@@ -59,6 +59,8 @@ EOF
 	* * * * * $NICE /usr/share/pld-builder/bin/request-fetcher.sh
 	* * * * * $NICE /usr/share/pld-builder/bin/load-balancer.sh
 	* * * * * $NICE /usr/share/pld-builder/bin/file-sender.sh
+
+	$(bin_builder_tmpwatch_cron_jobs)
 EOF
 
 	# set up crontab for ftpac
@@ -67,7 +69,6 @@ EOF
 	SHELL=/bin/sh
 	MAIL=ftpac
 
-	$(bin_builder_tmpwatch_cron_jobs)
 	$(ftp_update_indexes_cron_jobs)
 EOF
 }
