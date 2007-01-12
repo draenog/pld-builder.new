@@ -86,7 +86,7 @@ def transfer_file(r, b):
 def build_srpm(r, b):
     status.push("building %s" % b.spec)
     b.src_rpm = ""
-    builder_opts = "-nu --nodeps"
+    builder_opts = "-nu -nm --nodeps"
     if ("test-build" in r.flags) or b.branch and b.branch.startswith(config.tag_prefixes[0]):
                     tag_test=""
     else:
