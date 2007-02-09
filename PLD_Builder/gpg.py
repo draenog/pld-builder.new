@@ -1,5 +1,6 @@
 # vi: encoding=utf-8 ts=8 sts=4 sw=4 et
 
+import log
 import popen2
 import re
 import StringIO
@@ -15,7 +16,12 @@ def verify_sig(buf):
     object.
     """
     (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --decrypt")
-    body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
+    try:
+        body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
+    except OSError:
+        log.error("gnupg signing failed; does gpg binary exist?")
+        raise
+
     rx = re.compile("^gpg: (Good signature from|                aka) .*<([^>]+)>")
     emails = []
     for l in gpg_err.xreadlines():
@@ -27,6 +33,11 @@ def verify_sig(buf):
 
 def sign(buf):
     (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --clearsign")
-    body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
+    try:
+        body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
+    except OSError:
+        log.error("gnupg signing failed; does gpg binary exist?")
+        raise
+
     gpg_err.close()
     return body
