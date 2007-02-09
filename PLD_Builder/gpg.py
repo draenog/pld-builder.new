@@ -18,8 +18,8 @@ def verify_sig(buf):
     (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --decrypt")
     try:
         body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
-    except OSError:
-        log.error("gnupg signing failed; does gpg binary exist?")
+    except OSError, e:
+        log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
 
     rx = re.compile("^gpg: (Good signature from|                aka) .*<([^>]+)>")
@@ -35,8 +35,8 @@ def sign(buf):
     (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --clearsign")
     try:
         body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
-    except OSError:
-        log.error("gnupg signing failed; does gpg binary exist?")
+    except OSError, e:
+        log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
 
     gpg_err.close()
