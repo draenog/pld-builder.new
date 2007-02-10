@@ -142,7 +142,7 @@ def handle_request(f):
     if user == None:
         # FIXME: security email here
         log.alert("invalid signature, or not in acl %s" % em)
-        return
+        return False
     acl.set_current_user(user)
     status.push("email from %s" % user.login)
     r = request.parse_request(body)
@@ -159,13 +159,14 @@ def handle_request(f):
         m.write_line(msg)
         m.send()
     status.pop()
+    return True
 
 def main():
     init_conf("src")
     status.push("handling email request")
-    handle_request(sys.stdin)
+    ret = handle_request(sys.stdin)
     status.pop()
-    sys.exit(0)
+    sys.exit(not ret)
 
 if __name__ == '__main__':
     wrap.wrap(main)
