@@ -43,7 +43,7 @@ def run(cmd, user = "builder", logfile = None, logstdout = None):
 
 def cp(file, outfile, user="builder", rm=False):
     m = md5.new()
-    m.update(str(random.getrandbits(4096)))
+    m.update(str(random.sample(xrange(100000), 500)))
     digest = m.hexdigest()
 
     marker_start = "--- FILE BEGIN DIGEST %s ---" % digest
