@@ -39,7 +39,7 @@ def run(cmd, user = "builder", logfile = None, logstdout = None):
     else:
         return r
 
-def cp(file, outfile, rm=False):
+def cp(file, outfile, user="builder", rm=False):
     f = open(outfile, 'w')
     fileno = f.fileno()
     cmd = "cat %s" % file
