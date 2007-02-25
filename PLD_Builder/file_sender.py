@@ -74,7 +74,7 @@ def rsync_file(src, target, host):
     return f.close()
     
 def send_file(src, target):
-    log.notice("sending %s" % target)
+    log.notice("sending %s (size %d bytes)" % (target, os.stat(src).st_size))
     m = re.match('rsync://([^/]+)/.*', target)
     if m:
         return rsync_file(src, target, host = m.group(1))
