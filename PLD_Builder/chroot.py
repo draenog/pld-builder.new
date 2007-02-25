@@ -46,8 +46,8 @@ def cp(file, outfile, user="builder", rm=False):
     m.update(str(random.getrandbits(4096)))
     digest = m.hexdigest()
 
-    marker_start = "--- RPM BEGIN DIGEST %s ---" % digest
-    marker_end = "--- RPM END DIGEST %s ---" % digest
+    marker_start = "--- FILE BEGIN DIGEST %s ---" % digest
+    marker_end = "--- FILE END DIGEST %s ---" % digest
 
     f = open(outfile, 'w')
     cmd = "echo \"%s\"; cat %s; echo \"%s\"" % (marker_start, file, marker_end)
