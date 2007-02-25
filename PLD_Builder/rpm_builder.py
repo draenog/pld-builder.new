@@ -136,7 +136,7 @@ def build_rpm(r, b):
 
     for f in b.files:
         local = r.tmp_dir + os.path.basename(f)
-        chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
+        chroot.cp(f, rm=True, outfile = local)
         ftp.add(local)
 
     def uploadinfo(b):
