@@ -2,6 +2,7 @@
 
 import os
 import re
+import subprocess
 from config import config
 
 def quote(cmd):
@@ -32,6 +33,20 @@ def run(cmd, user = "builder", logfile = None, logstdout = None):
     for l in f:
         if logstdout != None:
             logstdout.write(l)
+    r = f.close()
+    if r == None:
+        return 0
+    else:
+        return r
+
+def cp(file, user = "builder", rm=False, outfile):
+    f = open(outfile, 'w')
+    fileno = f.fileno()
+    cmd = "cat %s >&%d" % (file, fileno)
+    if rm:
+        cmd += "; rm %s" % file
+    c = command(cmd, user)
+    subprocess.call(c, shell = True, close_fds = False)
     r = f.close()
     if r == None:
         return 0
