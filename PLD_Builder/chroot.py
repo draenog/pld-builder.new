@@ -39,13 +39,13 @@ def run(cmd, user = "builder", logfile = None, logstdout = None):
     else:
         return r
 
-def cp(file, outfile, user = "builder", rm=False):
+def cp(file, outfile, rm=False):
     f = open(outfile, 'w')
     fileno = f.fileno()
     cmd = "cat %s >&%d" % (file, fileno)
     if rm:
         cmd += "; rm %s" % file
-    c = command_sh(cmd, user)
+    c = command_sh(cmd)
     subprocess.call(c, shell = True, close_fds = False)
     r = f.close()
     if r == None:
