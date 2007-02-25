@@ -45,7 +45,7 @@ def cp(file, outfile, user = "builder", rm=False):
     cmd = "cat %s >&%d" % (file, fileno)
     if rm:
         cmd += "; rm %s" % file
-    c = command(cmd, user)
+    c = command_sh(cmd, user)
     subprocess.call(c, shell = True, close_fds = False)
     r = f.close()
     if r == None:
