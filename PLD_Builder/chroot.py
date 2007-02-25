@@ -2,7 +2,9 @@
 
 import os
 import re
-import subprocess
+import md5
+import random
+
 from config import config
 
 def quote(cmd):
@@ -40,13 +42,33 @@ def run(cmd, user = "builder", logfile = None, logstdout = None):
         return r
 
 def cp(file, outfile, user="builder", rm=False):
+    m = md5.new()
+    m.update(str(random.getrandbits(4096)))
+    digest = m.hexdigest()
+
+    marker_start = "--- RPM BEGIN DIGEST %s ---" % digest
+    marker_end = "--- RPM END DIGEST %s ---" % digest
+
     f = open(outfile, 'w')
-    fileno = f.fileno()
-    cmd = "cat %s" % file
+    cmd = "echo \"%s\"; cat %s; echo \"%s\"" % (marker_start, file, marker_end)
     if rm:
         cmd += "; rm %s" % file
     c = command(cmd, user)
-    subprocess.call(c, shell = True, stdout = f)
+    f = os.popen(c)
+    # get file contents
+    marker = False
+    for l in p:
+        if not marker and l.strip() == marker_start:
+            marker = True
+            continue
+        p = l.strip().find(marker_end)
+        if p != -1:
+            l = l[:p]
+            f.write(l)
+            marker = False
+            break
+        if marker:
+            f.write(l)
     r = f.close()
     if r == None:
         return 0
