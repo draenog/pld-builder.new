@@ -54,23 +54,24 @@ def cp(file, outfile, user="builder", rm=False):
     if rm:
         cmd += "; rm %s" % file
     c = command(cmd, user)
-    f = os.popen(c)
+    p = os.popen(c)
     # get file contents
     marker = False
     for l in p:
         if not marker and l.strip() == marker_start:
             marker = True
             continue
-        p = l.strip().find(marker_end)
-        if p != -1:
-            l = l[:p]
+        me = l.strip().find(marker_end)
+        if me != -1:
+            l = l[:me]
             f.write(l)
             marker = False
             break
         if marker:
             f.write(l)
-    r = f.close()
-    if r == None:
+    rp = p.close()
+    rf = f.close()
+    if rp == None:
         return 0
     else:
         return r
