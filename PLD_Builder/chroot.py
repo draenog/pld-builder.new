@@ -61,7 +61,7 @@ def cp(file, outfile, user="builder", rm=False):
         if not marker and l.strip() == marker_start:
             marker = True
             continue
-        me = l.strip().find(marker_end)
+        me = l.find(marker_end)
         if me != -1:
             l = l[:me]
             f.write(l)
