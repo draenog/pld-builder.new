@@ -49,7 +49,7 @@ def cp(file, outfile, user="builder", rm=False):
     marker_start = "--- FILE BEGIN DIGEST %s ---" % digest
     marker_end = "--- FILE END DIGEST %s ---" % digest
 
-    f = open(outfile, 'w')
+    f = open(outfile, 'wb')
     cmd = "echo \"%s\"; cat %s; echo \"%s\"" % (marker_start, file, marker_end)
     if rm:
         cmd += "; rm %s" % file
