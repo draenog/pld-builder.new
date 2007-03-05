@@ -102,6 +102,8 @@ def build_rpm(r, b):
         cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bp --short-circuit --nodeps --define 'prep exit 0' %s %s" % \
             (tmpdir, config.nice, rpmbuild_opt, b.spec)
         res = chroot.run(cmd, logfile = b.logfile)
+        if res != 0:
+            b.log_line("error: build arch check failed")
 
         if not res:
             if ("no-install-br" not in r.flags) and install_br.install_br(r, b):
