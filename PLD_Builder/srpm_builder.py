@@ -116,9 +116,9 @@ def build_srpm(r, b):
     if res == 0 and not "test-build" in r.flags:
         for pref in config.tag_prefixes:
             util.append_to(b.logfile, "tagging: %s" % pref)
-            chroot.run("cd rpm/SPECS; ./builder -r %s -Tp %s -Tv %s" % \
+            res = chroot.run("cd rpm/SPECS; ./builder -r %s -Tp %s -Tv %s" % \
                         (b.branch, pref, b.spec), logfile = b.logfile)
-    chroot.run("cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
+    res = chroot.run("cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
                          "--clean --rmspec --rmsource %s" % \
                          b.spec, logfile = b.logfile)
     status.pop()
