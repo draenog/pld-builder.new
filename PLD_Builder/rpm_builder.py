@@ -98,20 +98,27 @@ def build_rpm(r, b):
         prepare_env()
         chroot.run("install -m 700 -d %s" % tmpdir)
         rpmbuild_opt = "%s --target %s-pld-linux" % (b.bconds_string(), config.arch)
-        cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb %s %s" % \
-                    (tmpdir, config.nice, rpmbuild_opt, b.spec)
-        if ("no-install-br" not in r.flags) and install_br.install_br(r, b):
-            res = 1
-        else:
-            b.log_line("building RPM using: %s" % cmd)
-            res = chroot.run(cmd, logfile = b.logfile)
-            files = util.collect_files(b.logfile)
-            if len(files) > 0:
-                r.chroot_files.extend(files)
+        # check for build arch before filling BR
+        cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bp --short-circuit --nodeps --define 'prep exit 0' %s %s" % \
+            (tmpdir, config.nice, rpmbuild_opt, b.spec)
+        res = chroot.run(cmd, logfile = b.logfile)
+
+        if not res:
+            if ("no-install-br" not in r.flags) and install_br.install_br(r, b):
+                res = 1
             else:
-                b.log_line("error: No files produced.")
-                res = 1 # FIXME: is it error?
-            b.files = files
+                cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb %s %s" % \
+                            (tmpdir, config.nice, rpmbuild_opt, b.spec)
+                b.log_line("building RPM using: %s" % cmd)
+                res = chroot.run(cmd, logfile = b.logfile)
+                files = util.collect_files(b.logfile)
+                if len(files) > 0:
+                    r.chroot_files.extend(files)
+                else:
+                    b.log_line("error: No files produced.")
+                    res = 1 # FIXME: is it error?
+                b.files = files
+
     chroot.run("rm -rf %s; cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
                          "--clean --rmspec --rmsource %s" % \
                          (tmpdir, b.spec), logfile = b.logfile)
