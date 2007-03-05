@@ -102,7 +102,7 @@ def build_srpm(r, b):
     files = util.collect_files(b.logfile)
     if len(files) > 0:
         if len(files) > 1:
-            util.append_to(b.logfile, "error: More then one file produced: %s" % files)
+            util.append_to(b.logfile, "error: More than one file produced: %s" % files)
             res = 1
         last = files[len(files) - 1]
         b.src_rpm_file = last
@@ -113,7 +113,7 @@ def build_srpm(r, b):
         res = 1
     if res == 0 and not "test-build" in r.flags:
         for pref in config.tag_prefixes:
-            util.append_to(b.logfile, "tagging: %s" % pref)
+            util.append_to(b.logfile, "Tagging with prefix: %s" % pref)
             res = chroot.run("cd rpm/SPECS; ./builder -r %s -Tp %s -Tv %s" % \
                         (b.branch, pref, b.spec), logfile = b.logfile)
     if res == 0:
