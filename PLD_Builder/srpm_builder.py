@@ -118,7 +118,7 @@ def build_srpm(r, b):
             util.append_to(b.logfile, "tagging: %s" % pref)
             res = chroot.run("cd rpm/SPECS; ./builder -r %s -Tp %s -Tv %s" % \
                         (b.branch, pref, b.spec), logfile = b.logfile)
-    res = chroot.run("cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
+    chroot.run("cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
                          "--clean --rmspec --rmsource %s" % \
                          b.spec, logfile = b.logfile)
     status.pop()
