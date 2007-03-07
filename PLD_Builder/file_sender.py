@@ -82,15 +82,11 @@ def post_file(src, url):
         f.close()
         req = urllib2.Request(url, data)
         f = urllib2.urlopen(req)
-        code = f.code
         f.close()
     except Exception, e:
         problem = e
         return e
-    if code == 200:
-        return 0
-    else:
-        return code
+    return 0
 
 def send_file(src, target):
     log.notice("sending %s (size %d bytes)" % (target, os.stat(src).st_size))
