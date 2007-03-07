@@ -161,12 +161,15 @@ def handle_request(f):
     status.pop()
     return True
 
-def main():
+def handle_request_main(stream):
     init_conf("src")
     status.push("handling email request")
-    ret = handle_request(sys.stdin)
+    ret = handle_request(stream)
     status.pop()
-    sys.exit(not ret)
+    return ret
+
+def main():
+    sys.exit(not handle_request_main(sys.stdin))
 
 if __name__ == '__main__':
     wrap.wrap(main)

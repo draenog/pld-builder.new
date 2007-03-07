@@ -20,7 +20,7 @@ if [ "$1" != "y" ] ; then
   exit 1
 fi
 
-mkdir -p spool/{builds,buildlogs,ftp} www/srpms lock
+mkdir -p spool/{builds,buildlogs,notify,ftp} www/srpms lock
 echo 0 > www/max_req_no
 echo 0 > spool/last_req_no
 echo -n > spool/processed_ids

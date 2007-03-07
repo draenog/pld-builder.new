@@ -172,7 +172,7 @@ def handle_request(r):
     build.build_all(r, build_rpm)
     report.send_report(r, is_src = False)
     ftp.flush()
-    notify.send()
+    notify.send(r)
 
 def check_load():
     do_exit = 0

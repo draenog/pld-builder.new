@@ -89,6 +89,7 @@ class Builder_Conf:
         self.email = get("email")
         self.buildlogs_url = get("buildlogs_url", "/dev/null")
         self.ftp_url = get("ftp_url")
+        self.notify_url = get("notify_url")
         self.test_ftp_url = get("test_ftp_url", "/dev/null")
         self.rpmqa_url = get("rpmqa_url", "/dev/null")
         self.rpmqa_filename = get("rpmqa_filename")

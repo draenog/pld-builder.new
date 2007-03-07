@@ -8,6 +8,7 @@ import time
 import shutil
 import sys
 import traceback
+import urllib2
 
 from config import config, init_conf
 import mailer
@@ -72,7 +73,25 @@ def rsync_file(src, target, host):
     res = f.close()
     if password != None: os.unlink(".rsync.pass")
     return f.close()
-    
+
+def post_file(src, url):
+    global problem
+    try:
+        f = open(src, 'r')
+        data = f.read()
+        f.close()
+        req = urllib2.Request(url, data)
+        f = urllib2.urlopen(req)
+        code = f.code
+        f.close()
+    except Exception, e:
+        problem = e
+        return e
+    if code == 200:
+        return 0
+    else:
+        return code
+
 def send_file(src, target):
     log.notice("sending %s (size %d bytes)" % (target, os.stat(src).st_size))
     m = re.match('rsync://([^/]+)/.*', target)
@@ -83,6 +102,9 @@ def send_file(src, target):
     m = re.match('scp://([^@:]+@[^/:]+)(:|)(.*)', target)
     if m:
         return scp_file(src, m.group(1) + ":" + m.group(3))
+    m = re.match('http://.*', target)
+    if m:
+        return post_file(src, target)
     log.alert("unsupported protocol: %s" % target)
     # pretend everything went OK, so file is removed from queue,
     # and doesn't cause any additional problems
@@ -168,6 +190,7 @@ def main():
     if lock.lock("sending-files", non_block = 1) == None:
         return
     init_conf()
+    maybe_flush_queue(path.notify_queue_dir)
     maybe_flush_queue(path.buildlogs_queue_dir)
     maybe_flush_queue(path.ftp_queue_dir)
 
