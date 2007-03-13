@@ -141,7 +141,7 @@ def flush_queue(dir):
         if d != None: q.append(d)
     def mycmp(x, y):
         rc = cmp(x['Time'], y['Time'])
-        if (rc == 0):
+        if rc == 0 and x.has_key('Type') and y.has_key('Type'):
             return cmp(x['Type'], y['Type'])
         else:
             return rc
