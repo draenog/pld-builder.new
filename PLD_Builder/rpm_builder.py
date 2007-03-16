@@ -103,7 +103,7 @@ def build_rpm(r, b):
             (tmpdir, config.nice, rpmbuild_opt, b.spec)
         res = chroot.run(cmd, logfile = b.logfile)
         if res != 0:
-            b.log_line("error: build arch check failed")
+            b.log_line("error: build arch check (%s) failed" % cmd)
 
         if not res:
             if ("no-install-br" not in r.flags) and install_br.install_br(r, b):
