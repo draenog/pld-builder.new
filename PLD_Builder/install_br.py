@@ -6,8 +6,10 @@ import string
 import chroot
 
 def install_br(r, b):
-    cmd = "cd rpm/SPECS; TMPDIR=$HOME/%s rpmbuild --nobuild %s %s 2>&1" \
-                % (b.b_id, b.bconds_string(), b.spec)
+    tmpdir = "/tmp/BR." + b.b_id[0:6]
+    chroot.run("install -m 700 -d %s" % tmpdir)
+    cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild --nobuild %s %s 2>&1" \
+                % (tmpdir, b.bconds_string(), b.spec)
     f = chroot.popen(cmd)
     rx = re.compile(r"^\s*([^\s]+) .*is needed by")
     needed = {}
@@ -17,6 +19,7 @@ def install_br(r, b):
         m = rx.search(l)
         if m: needed[m.group(1)] = 1
     f.close()
+    chroot.run("rm -rf %s" % tmpdir)
     if len(needed) == 0:
         b.log_line("no BR needed")
         return
