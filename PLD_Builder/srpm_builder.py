@@ -72,7 +72,7 @@ def transfer_file(r, b):
     local = path.srpms_dir + r.id + "/" + b.src_rpm
     f = b.src_rpm_file
     # export files from chroot
-    chroot.run("cat %s; rm -f %s" % (f, f), logfile = local)
+    chroot.cp(f, outfile = local, rm = True)
     os.chmod(local, 0644)
     ftp.add(local)
 
