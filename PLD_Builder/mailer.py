@@ -7,6 +7,7 @@ import StringIO
 
 from config import config
 import util
+import log
 
 def recode(s):
     if s.__class__ == ''.__class__:
@@ -72,7 +73,10 @@ class Message:
         util.sendfile(self.body, f)
 
     def send(self):
+        if not os.path.exists("/usr/sbin/sendmail"):
+            log.alert("/usr/sbin/sendmail doesn't exists: can't send email")
+            return False
         send_sendmail = "/usr/sbin/sendmail -i -t -f %s" % config.admin_email
         f = os.popen(send_sendmail, "w")
         self.write_to(f)
-        f.close()
+        return f.close()
