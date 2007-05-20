@@ -131,6 +131,8 @@ def handle_notification(r, user):
     q.dump_html(open(path.queue_html_stats_file, "w"))
     os.chmod(path.queue_html_stats_file, 0644)
     os.chmod(path.queue_stats_file, 0644)
+    q.write_signed(path.req_queue_signed_file)
+    os.chmod(path.req_queue_signed_file, 0644)
     q.unlock()
 
 def handle_request(f):
