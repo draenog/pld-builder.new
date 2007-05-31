@@ -134,3 +134,15 @@ bin_builder
 
 Katalog ~/pld-builder.new/www/ z konta srpm_builder musi byæ dostêpny po
 http pod url podanym jako control_url w konfiguracji bin-builderów.
+
+103. src builder
+
+Automatyka potrafi przesy³aæ informacje (notify) pomiêdzy bin-builderami,
+a src-builderami za pomoc± emaila lub za pomoc± HTTP POST.
+
+W celu u¿ycia metody HTTP POST nale¿y po stronie src_buildera uruchomiæ:
+./request_handler_server.py
+natomiast po stronie bin-builderów w konfiguracji config/builder.conf
+w sekcji danego buildera:
+notify_url = http://some-server.pl:1234/
+
