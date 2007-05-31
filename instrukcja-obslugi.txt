@@ -103,6 +103,17 @@ tmpwatcha. Powinno to wygl±daæ mniej wiêcej tak:
 chroota znajduj±cego siê na koncie, a wewn±trz musi byæ zainstalowany tmpwatch.
 W przeciwnym przypadku trzeba to czy¶ciæ rêcznie.
 
+Przyk³ad dla bin buildera:
+* * * * * $HOME/pld-builder.new/bin/request-fetcher.sh
+* * * * * $HOME/pld-builder.new/bin/load-balancer.sh
+* * * * * $HOME/pld-builder.new/bin/file-sender.sh
+30 3 * * * $HOME/pld-builder.new/bin/maintainer.sh
+
+Przyk³ad dla src buildera:
+* * * * * $HOME/pld-builder.new/bin/src-builder.sh
+* * * * * $HOME/pld-builder.new/bin/file-sender.sh
+30 3 * * * $HOME/pld-builder.new/bin/maintainer.sh
+
 101. procmail
 
 srpms_builder:
