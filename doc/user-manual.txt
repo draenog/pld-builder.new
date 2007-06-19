@@ -38,7 +38,7 @@ bin_builder ALL = NOPASSWD: \
 
 3. Scripts installations
 
-Scripts *have* to be in ~/pld-builder.new/, checkouted from CVS.
+Scripts *have* to be in ~/pld-builder.new/, checked out from CVS.
 
 4. Installation of queues
 
@@ -130,7 +130,7 @@ bin_builder
 
 102. httpd
 
-Folder ~/pld-builder.new/www/, in srpm_builder account, have to be accessibble
+Directory ~/pld-builder.new/www/, in srpm_builder account, have to be accessibble
 via http (control_url in bin_builder configuration)
 
 103. src builder
