@@ -1,0 +1,145 @@
+Installation instructions.
+
+1. Accounts
+
+Builder needs account for it's needs. Account should be shared for all builders, 
+which build binary packages on specified host. This allows for better
+resources managment (hint: variable job_slots in configuration).
+
+However, SRPMS builder should use different account.
+
+We will call accounts: bin_builder and srpms_builder.
+
+2. Requirements
+
+Both:
+  sending mail
+  gpg
+  scp or/and rsync (sending buildlogs and files to ftp)
+  access to chroots
+
+srpms_builder:
+  mail box + procmail
+  posibillity to serve files via http
+  cvs connections
+  ftp or http connections (distfiles)
+
+bin_builder:
+  http connections
+
+access to chroots via sudo (sudoers):
+
+srpms_builder ALL = NOPASSWD: \
+  /usr/sbin/chroot /path/to/chroot *
+  
+bin_builder ALL = NOPASSWD: \
+  /usr/sbin/chroot /path/to/chroot1 *, \
+  /usr/sbin/chroot /path/to/chroot2 *
+
+3. Scripts installations
+
+Scripts *have* to be in w ~/pld-builder.new/, checkouted/excluded(?) from CVS.
+
+4. Instalation of queues
+
+cd ~/pld-builder.new
+./admin/fresh-queue.sh y
+
+5. Chroots setup
+poldek.conf:
+
+source = local,pri=1 /spools/ready/
+source = main-test,noauto,pri=2 ftp://ftp.pld-linux.org/dists/ac/test/athlon/
+source = main-ready,pri=3 ftp://ftp.pld-linux.org/dists/ac/ready/athlon/
+source = main-ug,pri=4 ftp://ftp.pld-linux.org/dists/ac/updates/general/athlon/
+source = main-us,pri=5 ftp://ftp.pld-linux.org/dists/ac/updates/security/athlon/
+source = main,pri=6 ftp://ftp.pld-linux.org/dists/ac/PLD/athlon/RPMS/
+particle_install = no
+greedy = yes
+rpmdef = _excludedocs 1
+cachedir = /spools/poldek/
+keep_downloads = yes
+
+Preinstalled packages:
+
+bin_builder:
+  rpm-build poldek shadow net-tools which
+
+srpms_builder:
+  bin_builder+
+  cvs wget rpm-perlprov rpm-php-pearprov rpm-pythonprov
+
+both: user builder
+
+both: ~builder/rpm/{SPECS,SOURCES,RPMS,SRPMS,BUILD}
+
+srpms_build: additionally has to have SPECS and SOURCES checkouted from CVS
+in SPECS it has to have builder, additional-md5sum and mirrors
+
+both: folders /spools/poldek/ /spools/ready/
+
+Wszystko to robi automagicznie admin/install-chroot.sh
+All that stuff can be done automaticly with admin/install-chroot.sh.
+
+[[...]]
+
+
+100. cron jobs
+
+srpms_builder:
+  src-builder.sh
+  file-sender.sh
+
+bin_builder:
+  request-fetcher.sh
+  load-balancer.sh
+  file-sender.sh
+
+*Very* good idea is to execute tmpwatch for each builder.:
+5 3 * * * sudo chroot $HOME/chroots/chroot-i686/ tmpwatch -m 200 /spools/ready/
+(autentic example). Of course, example cron item above should be placed for each chroot
+inside account. Tmpwatch have to be installed inside. In other case, You have to clean it
+manually.
+
+Example for bin builder:
+* * * * * $HOME/pld-builder.new/bin/request-fetcher.sh
+* * * * * $HOME/pld-builder.new/bin/load-balancer.sh
+* * * * * $HOME/pld-builder.new/bin/file-sender.sh
+30 3 * * * $HOME/pld-builder.new/bin/maintainer.sh
+
+Example for source builder:
+* * * * * $HOME/pld-builder.new/bin/src-builder.sh
+* * * * * $HOME/pld-builder.new/bin/file-sender.sh
+30 3 * * * $HOME/pld-builder.new/bin/maintainer.sh
+
+101. procmail
+
+srpms_builder:
+
+:0
+* ^X-New-PLD-Builder:
+|~/pld-builder.new/bin/request-handler.sh
+
+:0
+!admin@somehere
+
+bin_builder
+
+:0
+!admin@somwhere
+
+102. httpd
+
+Folder ~/pld-builder.new/www/, in srpm_builder account, have to be accessibble
+via http (control_url in bin_builder configuration)
+
+103. src builder
+
+Automat can send informaction (notify) between bin-builders and src-builders
+via e-mail or via http (POST METHOD).
+
+To use HTTP POST, one should run (src_builder side):
+./request_handler_server.py
+On other side (bin-builders):
+notify_url = http://some-server.pl:1234/
+
