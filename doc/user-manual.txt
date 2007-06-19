@@ -38,9 +38,9 @@ bin_builder ALL = NOPASSWD: \
 
 3. Scripts installations
 
-Scripts *have* to be in w ~/pld-builder.new/, checkouted/excluded(?) from CVS.
+Scripts *have* to be in ~/pld-builder.new/, checkouted from CVS.
 
-4. Instalation of queues
+4. Installation of queues
 
 cd ~/pld-builder.new
 ./admin/fresh-queue.sh y
