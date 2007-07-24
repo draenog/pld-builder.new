@@ -42,6 +42,9 @@ usage() {
   echo "Usage: make-request.sh [OPTION] ... [SPECFILE] ...."
   echo ""
   echo "Mandatory arguments to long options are mandatory for short options too."
+  echo "  -C  --config-file /path/to/config/file"
+  echo "       Source additional config file (after $USER_CFG), useful when"
+  echo "       when sending build requests to Ac/Th from the same account"
   echo "  -b 'BUILDER BUILDER ...'  --builder='BUILDER BUILDER ...'"
   echo "       Sends request to given builders"
   echo "  --with VALUE --without VALUE"
@@ -73,6 +76,10 @@ usage() {
 
 while [ $# -gt 0 ] ; do
   case "$1" in
+    --config-file | -C )
+      [ -f $2 ] && . $2 || die "Config file not found"
+      shift
+      ;;
     --builder | -b )
       builders="$builders $2"
       shift
