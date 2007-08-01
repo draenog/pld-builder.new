@@ -131,7 +131,7 @@ def build_rpm(r, b):
  
     if b.files != []:
         if "test-build" not in r.flags:
-            chroot.run("cp -f %s /spools/ready/; poldek --nodiff --mkidxz " \
+            chroot.run("cp -f %s /spools/ready/; poldek --mo=nodiff --mkidxz " \
                      "-s /spools/ready/" % \
                      string.join(b.files), logfile = b.logfile, user = "root")
         else:
