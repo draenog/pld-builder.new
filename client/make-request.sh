@@ -7,6 +7,7 @@ without=
 flags=
 command=
 command_flags=
+gpg_opts=
 
 if [ -n "$HOME_ETC" ]; then
 	USER_CFG=$HOME_ETC/.requestrc
@@ -25,6 +26,7 @@ default_key=deviloper@pld-linux.org
 builder_email=builderth@ep09.pld-linux.org
 mailer="/usr/sbin/sendmail -t"
 default_builders="th-*"
+gpg_opts=""
 
 # defaults:
 f_upgrade=yes
@@ -66,6 +68,8 @@ usage() {
   echo "       Executes a given command on builders"
   echo "       --cvsup"
   echo "       Updates builders infrastructure (outside chroot)"
+  echo "  -g   --gpg-opts \"opts\""
+  echo "       Pass additional options to gpg binary"
   echo "  -p   --priority VALUE"
   echo "       sets request priority (default 2)"
   echo "  -h   --help"
@@ -137,10 +141,15 @@ while [ $# -gt 0 ] ; do
       shift
       ;;
 
-	--cvsup )
-	  command_flags="no-chroot"
-	  command="cvs up"
-	  ;;
+    --cvsup )
+       command_flags="no-chroot"
+       command="cvs up"
+      ;;
+
+    --gnupg-opts | -g )
+       gnupg_opts="$2"
+       shift
+       ;;
 	  
     --help | -h )
       usage
@@ -260,7 +269,7 @@ Message-Id: <$id@$(hostname)>
 X-New-PLD-Builder: request
 X-Requester-Version: \$Id$
 
-$(gen_req | gpg --clearsign --default-key $default_key)
+$(gen_req | gpg --clearsign --default-key $default_key $gpg_opts)
 EOF
 }
 
