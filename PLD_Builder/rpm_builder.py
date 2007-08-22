@@ -69,7 +69,13 @@ def fetch_src(r, b):
                 f = urllib.urlopen(src_url) # So we get the exception logged :)
 
     o = chroot.popen("cat > %s" % b.src_rpm, mode = "w")
-    bytes = util.sendfile(f, o)
+
+    try:
+        bytes = util.sendfile(f, o)
+    except IOError, e:
+        b_log_line("error: unable to write to `%s': %s" % (b.src_rpm, e)
+        raise
+
     f.close()
     o.close()
     t = time.time() - start
