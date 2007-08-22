@@ -74,4 +74,4 @@ def cp(file, outfile, user="builder", rm=False):
     if rp == None:
         return 0
     else:
-        return r
+        return rp
