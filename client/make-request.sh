@@ -146,8 +146,8 @@ while [ $# -gt 0 ] ; do
        command="cvs up"
       ;;
 
-    --gnupg-opts | -g )
-       gnupg_opts="$2"
+    --gpg-opts | -g )
+       gpg_opts="$2"
        shift
        ;;
 	  
