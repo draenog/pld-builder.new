@@ -1,0 +1,107 @@
+Note: this was supposed to be a project for my .uni, hence the structure. Still, it might contain some useful information.
+
+
+
+Design, Implementation And Future Development Of The PLD Builder Infrastructure
+
+Abstract
+
+The following paper presents the current state of and feature plans regarding the PLD Linux Distribution's builder infrastructure, that is, the set of software responsible for automatic production of binary RPM packages and for maintaining the build environments required to build them.
+
+1 Introduction
+
+As is the case with most open source projects, the PLD Linux Distribution (PLD in short; yes, that's a recursive acronym) has many times more work to get done, than it has developers with time available. This holds especially true with regards to the jobs of no immediate direct benefit to developers. While updating a particular piece of software seems worthwhile to most (mostly because they actually have a need for the new and/or patched version), the same does not hold true with regards to maintaining the distribution's infrastructure or taking part in various activities necessary to actually release a new version of PLD. Of course, it's bad when some important part of the infrastructure is down or the current release is behind schedule, it's another matter to actually find people willing to commit to maintaining those on a daily basis.
+
+People with enough knowledge and the will to take care of those things are hard to find and their time is of extremely high value. That is why it's very important not to waste it. The ultimate goal is to automate all of the activities where it is reasonable to do so (including coding extended fault-tolerance into the infrastructure), so to enable developers to 
+
+1.1 Glossary
+
+PLD Linux Distribution -- an RPM-based Linux distribution originally started in Poland. Website available at http://pld-linux.org.
+
+RPM Package Manager -- one of the two most popular package management systems used by leading Linux distributions (the other one being DEB). Basic features include the ability to distribute binary software (that is in an already compiled, ready to run form), installing, uninstalling and upgrading that software and keeping extensive metadata (file listings, md5 hashes of all the files, info on other applications and libraries it might depend on, etc.) about it while it's present in the system.
+
+RPM Package -- a file (usually) containing an application, which then can be installed (using the RPM package manager) and run.
+
+Poldek -- a high level shell around the RPM package manager originally developed for and used by PLD.
+
+Builder -- a machine containing a properly set up build environment (compilers, libraries, etc.) and a set of management scripts used for creating RPM packages with as little human interaction as is possible.
+
+2 First Generation Builder Infrastructure Design
+
+Mostly shell scripts. TODO SOME RESEARCH ON HISTORY(?)
+
+3 Second Generation Builder Infrastructure Design
+
+Originally written by Michal Moskal during the summer of 2003, it was a big step forward over the previous design. Written in Python, it introduced a lot of functionality that drastically reduced the amount of work required to maintain and make use of builders.
+
+Over the years it has seen a steady stream of improvements with some major changes taking place during the winter of 2004/2005, when the new FTP Administration Infrastructure was being written.
+
+On a high level, all of the systems that are currently used to actually build, test and distribute packages consist of the following:
+
+- The CVS repository along with the distfiles server
+- The buildlogs server
+- The FTP administration infrastructure
+- The builder infrastructure
+
+3.1 The CVS Repository With The Distfiles Server And The Buildlogs Server
+
+The CVS repository along with the distfiles server are just places where application sources along with various patches and so called spec files reside (a spec files is basically a recipe telling the RPM software how to create an RPM package). 99% of the time builders just fetch files from them (the remaining 1% is of no interest here).
+
+PLD's CVS repository can be found at http://cvs.pld-linux.org.
+
+The buildlogs server is just a place where logs of the builds performed on builders reside. It's useful from time to time to be able to go through the whole process, usually during debugging (eg. when a given application somehow got built with a different set of build flags, then what a developer was expecting). 100% of the time builders just upload simple text files (the buildlogs) there.
+
+The buildlogs server can be reached at http://buildlogs.pld-linux.org.
+
+Both of the above systems are beyond the scope of this documents and no changes to them are currently planned.
+
+3.2 FTP Administration Infrastructure
+
+The currently used version was written around 2004/2005 in Python. As the name suggests, it's a set of scripts used for managing a large number of RPM packages (which *are* the distribution itself) on the PLD's FTP server. It is here, using those scripts, that decisions are made regarding which packages get dropped, which packages replace their older versions and which should (at least for the time being) be made available only to (willing) testers to download.
+
+The only interaction between the builders and the FTP admin infrastructure is that the former, in case of a successful build having been performed, upload the resulting RPM packages to the FTP server, so that the admin scripts can notice the new files, and take appropriate actions.
+
+No changes to this part of the infrastructure is currently being planned either.
+
+3.3 The Builder Infrastructure
+
+TODO
+Also: read ARCHITECTURE file.
+
+3.4 Summary
+
+In short, the build process looks like this:
+- A developer sends a request to the source builder to build package XYZ.
+- The source builder fetches necessary sources from the CVS repository and the distfiles server and pushes them to the binary builders (in the form of a source RPM package).
+- Both source and binary builders upload their resulting RPM packages to the FTP server, their buildlogs to the buildlogs server and inform the developer about what happened with his request via email. Additionally binary builders inform the source builder about what happened to the build they've just performed.
+
+4 Third Generation Builder Infrastructure Design
+
+The third generation design is more of an evolution rather then a revolution (contrary to the shift away from the primitive first versions). Most of the code will remain the same, however some fundamental changes to the low level communication protocols and metadata storage solutions will take place, which will result in the overall system being more robust and reliable and having a lot more flexibility (and a nice GUI).
+
+4.1 Communication Protocol Changes
+
+Switching from talking via emails to talking via xmlrpc over https. TODO WRITE MORE + RATIONALE
+
+4.2 Metadata Storage Changes
+
+Within the builder infrastructure, the source builder acts as the central hub. It receives build requests from developers, it fetches sources necessary to build a package, it pushes those sources to the binary builders and receives status reports from them. It's obvious, that the flexibility of the whole system depends largely on what the source builder is capable of.
+
+Unfortunately, as was explained in chapter 3.3, the current solution isn't suitable for anything advanced. Hence the new design.
+
+4.2.1 Database Layout
+
+What follows are the SQL queries used to create the database.
+
+[TODO]
+
+4.3 Summary Of Changes
+
+- Switch from using emails to xmlprc over https for any type of builder communication.
+- Design a robust, extensible database for storing source builder metadata.
+- Alter the source builder to use that database as it's backend.
+- Write a (PHP based) web interface for manipulating data in the aforementioned database.
+- Extend binary builders to take better advantage of source builder's new functionality.
+
+
+
