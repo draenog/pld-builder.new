@@ -51,6 +51,8 @@ usage() {
   echo "       Sends request to given builders"
   echo "  --with VALUE --without VALUE"
   echo "       Build package with(out) a given bcond"
+  echo "  --kernel VALUE"
+  echo "       set alt_kernel to VALUE"
   echo "  -t   --test-build"
   echo "       Performs a test build. No upgrades on builders, no tagging."
   echo "  -r   --ready-build"
@@ -108,6 +110,11 @@ while [ $# -gt 0 ] ; do
 	  build_mode=ready
 	  f_upgrade=yes
 	  ;;
+
+    --kernel )
+      kernel=$2
+      shift
+      ;;
 
     --priority | -p )
       priority=$2
@@ -240,6 +247,7 @@ gen_req() {
     branch=$(echo "$s" | sed -e 's|.*:||')
     echo "     <spec>$name</spec>"
     echo "     <branch>$branch</branch>"
+    echo "     <kernel>$kernel</kernel>"
     echo "     <info></info>"
     echo
     for b in $with ; do
