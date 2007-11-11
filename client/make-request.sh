@@ -324,7 +324,7 @@ gen_req() {
     echo >&2 "* Adding #$i $name:$branch"
     echo "     <spec>$name</spec>"
     echo "     <branch>$branch</branch>"
-    echo "     <kernel>$kernel</kernel>"
+    echo "     ${kernel:+<kernel>$kernel</kernel>}"
     echo "     <info></info>"
     echo
     for b in $with; do
