@@ -123,6 +123,7 @@ class Batch:
         self.bconds_without = []
         self.builders = []
         self.builders_status = {}
+        self.kernel = ""
         self.branch = ""
         self.src_rpm = ""
         self.info = ""
@@ -147,6 +148,8 @@ class Batch:
                 self.command_flags = string.split(attr(c, "flags", ""))
             elif c.nodeName == "info":
                 self.info = text(c)
+            elif c.nodeName == "kernel":
+                self.kernel = text(c)
             elif c.nodeName == "branch":
                 self.branch = text(c)
             elif c.nodeName == "builder":
@@ -170,6 +173,7 @@ class Batch:
     def dump(self, f):
         f.write("  batch: %s/%s\n" % (self.src_rpm, self.spec))
         f.write("    info: %s\n" % self.info)
+        f.write("    kernel: %s\n" % self.kernel)
         f.write("    branch: %s\n" % self.branch)
         f.write("    bconds: %s\n" % self.bconds_string())
         builders = []
@@ -185,8 +189,8 @@ class Batch:
         if self.is_command():
             desc = "SH: %s [%s]" % (self.command, ' '.join(self.command_flags))
         else:
-            desc = "%s (%s -R %s %s)" % \
-                (self.src_rpm, self.spec, self.branch, self.bconds_string())
+            desc = "%s (%s -R %s %s %s)" % \
+                (self.src_rpm, self.spec, self.branch, self.bconds_string(), self.kernel_string())
         f.write("%s <small>[" % desc)
         builders = []
         for b in self.builders:
@@ -219,6 +223,12 @@ class Batch:
                                         (c, b, s)) + link_post)
         f.write("%s]</small></li>\n" % string.join(builders))
 
+    def kernel_string(self):
+        r = ""
+        if self.kernel != "":
+            r = " --define 'alt_kernel " + self.kernel + "'"
+        return r
+
     def bconds_string(self):
         r = ""
         for b in self.bconds_with:
@@ -234,11 +244,12 @@ class Batch:
            <command flags="%s">%s</command>
            <spec>%s</spec>
            <branch>%s</branch>
+           <kernel>%s</kernel>
            <info>%s</info>\n""" % (self.b_id, 
                  string.join(map(lambda (b): b.b_id, self.depends_on)),
                  escape(self.src_rpm), 
                  escape(' '.join(self.command_flags)), escape(self.command),
-                 escape(self.spec), escape(self.branch), escape(self.info)))
+                 escape(self.spec), escape(self.branch), escape(self.kernel), escape(self.info)))
         for b in self.bconds_with:
             f.write("           <with>%s</with>\n" % escape(b))
         for b in self.bconds_without:
