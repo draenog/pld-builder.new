@@ -91,9 +91,9 @@ def build_srpm(r, b):
                     tag_test=""
     else:
                     tag_test=" -Tp %s -tt" % (config.tag_prefixes[0],)
-    cmd = ("cd rpm/SPECS; nice -n %s ./builder %s -bs %s -r %s %s %s 2>&1" %
+    cmd = ("cd rpm/SPECS; nice -n %s ./builder %s -bs %s -r %s %s %s %s 2>&1" %
              (config.nice, builder_opts, b.bconds_string(), b.branch, 
-              tag_test, b.spec))
+              tag_test, b.kernel_string(), b.spec))
     util.append_to(b.logfile, "request from: %s" % r.requester)
     util.append_to(b.logfile, "started at: %s" % time.asctime())
     util.append_to(b.logfile, "building SRPM using: %s\n" % cmd)
