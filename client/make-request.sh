@@ -219,8 +219,8 @@ ac)
   default_branch="AC-branch"
   ;;
 ti)
-  builder_email="builderti@oberon.pld-linux.org"
-  default_builders="ti-i686"
+  builder_email="builderti@ep09.pld-linux.org"
+  default_builders="ti-*"
   ;;
 th)
   builder_email="builderth@ep09.pld-linux.org"
