@@ -250,7 +250,7 @@ class Batch:
                  escape(' '.join(self.command_flags)), escape(self.command),
                  escape(self.spec), escape(self.branch), escape(self.info)))
         if self.kernel != "":
-            f.write("           <kernel>%s</kernel>\n" % escape(self.kernel)
+            f.write("           <kernel>%s</kernel>\n" % escape(self.kernel))
         for b in self.bconds_with:
             f.write("           <with>%s</with>\n" % escape(b))
         for b in self.bconds_without:
