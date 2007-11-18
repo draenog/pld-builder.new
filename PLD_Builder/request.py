@@ -189,8 +189,8 @@ class Batch:
         if self.is_command():
             desc = "SH: %s [%s]" % (self.command, ' '.join(self.command_flags))
         else:
-            desc = "%s (%s -R %s %s %s)" % \
-                (self.src_rpm, self.spec, self.branch, self.bconds_string(), self.kernel_string())
+            desc = "%s (<a href=\"http://cvs.pld-linux.org/cgi-bin/cvsweb.cgi/SPECS/%s\">%s</a> -R %s %s %s)" \
+            % (self.src_rpm, self.spec, self.spec, self.branch, self.bconds_string(), self.kernel_string())
         f.write("%s <small>[" % desc)
         builders = []
         for b in self.builders:
