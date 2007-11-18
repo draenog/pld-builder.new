@@ -244,12 +244,13 @@ class Batch:
            <command flags="%s">%s</command>
            <spec>%s</spec>
            <branch>%s</branch>
-           <kernel>%s</kernel>
            <info>%s</info>\n""" % (self.b_id, 
                  string.join(map(lambda (b): b.b_id, self.depends_on)),
                  escape(self.src_rpm), 
                  escape(' '.join(self.command_flags)), escape(self.command),
-                 escape(self.spec), escape(self.branch), escape(self.kernel), escape(self.info)))
+                 escape(self.spec), escape(self.branch), escape(self.info)))
+        if self.kernel != "":
+            f.write("           <kernel>%s</kernel>\n" % escape(self.kernel)
         for b in self.bconds_with:
             f.write("           <with>%s</with>\n" % escape(b))
         for b in self.bconds_without:
