@@ -21,31 +21,35 @@ def verify_sig(buf):
     object.
     """
 
-    (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --decrypt")
+    gpg_run = popen2.Popen3("gpg --batch --no-tty --decrypt", True)
     try:
-        body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
+        body = pipeutil.rw_pipe(buf, gpg_run.tochild, gpg_run.fromchild)
     except OSError, e:
         __gpg_close([gpg_out, gpg_err, gpg_in])
+        gpg_run.wait()
         log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
 
     rx = re.compile("^gpg: (Good signature from|                aka) .*<([^>]+)>")
     emails = []
-    for l in gpg_err.xreadlines():
+    for l in gpg_run.childerr.xreadlines():
         m = rx.match(l)
         if m:
             emails.append(m.group(2))
-    __gpg_close([gpg_out, gpg_err, gpg_in])
+    __gpg_close([gpg_run.fromchild, gpg_run.childerr, gpg_run.tochild])
+    gpg_run.wait()
     return (emails, body)
 
 def sign(buf):
-    (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --clearsign")
+    gpg_run  = popen2.Popen3("gpg --batch --no-tty --clearsign", True)
     try:
-        body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
+        body = pipeutil.rw_pipe(buf, gpg_run.tochild, gpg_run.fromchild)
     except OSError, e:
         __gpg_close([gpg_out, gpg_err, gpg_in])
+        gpg_run.wait()
         log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
 
-    __gpg_close([gpg_out, gpg_err, gpg_in])
+    __gpg_close([gpg_run.fromchild, gpg_run.childerr, gpg_run.tochild])
+    gpg_run.wait()
     return body
