@@ -190,6 +190,7 @@ while [ $# -gt 0 ] ; do
 		--cvsup )
 			command_flags="no-chroot"
 			command="cvs up"
+			f_upgrade=no
 			;;
 
 		--gpg-opts | -g )
