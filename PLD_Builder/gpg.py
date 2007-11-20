@@ -8,6 +8,11 @@ import StringIO
 import util
 import pipeutil
 
+def __gpg_close(descriptors):
+    for d in descriptors:
+        if not d.closed:
+            d.close()
+
 def verify_sig(buf):
     """Check signature.
     
@@ -16,16 +21,11 @@ def verify_sig(buf):
     object.
     """
 
-    def __close(descriptors):
-        for d in descriptors:
-            if not d.closed:
-                d.close()
-
     (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --decrypt")
     try:
         body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
     except OSError, e:
-        __close([gpg_out, gpg_in, gpg_err])
+        __gpg_close([gpg_out, gpg_in, gpg_err])
         log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
 
@@ -35,7 +35,7 @@ def verify_sig(buf):
         m = rx.match(l)
         if m:
             emails.append(m.group(2))
-    __close([gpg_out, gpg_in, gpg_err])
+    __gpg_close([gpg_out, gpg_in, gpg_err])
     return (emails, body)
 
 def sign(buf):
@@ -43,8 +43,9 @@ def sign(buf):
     try:
         body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
     except OSError, e:
+        __gpg_close([gpg_out, gpg_in, gpg_err])
         log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
 
-    gpg_err.close()
+    __gpg_close([gpg_out, gpg_in, gpg_err])
     return body
