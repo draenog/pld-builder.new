@@ -15,10 +15,17 @@ def verify_sig(buf):
     where signer-emails is lists of strings, and signed-body is StringIO
     object.
     """
+
+    def __close(descriptors):
+        for d in descriptors:
+            if not d.closed:
+                d.close()
+
     (gpg_out, gpg_in, gpg_err) = popen2.popen3("gpg --batch --no-tty --decrypt")
     try:
         body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
     except OSError, e:
+        __close([gpg_out, gpg_in, gpg_err])
         log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
 
@@ -28,7 +35,7 @@ def verify_sig(buf):
         m = rx.match(l)
         if m:
             emails.append(m.group(2))
-    gpg_err.close()
+    __close([gpg_out, gpg_in, gpg_err])
     return (emails, body)
 
 def sign(buf):
