@@ -25,7 +25,7 @@ def verify_sig(buf):
     try:
         body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
     except OSError, e:
-        __gpg_close([gpg_out, gpg_in, gpg_err])
+        __gpg_close([gpg_out, gpg_err, gpg_in])
         log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
 
@@ -35,7 +35,7 @@ def verify_sig(buf):
         m = rx.match(l)
         if m:
             emails.append(m.group(2))
-    __gpg_close([gpg_out, gpg_in, gpg_err])
+    __gpg_close([gpg_out, gpg_err, gpg_in])
     return (emails, body)
 
 def sign(buf):
@@ -43,9 +43,9 @@ def sign(buf):
     try:
         body = pipeutil.rw_pipe(buf, gpg_in, gpg_out)
     except OSError, e:
-        __gpg_close([gpg_out, gpg_in, gpg_err])
+        __gpg_close([gpg_out, gpg_err, gpg_in])
         log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
 
-    __gpg_close([gpg_out, gpg_in, gpg_err])
+    __gpg_close([gpg_out, gpg_err, gpg_in])
     return body
