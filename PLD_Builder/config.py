@@ -67,7 +67,6 @@ class Builder_Conf:
         self.max_keep_time = int(get("max_keep_time", 168))*60*60
         self.bot_email = get("bot_email", "")
         self.control_url = get("control_url")
-        self.notify_email = get("notify_email")
         self.admin_email = get("admin_email")
         self.builder_list = get("builder_list", "")
         self.gen_upinfo = get("gen_upinfo", "yes")
