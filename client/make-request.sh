@@ -301,6 +301,7 @@ gen_req() {
 
 	if [ "$command" != "" ] ; then
 		bid=$(uuidgen)
+		echo >&2 "* Command: $command"
 		echo "	<batch id='$bid' depends-on=''>"
 		echo "		 <command flags='$command_flags'>$command</command>"
 		echo "		 <info></info>"
