@@ -232,6 +232,9 @@ th)
 	builder_email="builderth@ep09.pld-linux.org"
 	default_builders="th-*"
 	;;
+*)
+	die "distro \`$distro' not known"
+	;;
 esac
 
 specs=`for s in $specs; do
@@ -255,7 +258,7 @@ if [[ "$requester" != *@* ]] ; then
 		requester="$requester@pld-linux.org"
 fi
 
-if [ "$builders" = "" ] ; then
+if [ -z "$builders" ] ; then
 	builders="$default_builders"
 fi
 
@@ -305,7 +308,8 @@ gen_req() {
 		echo "	<batch id='$bid' depends-on=''>"
 		echo "		 <command flags='$command_flags'>$command</command>"
 		echo "		 <info></info>"
-		for b in $builders ; do
+		for b in $builders; do
+			echo >&2 "* Builder: $b"
 			echo "		 <builder>$b</builder>"
 		done
 		echo "	</batch>"
@@ -342,6 +346,7 @@ gen_req() {
 		done
 		echo
 		for b in $builders; do
+			echo >&2 "* Builder: $b"
 			echo "		 <builder>$b</builder>"
 		done
 		echo "	</batch>"
