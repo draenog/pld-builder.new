@@ -331,6 +331,10 @@ gen_req() {
 	# first id:
 	fid=
 	i=1
+
+	for b in $builders; do
+		echo >&2 "* Builder: $b"
+	done
 	for s in $specs; do
 		bid=$(uuidgen)
 		echo "	<batch id='$bid' depends-on='$fid'>"
@@ -351,7 +355,6 @@ gen_req() {
 		done
 		echo
 		for b in $builders; do
-			echo >&2 "* Builder: $b"
 			echo "		 <builder>$b</builder>"
 		done
 		echo "	</batch>"
