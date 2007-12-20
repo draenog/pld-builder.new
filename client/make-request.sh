@@ -341,7 +341,7 @@ gen_req() {
 		[ "$fid" = "" ] && fid="$bid"
 		name=$(echo "$s" | sed -e 's|:.*||')
 		branch=$(echo "$s" | sed -e 's|.*:||')
-		echo >&2 "* Adding #$i $name:$branch"
+		echo >&2 "* Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}"
 		echo "		 <spec>$name</spec>"
 		echo "		 <branch>$branch</branch>"
 		echo "		 ${kernel:+<kernel>$kernel</kernel>}"
