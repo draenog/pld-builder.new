@@ -189,7 +189,7 @@ class Batch:
         if self.is_command():
             desc = "SH: %s [%s]" % (self.command, ' '.join(self.command_flags))
         else:
-            desc = "%s (%s -R %s %s %s)" \
+            desc = "%s (%s -r %s %s %s)" \
                 % (self.src_rpm, self.spec, self.branch, self.bconds_string(), self.kernel_string())
         f.write("%s <small>[" % desc)
         builders = []
