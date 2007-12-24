@@ -78,5 +78,10 @@ class Message:
             return False
         send_sendmail = "/usr/sbin/sendmail -i -t -f %s" % config.admin_email
         f = os.popen(send_sendmail, "w")
-        self.write_to(f)
+        try:
+            self.write_to(f)
+        except IOError, e:
+            log.alert("sending email message failed: %s" % e)
+            f.close()
+            return False
         return f.close()
