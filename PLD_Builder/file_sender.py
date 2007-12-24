@@ -18,7 +18,7 @@ import loop
 import status
 import lock
 
-retries_times = [5 * 60, 15 * 60, 60 * 60, 2 * 60 * 60, 5 * 60 * 60]
+retries_times = [5 * 60, 5 * 60, 10 * 60, 10 * 60, 30 * 60, 60 * 60]
 
 def read_name_val(file):
     f = open(file)
