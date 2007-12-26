@@ -5,7 +5,6 @@ import string
 import time
 import xml.sax.saxutils
 import fnmatch
-import binascii, md5
 
 import util
 import log
@@ -216,8 +215,8 @@ class Batch:
                 if s == "OK":
                     is_ok = 1
                 bld = lin_ar.split('-')
-                link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&id=%s\">" \
-                     % (bld[0], bld[1], is_ok, binascii.b2a_hex(md5.new(path).digest()))
+                link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s\">" \
+                     % (bld[0], bld[1], is_ok, bl_name)
                 link_post = "</a>"
             builders.append(link_pre + ("<font color='%s'><b>%s:%s</b></font>" %
                                         (c, b, s)) + link_post)
