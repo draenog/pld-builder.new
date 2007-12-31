@@ -237,6 +237,10 @@ th)
 	builder_email="builderth@ep09.pld-linux.org"
 	default_builders="th-*"
 	;;
+th-java) # fake "distro" for java available th archidectures
+	builder_email="builderth@ep09.pld-linux.org"
+	default_builders="th-*"
+	;;
 *)
 	die "distro \`$distro' not known"
 	;;
