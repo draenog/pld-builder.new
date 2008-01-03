@@ -219,7 +219,7 @@ ac)
 	default_builders="ac-*"
 	default_branch="AC-branch"
 	;;
-ac-java) # fake "distro" for java available ac archidectures
+ac-java) # fake "distro" for java available ac architectures
 	builder_email="builder-ac@pld-linux.org"
 	default_builders="ac-i586 ac-i686 ac-athlon ac-amd64"
 	default_branch="AC-branch"
@@ -237,7 +237,7 @@ th)
 	builder_email="builderth@ep09.pld-linux.org"
 	default_builders="th-*"
 	;;
-th-java) # fake "distro" for java available th archidectures
+th-java) # fake "distro" for java available th architectures
 	builder_email="builderth@ep09.pld-linux.org"
 	default_builders="th-x86_64 th-athlon th-i686"
 	;;
