@@ -2,7 +2,7 @@
     <generator>
         <name>PLD Linux Builder client for CIA</name>
 	<version>0.001</version>
-	<url>http://cvs.pld-linux.org/PLD_Builder/report.py</url>
+	<url>http://cvs.pld-linux.org/pld-builder.new/PLD_Builder/report.py</url>
     </generator>
     <source>
         <project>pld</project>
