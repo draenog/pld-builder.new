@@ -124,11 +124,11 @@ def send_cia_report(r, is_src = False):
     # write in iteration list and status of all processed files
     for b in r.batches:
         # Instead of hardcoded Ac information use some config variable
-        m.write('<package>\n')
+        m.write('<package name="%s" arch="%s">\n' % (b.spec, b.branch))
         if b.build_failed:
-            m.write('<failed>%s from tag %s</failed>\n' % (b.spec, b.branch))
+            m.write('<failed/>\n')
         else:
-            m.write('<success>%s from tag %s</success>\n' % (b.spec, b.branch))
+            m.write('<success/>\n')
         m.write('</package>\n')
 
     # get footer of xml message from file
