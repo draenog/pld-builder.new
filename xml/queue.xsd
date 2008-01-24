@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://pld-linux.org"
+xmlns="http://pld-linux.org"
+elementFormDefault="qualified">
+
+<xs:element name="queue">
+<xs:complexType>
+<xs:sequence>
+	<xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+	<xs:complexType>
+	<xs:sequence>
+		<xs:element name="requester">
+		<xs:complexType mixed="true">
+			<xs:attribute name="email" type="xs:string"/>
+		</xs:complexType>
+		</xs:element>
+		<xs:element name="time" type="xs:integer"/>
+		<xs:element name="priority" type="xs:integer"/>
+		<xs:element name="batch" maxOccurs="unbounded">
+		<xs:complexType>
+		<xs:sequence>
+			<xs:element name="src-rpm" type="xs:string"/>
+			<xs:element name="command">
+			<xs:complexType mixed="true">
+				<xs:attribute name="flags" type="xs:string" default=""/>
+			</xs:complexType>
+			</xs:element>
+			<xs:element name="spec" type="xs:string"/>
+			<xs:element name="branch" type="xs:string"/>
+			<xs:element name="info" type="xs:string" default=""/>
+			<xs:element name="kernel" type="xs:string" minOccurs="0"/>
+			<xs:element name="with" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="without" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="builder" maxOccurs="unbounded">
+			<xs:complexType mixed="true">
+				<xs:attribute name="status" type="xs:string" default=""/>
+			</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+			<xs:attribute name="id" type="xs:string"/>
+			<xs:attribute name="depends-on" type="xs:string" default=""/>
+		</xs:complexType>
+		</xs:element>
+	</xs:sequence>
+		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="no" type="xs:integer"/>
+		<xs:attribute name="flags" type="xs:string" default=""/>
+	</xs:complexType>
+	</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+
+</xs:schema>
