@@ -1,0 +1,39 @@
+<!ELEMENT queue (group*)>
+
+<!ELEMENT group (requester,time,priority,batch+)>
+<!ATTLIST group id CDATA #REQUIRED>
+<!ATTLIST group no CDATA #REQUIRED>
+<!ATTLIST group flags CDATA "">
+
+<!ELEMENT requester (#PCDATA)>
+<!ATTLIST requester email CDATA #REQUIRED>
+
+<!ELEMENT time (#PCDATA)>
+
+<!ELEMENT priority (#PCDATA)>
+
+<!ELEMENT batch (src-rpm,command,spec,branch,info,kernel?,(with|without)*,builder+)>
+<!ATTLIST batch id CDATA #REQUIRED>
+<!ATTLIST batch depends-on CDATA "">
+
+<!ELEMENT src-rpm (#PCDATA)>
+
+<!ELEMENT command (#PCDATA)>
+<!ATTLIST command flags CDATA "">
+
+<!ELEMENT spec (#PCDATA)>
+
+<!ELEMENT branch (#PCDATA)>
+
+<!ELEMENT info (#PCDATA)>
+
+<!ELEMENT kernel (#PCDATA)>
+
+<!ELEMENT with (#PCDATA)>
+
+<!ELEMENT without (#PCDATA)>
+
+<!ELEMENT builder (#PCDATA)>
+<!ATTLIST builder status CDATA #REQUIRED>
+
+
