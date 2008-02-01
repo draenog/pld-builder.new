@@ -315,7 +315,7 @@ gen_req() {
 		bid=$(uuidgen)
 		echo >&2 "* Command: $command"
 		echo "	<batch id='$bid' depends-on=''>"
-		echo "		 <command flags='$command_flags'>$command</command>"
+		echo "		 <command flags='$command_flags'>$(echo "$command" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g')</command>"
 		echo "		 <info></info>"
 		for b in $builders; do
 			echo >&2 "* Builder: $b"
