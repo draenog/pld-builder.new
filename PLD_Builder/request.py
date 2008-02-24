@@ -239,7 +239,7 @@ class Batch:
             return ""
 
     def default_target(self, arch):
-        self.target.append("--target %s-pld-linux" % arch)
+        self.target.append("%s-pld-linux" % arch)
 
     def bconds_string(self):
         r = ""
