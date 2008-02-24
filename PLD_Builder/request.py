@@ -123,6 +123,7 @@ class Batch:
         self.builders = []
         self.builders_status = {}
         self.kernel = ""
+        self.target = []
         self.branch = ""
         self.src_rpm = ""
         self.info = ""
@@ -149,6 +150,8 @@ class Batch:
                 self.info = text(c)
             elif c.nodeName == "kernel":
                 self.kernel = text(c)
+            elif c.nodeName == "target":
+                self.target.append(text(c))
             elif c.nodeName == "branch":
                 self.branch = text(c)
             elif c.nodeName == "builder":
@@ -173,6 +176,7 @@ class Batch:
         f.write("  batch: %s/%s\n" % (self.src_rpm, self.spec))
         f.write("    info: %s\n" % self.info)
         f.write("    kernel: %s\n" % self.kernel)
+        f.write("    target: %s\n" % self.target_string())
         f.write("    branch: %s\n" % self.branch)
         f.write("    bconds: %s\n" % self.bconds_string())
         builders = []
@@ -188,8 +192,8 @@ class Batch:
         if self.is_command():
             desc = "SH: %s [%s]" % (self.command, ' '.join(self.command_flags))
         else:
-            desc = "%s (%s -r %s %s %s)" \
-                % (self.src_rpm, self.spec, self.branch, self.bconds_string(), self.kernel_string())
+            desc = "%s (%s -r %s %s %s %s)" \
+                % (self.src_rpm, self.spec, self.branch, self.bconds_string(), self.kernel_string(), self.target_string())
         f.write("%s <small>[" % desc)
         builders = []
         for b in self.builders:
@@ -228,6 +232,15 @@ class Batch:
             r = " --define 'alt_kernel " + self.kernel + "'"
         return r
 
+    def target_string(self):
+        if len(self.target) > 0:
+            return " --target " + ",".join(self.target)
+        else:
+            return ""
+
+    def default_target(self, arch):
+        self.target.append("--target %s-pld-linux" % config.arch)
+
     def bconds_string(self):
         r = ""
         for b in self.bconds_with:
@@ -252,6 +265,8 @@ class Batch:
             f.write("           <kernel>%s</kernel>\n" % escape(self.kernel))
         for b in self.bconds_with:
             f.write("           <with>%s</with>\n" % escape(b))
+        for b in self.target:
+            f.write("           <target>%s</target>\n" % escape(b))
         for b in self.bconds_without:
             f.write("           <without>%s</without>\n" % escape(b))
         for b in self.builders:

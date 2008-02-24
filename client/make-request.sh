@@ -55,6 +55,8 @@ usage() {
 	echo "       Build package with(out) a given bcond"
 	echo "  --kernel VALUE"
 	echo "       set alt_kernel to VALUE"
+	echo "  --target VALUE"
+	echo "       set --target to VALUE"
 	echo "  -t   --test-build"
 	echo "       Performs a 'test-build'. Package will be uploaded to test/ tree"
 	echo "       and won't be upgraded on builders"
@@ -127,6 +129,11 @@ while [ $# -gt 0 ] ; do
 
 		--kernel )
 			kernel=$2
+			shift
+			;;
+
+		--target)
+			target=$2
 			shift
 			;;
 
@@ -345,10 +352,11 @@ gen_req() {
 		[ "$fid" = "" ] && fid="$bid"
 		name=$(echo "$s" | sed -e 's|:.*||')
 		branch=$(echo "$s" | sed -e 's|.*:||')
-		echo >&2 "* Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}"
+		echo >&2 "* Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}${target:+ target=$target}"
 		echo "		 <spec>$name</spec>"
 		echo "		 <branch>$branch</branch>"
 		echo "		 ${kernel:+<kernel>$kernel</kernel>}"
+		echo "		 ${target:+<target>$target</target>}"
 		echo "		 <info></info>"
 		echo
 		for b in $with; do
