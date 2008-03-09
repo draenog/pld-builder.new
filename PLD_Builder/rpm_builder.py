@@ -73,7 +73,7 @@ def fetch_src(r, b):
     try:
         bytes = util.sendfile(f, o)
     except IOError, e:
-        b_log_line("error: unable to write to `%s': %s" % (b.src_rpm, e))
+        b.log_line("error: unable to write to `%s': %s" % (b.src_rpm, e))
         raise
 
     f.close()
