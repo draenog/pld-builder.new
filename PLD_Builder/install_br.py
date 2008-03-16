@@ -4,6 +4,8 @@ import re
 import string
 
 import chroot
+import util
+import upgrade
 
 def install_br(r, b):
     tmpdir = "/tmp/BR." + b.b_id[0:6]
@@ -34,7 +36,7 @@ def install_br(r, b):
     # check conflicts in BRed packages
     b.log_line("checking conflicting packages in BRed packages")
     f = chroot.popen("poldek --test --caplookup -Q -v --upgrade %s" % br, user = "root")
-    rx = re.compile(r".*conflicts with installed ([^\s]+)")
+    rx = re.compile(r".*conflicts with installed [^\s]+)-[^-]+-[^-]+$")
     conflicting = {}
     for l in f.xreadlines():
         b.log_line("rpm: %s" % l)
@@ -44,15 +46,10 @@ def install_br(r, b):
     if len(conflicting) == 0:
         b.log_line("no conflicts found")
     else:
-        ncf = ""
-        for cfe in conflicting.keys():
-            ncf = ncf + " " + re.escape(cfe)
-        cf = string.strip(cfe)
         b.log_line("uninstalling conflicting packages")
-        res = chroot.run("poldek -Q -v --noask --erase %s" % br,
-                user = "root",
-                logfile = b.logfile)
-        if res != 0:
+        err = upgrade.close_killset(conflicting)
+        if err != "":
+            util.append_to(b.logfile, err)
             b.log_line("error: conflicting packages uninstallation failed")
     b.log_line("installing BR: %s" % br)
     res = chroot.run("poldek --caplookup -Q -v --upgrade %s" % br,
