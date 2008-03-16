@@ -39,7 +39,7 @@ def install_br(r, b):
     rx = re.compile(r".*conflicts with installed ([^\s]+)-[^-]+-[^-]+$")
     conflicting = {}
     for l in f.xreadlines():
-        b.log_line("rpm: %s" % l)
+        b.log_line("poldek: %s" % l)
         m = rx.search(l)
         if m: conflicting[m.group(1)] = 1
     f.close()
