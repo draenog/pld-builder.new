@@ -52,7 +52,7 @@ def install_br(r, b):
             util.append_to(b.logfile, err)
             b.log_line("error: conflicting packages uninstallation failed")
         else:
-            k = string.join(conlicting.keys())
+            k = string.join(conflicting.keys())
             b.log_line("removing %s" % k)
             res = chroot.run("poldek --noask --erase %s" % k, logfile = b.logfile, user = "root")
             if res != 0:
