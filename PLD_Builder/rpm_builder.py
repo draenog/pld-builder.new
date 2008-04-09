@@ -86,6 +86,11 @@ def fetch_src(r, b):
 
 def prepare_env():
     chroot.run("test ! -f /proc/uptime && mount /proc", 'root')
+    chroot.run("test ! -e /dev/full && mknod /dev/full c 1 7 && chmod 666 /dev/full", 'root')
+    chroot.run("test ! -e /dev/null && mknod /dev/null c 1 3 && chmod 666 /dev/null", 'root')
+    chroot.run("test ! -e /dev/random && mknod /dev/random c 1 8 && chmod 644 /dev/random", 'root')
+    chroot.run("test ! -e /dev/urandom && mknod /dev/urandom c 1 9 && chmod 644 /dev/urandom", 'root')
+    chroot.run("test ! -e /dev/zero && mknod /dev/zero c 1 5 && chmod 666 /dev/zero", 'root')
 
 def build_rpm(r, b):
     status.push("building %s" % b.spec)
