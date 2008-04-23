@@ -74,6 +74,14 @@ def rsync_file(src, target, host):
     if password != None: os.unlink(".rsync.pass")
     return f.close()
 
+def rsync_ssh_file(src, target, host):
+    global problem
+    rsync = "rsync --verbose --archive -e ssh"
+    f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
+    problem = f.read()
+    res = f.close()
+    return f.close()
+
 def post_file(src, url):
     global problem
     try:
@@ -98,6 +106,9 @@ def send_file(src, target):
     m = re.match('scp://([^@:]+@[^/:]+)(:|)(.*)', target)
     if m:
         return scp_file(src, m.group(1) + ":" + m.group(3))
+    m = re.match('ssh\+rsync://([^@:]+@[^/:]+)(:|)(.*)', target)
+    if m:
+        return rsync_ssh_file(src, m.group(1) + ":" + m.group(3))
     m = re.match('http://.*', target)
     if m:
         return post_file(src, target)
