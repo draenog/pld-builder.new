@@ -74,7 +74,7 @@ def rsync_file(src, target, host):
     if password != None: os.unlink(".rsync.pass")
     return f.close()
 
-def rsync_ssh_file(src, target, host):
+def rsync_ssh_file(src, target):
     global problem
     rsync = "rsync --verbose --archive -e ssh"
     f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
