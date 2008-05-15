@@ -110,7 +110,7 @@ def build_rpm(r, b):
         chroot.run("install -m 700 -d %s" % tmpdir)
 
         b.default_target(config.arch)
-        rpmbuild_opt = "%s %s %s" % (b.kernel_string(), b.bconds_string(), b.target_string())
+        rpmbuild_opt = "%s %s %s" % (b.target_string(), b.kernel_string(), b.bconds_string())
         # check for build arch before filling BR
         cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bp --short-circuit --nodeps --define 'prep exit 0' %s %s" % \
             (tmpdir, config.nice, rpmbuild_opt, b.spec)
