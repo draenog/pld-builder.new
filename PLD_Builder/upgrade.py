@@ -8,7 +8,8 @@ import chroot
 import util
 import log
 
-hold = [ 
+hold = [
+    'dev',
     'poldek',
     'rpm-build'
 ]
