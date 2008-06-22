@@ -6,6 +6,25 @@ import os
 import log
 import string
 
+def uuid_python():
+    return uuid.uuid4()
+
+def uuid_external():
+    f = os.popen("uuidgen 2>&1")
+    u = string.strip(f.read())
+    f.close()
+    if len(u) != 36:
+        raise "uuid: fatal, cannot generate uuid: %s" % u
+    return u
+
+# uuid module available in python >= 2.5
+try:
+    import uuid
+except ImportError:
+    uuid = uuid_external
+else:
+    uuid = uuid_python
+
 def pkg_name(nvr):
     return re.match(r"(.+)-[^-]+-[^-]+", nvr).group(1)
     
@@ -29,14 +48,6 @@ def append_to(log, msg):
 def clean_tmp(dir):
     # FIXME: use python
     os.system("rm -f %s/* 2>/dev/null; rmdir %s 2>/dev/null" % (dir, dir))
-
-def uuid():
-    f = os.popen("uuidgen 2>&1")
-    u = string.strip(f.read())
-    f.close()
-    if len(u) != 36:
-        raise "uuid: fatal, cannot generate uuid: %s" % u
-    return u
 
 def collect_files(log):
     f = open(log)
