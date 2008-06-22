@@ -6,9 +6,6 @@ import os
 import log
 import string
 
-def uuid_python():
-    return uuid.uuid4()
-
 def uuid_external():
     f = os.popen("uuidgen 2>&1")
     u = string.strip(f.read())
@@ -19,11 +16,9 @@ def uuid_external():
 
 # uuid module available in python >= 2.5
 try:
-    import uuid
+    from uuid import uuid4 as uuid
 except ImportError:
     uuid = uuid_external
-else:
-    uuid = uuid_python
 
 def pkg_name(nvr):
     return re.match(r"(.+)-[^-]+-[^-]+", nvr).group(1)
