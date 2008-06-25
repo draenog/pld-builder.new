@@ -46,6 +46,28 @@ stop() {
 	fi
 }
 
+
+condrestart() {
+	if [ -f /var/lock/subsys/pld-builder ]; then
+		stop
+		start
+	else
+		msg_not_running pld-builder
+		RETVAL=$1
+	fi
+}
+
+reload() {
+	if [ -f /var/lock/subsys/pld-builder ]; then
+		msg_reloading pld-builder
+		pld_builder_reload
+		RETVAL=$?
+	else
+		msg_not_running pld-builder
+		RETVAL=7
+	fi
+}
+
 # See how we were called.
 case "$1" in
   start)
@@ -59,27 +81,18 @@ case "$1" in
 	start
 	exit $?
 	;;
-  reload)
-	if [ -f /var/lock/subsys/pld-builder ]; then
-		msg_reloading pld-builder
-		pld_builder_reload
-		RETVAL=$?
-	else
-		msg_not_running pld-builder
-		RETVAL=7
-	fi
+  try-restart)
+	condrestart 0
 	;;
-  force-reload)
-	# if program allows reloading without stopping
-	pld_builder_reload
-	exit $?
+  reload|force-reload)
+  	reload
 	;;
   status)
 	pld_builder_status
 	RETVAL=$?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|status}"
 	exit 3
 	;;
 esac
