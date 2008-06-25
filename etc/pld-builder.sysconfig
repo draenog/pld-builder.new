@@ -44,7 +44,7 @@ pld_builder_start ()
 	show "setting up crontab for srpms_builder"
 	crontab -u srpms_builder - <<- EOF && ok || fail
 	SHELL=/bin/sh
-	MAIL=srpms_builder
+	MAILTO=srpms_builder
 
 	* * * * * $NICE /usr/share/pld-builder/bin/src-builder.sh
 	* * * * * $NICE /usr/share/pld-builder/bin/file-sender.sh
@@ -54,7 +54,7 @@ EOF
 	show "setting up crontab for bin_builder"
 	crontab -u bin_builder - <<-EOF && ok || fail
 	SHELL=/bin/sh
-	MAIL=bin_builder
+	MAILTO=bin_builder
 
 	* * * * * $NICE /usr/share/pld-builder/bin/request-fetcher.sh
 	* * * * * $NICE /usr/share/pld-builder/bin/load-balancer.sh
@@ -67,7 +67,7 @@ EOF
 	show "setting up crontab for ftp"
 	crontab -u ftpac - <<-EOF && ok || fail
 	SHELL=/bin/sh
-	MAIL=ftpac
+	MAILTO=ftpac
 
 	$(ftp_update_indexes_cron_jobs)
 EOF
