@@ -29,7 +29,11 @@ def alarmalarm(signum, frame):
 def has_new(control_url):
     global last_count
     cnt_f = open(path.last_req_no_file)
-    last_count = int(string.strip(cnt_f.readline()))
+    try:
+        last_count = int(string.strip(cnt_f.readline()))
+    except ValueError, e:
+        last_count = 0
+
     cnt_f.close()
     f = None
     socket.setdefaulttimeout(240)
