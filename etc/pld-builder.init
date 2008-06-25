@@ -20,9 +20,7 @@ pld_builder_stop () ok
 # Get service config - may override defaults
 [ -f /etc/sysconfig/pld-builder ] && . /etc/sysconfig/pld-builder
 
-# See how we were called.
-case "$1" in
-  start)
+start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/pld-builder ]; then
 		msg_starting pld-builder
@@ -33,8 +31,9 @@ case "$1" in
 	else
 		msg_already_running pld-builder
 	fi
-	;;
-  stop)
+}
+
+stop() {
 	if [ -f /var/lock/subsys/pld-builder ]; then
 		# Stop daemons.
 		msg_stopping pld-builder
@@ -45,10 +44,19 @@ case "$1" in
 	else
 		msg_not_running pld-builder
 	fi
+}
+
+# See how we were called.
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
 	;;
   restart)
-	$0 stop
-	$0 start
+	stop
+	start
 	exit $?
 	;;
   reload)
@@ -83,6 +91,3 @@ unset -f pld_builder_status
 unset -f pld_builder_stop
 
 exit $RETVAL
-
-# This must be last line !
-# vi:syntax=sh
