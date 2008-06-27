@@ -199,22 +199,10 @@ def check_load():
         sys.exit(0)
 
 def main_for(builder):
-    init_conf(builder)
-    # allow only one build in given builder at once
-    if not lock.lock("building-rpm-for-%s" % config.builder, non_block = 1):
-        return
-    # don't kill server
-    check_load()
-    # not more then job_slots builds at once
-    locked = 0
-    for slot in range(config.job_slots):
-        if lock.lock("building-rpm-slot-%d" % slot, non_block = 1):
-            locked = 1
-            break
-    if not locked:
-        return
+    msg = ""
 
-    status.push("picking request for %s" % config.builder)
+    init_conf(builder)
+
     q = B_Queue(path.queue_file + "-" + config.builder)
     q.lock(0)
     q.read()
@@ -223,18 +211,36 @@ def main_for(builder):
         return
     req = pick_request(q)
     q.unlock()
-    status.pop()
 
-    # record fact that we got lock for this builder, load balancer
-    # will use it for fair-queuing
-    l = lock.lock("got-lock")
-    f = open(path.got_lock_file, "a")
-    f.write(config.builder + "\n")
-    f.close()
-    l.close()
+    # high priority tasks have priority >= 1000
+    if req.priority < 1000:
+
+        # allow only one build in given builder at once
+        if not lock.lock("building-rpm-for-%s" % config.builder, non_block = 1):
+            return
+        # don't kill server
+        check_load()
+        # not more then job_slots builds at once
+        locked = 0
+        for slot in range(config.job_slots):
+            if lock.lock("building-rpm-slot-%d" % slot, non_block = 1):
+                locked = 1
+                break
+        if not locked:
+            return
+
+        # record fact that we got lock for this builder, load balancer
+        # will use it for fair-queuing
+        l = lock.lock("got-lock")
+        f = open(path.got_lock_file, "a")
+        f.write(config.builder + "\n")
+        f.close()
+        l.close()
+    else:
+        msg = "HIGH PRIORITY: "
     
-    msg = "handling request %s (%d) for %s from %s" \
-            % (req.id, req.no, config.builder, req.requester)
+    msg += "handling request %s (%d) for %s from %s, priority %s" \
+            % (req.id, req.no, config.builder, req.requester, req.priority)
     log.notice(msg)
     status.push(msg)
     handle_request(req)
