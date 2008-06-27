@@ -47,7 +47,7 @@ def pick_request(q):
         if pri_diff == 0:
             return cmp(r1.time, r2.time)
         else:
-            return pri_diff
+            return -pri_diff
     q.requests.sort(mycmp)
     ret = q.requests[0]
     return ret
