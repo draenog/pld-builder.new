@@ -70,8 +70,6 @@ class User:
                     return prio
                 else:
                     return val
-        if prio<10:
-            prio=10
         return prio
 
     def mail_to(self):
