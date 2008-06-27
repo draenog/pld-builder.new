@@ -212,8 +212,8 @@ def main_for(builder):
     req = pick_request(q)
     q.unlock()
 
-    # high priority tasks have priority < 0
-    if req.priority < 0:
+    # high priority tasks have priority < 0, normal tasks >= 0
+    if req.priority >= 0:
 
         # allow only one build in given builder at once
         if not lock.lock("building-rpm-for-%s" % config.builder, non_block = 1):
