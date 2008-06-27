@@ -21,7 +21,7 @@ srpm buildera.
 
 3. Na koncie srpm buildera z crona chodzi skrypt srpm_builder.py.
    a) Czyta spool/queue, je¶li s± tam jakie¶ zlecenia, sortuje wg. priorytetu
-      (wy¿szy numer == wa¿niejsze zlecenie), a nastêpnie sortuje wg. czasu
+      (ni¿szy numer == wa¿niejsze zlecenie), a nastêpnie sortuje wg. czasu
       przybycia zlecenia (starsze == wa¿niejsze), wyci±ga je z kolejki i zapisuje
       kolejkê.
    b) Obs³uguje tylko <group ...>.
@@ -88,7 +88,7 @@ srpm buildera.
    c) lockowanie building-rpm-for-<builder> (tylko jeden build w chroot
       na raz)
    d) Czyta spool/queue, je¶li s± tam jakie¶ zlecenia, sortuje wg. priorytetu
-      (wy¿szy numer == wa¿niejsze zlecenie), a nastêpnie sortuje wg. czasu
+      (ni¿szy numer == wa¿niejsze zlecenie), a nastêpnie sortuje wg. czasu
       przybycia zlecenia (starsze == wa¿niejsze), wyci±ga je z kolejki i zapisuje
       kolejkê.
    e) buduje pakiety, wrzuca pliki do spool/{buildlogs,ftp}. Je¶li nie ma flagi
