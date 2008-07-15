@@ -25,7 +25,7 @@ def verify_sig(buf):
     try:
         body = pipeutil.rw_pipe(buf, gpg_run.tochild, gpg_run.fromchild)
     except OSError, e:
-        __gpg_close([gpg_out, gpg_err, gpg_in])
+        __gpg_close([gpg_run.fromchild, gpg_run.childerr, gpg_run.tochild])
         gpg_run.wait()
         log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
