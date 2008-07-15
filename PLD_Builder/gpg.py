@@ -6,6 +6,7 @@ import re
 import StringIO
 
 import util
+import os
 import pipeutil
 
 def __gpg_close(descriptors):
@@ -21,7 +22,11 @@ def verify_sig(buf):
     object.
     """
 
-    gpg_run = popen2.Popen3("gpg --batch --no-tty --decrypt", True)
+    if not os.path.isfile('/usr/bin/gpg'):
+        log.error("missing gnupg binary: /usr/bin/gpg")
+        raise OSError, 'Missing gnupg binary'
+
+    gpg_run = popen2.Popen3("/usr/bin/gpg --batch --no-tty --decrypt", True)
     try:
         body = pipeutil.rw_pipe(buf, gpg_run.tochild, gpg_run.fromchild)
     except OSError, e:
@@ -41,7 +46,11 @@ def verify_sig(buf):
     return (emails, body)
 
 def sign(buf):
-    gpg_run  = popen2.Popen3("gpg --batch --no-tty --clearsign", True)
+    if not os.path.isfile('/usr/bin/gpg'):
+        log.error("missing gnupg binary: /usr/bin/gpg")
+        raise OSError, 'Missing gnupg binary'
+
+    gpg_run  = popen2.Popen3("/usr/bin/gpg --batch --no-tty --clearsign", True)
     try:
         body = pipeutil.rw_pipe(buf, gpg_run.tochild, gpg_run.fromchild)
     except OSError, e:
