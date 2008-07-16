@@ -57,7 +57,7 @@ def install_br(r, b):
                 b.log_line("package removal failed")
                 return res
     b.log_line("installing BR: %s" % br)
-    res = chroot.run("poldek --caplookup -Q -v --upgrade %s" % br,
+    res = chroot.run("poldek --noask --caplookup -Q -v --upgrade %s" % br,
             user = "root",
             logfile = b.logfile)
     if res != 0:
