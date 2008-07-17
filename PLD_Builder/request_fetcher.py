@@ -43,9 +43,9 @@ def has_new(control_url):
         f = urllib.urlopen(control_url + "/max_req_no")
         count = int(string.strip(f.readline()))
         signal.alarm(0)
-    except:
+    except Exception, e:
         signal.alarm(0)
-        log.error("can't fetch %s" % (control_url + "/max_req_no"))
+        log.error("can't fetch %s: %s" % (control_url + "/max_req_no", e))
         sys.exit(1)
     res = 0
     if count != last_count:
@@ -60,9 +60,9 @@ def fetch_queue(control_url):
     try:
         f = urllib.urlopen(control_url + "/queue.gz")
         signal.alarm(0)
-    except:
+    except Exception, e:
         signal.alarm(0)
-        log.error("can't fetch %s" % (control_url + "/queue.gz"))
+        log.error("can't fetch %s: %s" % (control_url + "/queue.gz", e))
         sys.exit(1)
     sio = StringIO.StringIO()
     util.sendfile(f, sio)
