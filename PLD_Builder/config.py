@@ -95,6 +95,7 @@ class Builder_Conf:
         self.job_slots = int(get("job_slots"))
         self.max_load = float(get("max_load"))
         self.control_url = get("control_url")
+        self.rpm_cache_dir = get("rpm_cache_dir", "/spools/ready")
         self.builder_user = get("builder_user", "builder")
         self.sudo_chroot_wrapper = get("sudo_chroot_wrapper", "")
         self.nice = get("nice", "0")

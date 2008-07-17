@@ -143,12 +143,17 @@ def build_rpm(r, b):
         util.append_to(b.logfile, l)
  
     if b.files != []:
+        rpm_cache_dir = config.rpm_cache_dir
         if "test-build" not in r.flags:
-            chroot.run("cp -f %s /spools/ready/; poldek --mo=nodiff --mkidxz " \
-                     "-s /spools/ready/" % \
-                     string.join(b.files), logfile = b.logfile, user = "root")
+            # XXX missing error check!
+            b.log_line("copy rpm files to cache_dir=%s" % rpm_cache_dir)
+            res = chroot.run(
+                    "cp -f %s %s && poldek --mo=nodiff --mkidxz -s %s/" % \
+                        (string.join(b.files), rpm_cache_dir, rpm_cache_dir),
+                     logfile = b.logfile, user = "root"
+            )
         else:
-            ll("test-build: not copying to /spools/ready/")
+            ll("test-build: not copying to " + rpm_cache_dir)
         ll("Begin-PLD-Builder-Info")
         if "upgrade" in r.flags:
             b.upgraded = upgrade.upgrade_from_batch(r, b)
