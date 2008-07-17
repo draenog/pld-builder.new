@@ -32,8 +32,8 @@ def run(cmd, user = "builder", logfile = None, logstdout = None):
         else:
             c = "%s >> %s 2>&1" % (c, logfile)
     f = os.popen(c)
-    for l in f:
-        if logstdout != None:
+    if logstdout != None:
+        for l in f:
             logstdout.write(l)
     r = f.close()
     if r == None:
