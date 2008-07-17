@@ -33,7 +33,7 @@ def install_br(r, b):
     chroot.run("poldek --up --upa", user = "root", logfile = b.logfile)
     # check conflicts in BRed packages
     b.log_line("checking conflicting packages in BRed packages")
-    f = chroot.popen("poldek --test --caplookup -Q -v --upgrade %s" % br, user = "root")
+    f = chroot.popen("poldek --test --noask --caplookup -Q -v --upgrade %s" % br, user = "root")
     rx = re.compile(r".*conflicts with installed ([^\s]+)-[^-]+-[^-]+$")
     conflicting = {}
     for l in f.xreadlines():
