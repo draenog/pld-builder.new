@@ -143,8 +143,10 @@ def handle_request(f):
     user = acl.user_by_email(em)
     if user == None:
         # FIXME: security email here
-        log.alert("invalid signature, or not in acl %s" % em)
+        sio.seek(0); keys = gpg.get_keys(sio)
+        log.alert("Invalid signature, missing/untrusted key, or '%s' not in acl. Keys in gpg batch: '%s'" % (em, keys))
         return False
+
     acl.set_current_user(user)
     status.push("email from %s" % user.login)
     r = request.parse_request(body)
