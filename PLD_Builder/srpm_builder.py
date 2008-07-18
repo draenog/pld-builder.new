@@ -29,7 +29,7 @@ from config import config, init_conf
 def pick_request(q):
     def mycmp(r1, r2):
         if r1.kind != 'group' or r2.kind != 'group':
-            raise "non-group requests"
+            raise Exception, "non-group requests"
         pri_diff = cmp(r1.priority, r2.priority)
         if pri_diff == 0:
             return cmp(r1.time, r2.time)

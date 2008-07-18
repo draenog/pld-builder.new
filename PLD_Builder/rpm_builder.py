@@ -42,7 +42,7 @@ socket.socket=mysocket
 def pick_request(q):
     def mycmp(r1, r2):
         if r1.kind != 'group' or r2.kind != 'group':
-            raise "non-group requests"
+            raise Exception, "non-group requests"
         pri_diff = cmp(r1.priority, r2.priority)
         if pri_diff == 0:
             return cmp(r1.time, r2.time)
@@ -268,7 +268,7 @@ def main_for(builder):
     
 def main():
     if len(sys.argv) < 2:
-        raise "fatal: need to have builder name as first arg"
+        raise Exception, "fatal: need to have builder name as first arg"
     return main_for(sys.argv[1])
     
 if __name__ == '__main__':

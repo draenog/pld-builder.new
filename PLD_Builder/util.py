@@ -14,7 +14,7 @@ def uuid_external():
     u = string.strip(f.read())
     f.close()
     if len(u) != 36:
-        raise "uuid: fatal, cannot generate uuid: %s" % u
+        raise Exception, "uuid: fatal, cannot generate uuid: %s" % u
     return u
 
 # uuid module available in python >= 2.5

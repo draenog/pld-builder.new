@@ -89,7 +89,7 @@ def handle_reqs(builder, reqs):
     q.read()
     for r in reqs:
         if r.kind != 'group': 
-            raise 'handle_reqs: fatal: huh? %s' % r.kind
+            raise Exception, 'handle_reqs: fatal: huh? %s' % r.kind
         need_it = 0
         for b in r.batches:
             if builder in b.builders:
