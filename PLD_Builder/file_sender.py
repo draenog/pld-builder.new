@@ -38,7 +38,7 @@ def read_name_val(file):
 
 def scp_file(src, target):
     global problem
-    f = os.popen("scp -v -B -p %s %s 2>&1 < /dev/null" % (src, target))
+    f = os.popen("scp -v -B %s %s 2>&1 < /dev/null" % (src, target))
     problem = f.read()
     return f.close()
 
