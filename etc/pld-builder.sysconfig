@@ -9,8 +9,7 @@ FTPDIRS=/mnt/hda9/adm/builders/pld/ftp/ftp/{{ac,actw}/{ready,test}/{SRPMS,athlon
 
 NICE="nice -n 19"
 
-bin_builder_tmpwatch_cron_jobs ()
-{
+bin_builder_tmpwatch_cron_jobs () {
 	local hour=0
 	for CHROOT in $CHROOTS; do
 		[ $hour -gt 23 ] && hour=0
@@ -19,8 +18,7 @@ bin_builder_tmpwatch_cron_jobs ()
 	done
 }
 
-ftp_update_indexes_cron_jobs ()
-{
+ftp_update_indexes_cron_jobs () {
 	local minute=0
 	for FTPDIR in $FTPDIRS; do
 		[ $minute -gt 59 ] && minute=0
@@ -29,8 +27,7 @@ ftp_update_indexes_cron_jobs ()
 	done
 }
 
-pld_builder_start ()
-{
+pld_builder_start () {
 	# mount /proc in chroots
 	local RET
 	echo
@@ -49,8 +46,8 @@ pld_builder_start ()
 	SHELL=/bin/sh
 	MAILTO=srpms_builder
 
-	* * * * * $NICE /usr/share/pld-builder/bin/src-builder.sh
-	* * * * * $NICE /usr/share/pld-builder/bin/file-sender.sh
+	* * * * * exec $NICE /usr/share/pld-builder/bin/src-builder.sh
+	* * * * * exec $NICE /usr/share/pld-builder/bin/file-sender.sh
 EOF
 
 	# set up crontab for bin_builder
@@ -62,9 +59,9 @@ EOF
 	SHELL=/bin/sh
 	MAILTO=bin_builder
 
-	* * * * * $NICE /usr/share/pld-builder/bin/request-fetcher.sh
-	* * * * * $NICE /usr/share/pld-builder/bin/load-balancer.sh
-	* * * * * $NICE /usr/share/pld-builder/bin/file-sender.sh
+	* * * * * exec $NICE /usr/share/pld-builder/bin/request-fetcher.sh
+	* * * * * exec $NICE /usr/share/pld-builder/bin/load-balancer.sh
+	* * * * * exec $NICE /usr/share/pld-builder/bin/file-sender.sh
 
 	$(bin_builder_tmpwatch_cron_jobs)
 EOF
@@ -82,8 +79,7 @@ EOF
 EOF
 }
 
-pld_builder_stop ()
-{
+pld_builder_stop () {
 	local RET
 	echo
 	for CHROOT in $CHROOTS; do
@@ -98,16 +94,14 @@ pld_builder_stop ()
 	done
 }
 
-pld_builder_status ()
-{
+pld_builder_status () {
 	local RET
 	echo
 	for CHROOT in $CHROOTS; do
 		show "chroot: %s is /proc mounted?" "$CHROOT"
-		RET=$( (chroot $CHROOT mount -v 2> /dev/null) | grep -q 'none.*/proc' ; echo $? )
+		RET=$(chroot $CHROOT mount -v 2> /dev/null | grep -q 'none.*/proc'; echo $?)
 		[ $RET -eq 0 ] && ok || fail
 	done
 }
 
 #END
-# vi:syntax=sh:ts=4:sw=4
