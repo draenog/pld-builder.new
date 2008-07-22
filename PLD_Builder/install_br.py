@@ -8,6 +8,9 @@ import util
 import upgrade
 
 def install_br(r, b):
+    # ignore internal rpm dependencies, see lib/rpmns.c for list
+    ignore_br = re.compile(r'^\s*(rpmlib|cpuinfo|getconf|uname|soname|user|group|mounted|diskspace|digest|gnupg|macro|envvar|running|sanitycheck|vcheck|signature|verify|exists|executable|readable|writable)\(.*')
+
     tmpdir = "/tmp/BR." + b.b_id[0:6]
     chroot.run("install -m 700 -d %s" % tmpdir)
     cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild --nobuild %s %s 2>&1" \
@@ -19,7 +22,8 @@ def install_br(r, b):
     for l in f.xreadlines():
         b.log_line("rpm: %s" % l.rstrip())
         m = rx.search(l)
-        if m: needed[m.group(1)] = 1
+        if m and not ignore_br.match(l):
+            needed[m.group(1)] = 1
     f.close()
     chroot.run("rm -rf %s" % tmpdir)
     if len(needed) == 0:
