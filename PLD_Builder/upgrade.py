@@ -11,7 +11,9 @@ import log
 hold = [
     'dev',
     'poldek',
-    'rpm-build'
+    'rpm-build',
+    'pdksh',
+    'coreutils'
 ]
 
 def close_killset(killset):
@@ -58,12 +60,14 @@ def upgrade_from_batch(r, b):
             log.notice("cannot upgrade rpms")
             return False
         k = string.join(killset.keys())
-        if 0:
-            b.log_line("removing %s" % k)
+        if True:
+            b.log_line("upgrade requires removal of %s" % k)
             res = chroot.run("rpm -e %s" % k, logfile = b.logfile, user = "root")
             if res != 0:
                 b.log_line("package removal failed")
                 return False
+            else:
+                b.log_line("packages removed sucessfuly")
         else:
             b.log_line("upgrade would need removal of %s" % k)
             return False
