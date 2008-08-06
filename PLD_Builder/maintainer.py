@@ -3,6 +3,7 @@
 import os
 import sys
 import time
+import datetime
 
 from config import config, init_conf
 import util
@@ -23,6 +24,7 @@ def send_rpmqa():
     tmp = path.build_dir + util.uuid() + '/'
     os.mkdir(tmp)
     log = tmp + config.rpmqa_filename
+    open(log, 'a').write("Query done at: %s\n" % datetime.datetime.now().isoformat(' '))
     chroot.run("rpm -qa|sort", logfile=log)
     os.chmod(log,0644)
     ftp.init(rpmqa=True)
