@@ -4,7 +4,6 @@ import re
 import string
 import StringIO
 
-from config import config, init_conf
 import chroot
 import util
 import log
@@ -103,7 +102,7 @@ def uninstall_self_conflict(b):
     rpmbuild_opt = "%s %s %s" % (b.target_string(), b.kernel_string(), b.bconds_string())
     tmpdir = "/tmp/BR." + b.b_id[0:6]
     f = chroot.popen("cd rpm/SPECS; TMPDIR=%s rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %s %s 2>&1" \
-            % (tmpdir, config.nice, rpmbuild_opt, b.spec))
+            % (tmpdir, rpmbuild_opt, b.spec))
     rx = re.compile(r".*conflicts with ([^\s]+-[^-]+-[^-]+)\.src$")
     conflicting = {}
     for l in f.xreadlines():
