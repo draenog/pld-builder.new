@@ -108,9 +108,10 @@ def uninstall_self_conflict(b):
     rx = re.compile(r"\s+(\w+)\s+.*\s+conflicts with [^\s]+-[^-]+-[^-]+\.src$")
     conflicting = {}
     for l in f.xreadlines():
-        b.log_line("rpmbuild: %s" % l.rstrip())
         m = rx.search(l)
-        if m: conflicting[m.group(1)] = 1
+        if m:
+            b.log_line("rpmbuild: %s" % l.rstrip())
+            conflicting[m.group(1)] = 1
     f.close()
     if len(conflicting) and not uninstall(conflicting, b):
         return False
