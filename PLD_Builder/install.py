@@ -101,6 +101,7 @@ def uninstall(conflicting, b):
 def uninstall_self_conflict(b):
     b.log_line("checking BuildConflict-ing packages")
     rpmbuild_opt = "%s %s %s" % (b.target_string(), b.kernel_string(), b.bconds_string())
+    tmpdir = "/tmp/BR." + b.b_id[0:6]
     f = chroot.popen("cd rpm/SPECS; TMPDIR=%s rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %s %s 2>&1" \
             % (tmpdir, config.nice, rpmbuild_opt, b.spec))
     rx = re.compile(r".*conflicts with ([^\s]+-[^-]+-[^-]+)\.src$")
