@@ -4,6 +4,7 @@ import re
 import string
 import StringIO
 
+from config import config, init_conf
 import chroot
 import util
 import log
@@ -81,6 +82,41 @@ def upgrade_from_batch(r, b):
     logbuf.close()
     return True
 
+def uninstall(conflicting, b):
+    b.log_line("uninstalling conflicting packages")
+    err = close_killset(conflicting)
+    if err != "":
+        util.append_to(b.logfile, err)
+        b.log_line("error: conflicting packages uninstallation failed")
+        return False
+    else:
+        k = string.join(conflicting.keys())
+        b.log_line("removing %s" % k)
+        res = chroot.run("poldek --noask --erase %s" % k, logfile = b.logfile, user = "root")
+        if res != 0:
+            b.log_line("package removal failed")
+            return False
+    return True
+
+def uninstall_self_conflict(b):
+    b.log_line("checking BuildConflict-ing packages")
+    rpmbuild_opt = "%s %s %s" % (b.target_string(), b.kernel_string(), b.bconds_string())
+    f = chroot.popen("cd rpm/SPECS; TMPDIR=%s rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %s %s 2>&1" \
+            % (tmpdir, config.nice, rpmbuild_opt, b.spec))
+    rx = re.compile(r".*conflicts with ([^\s]+-[^-]+-[^-]+)\.src$")
+    conflicting = {}
+    for l in f.xreadlines():
+        b.log_line("rpmbuild: %s" % l.rstrip())
+        m = rx.search(l)
+        if m: conflicting[m.group(1)] = 1
+    f.close()
+    if len(conflicting) == 0:
+        b.log_line("no BuildConflicts found")
+    else:
+        if not uninstall(conflicting):
+            return False
+    return True
+
 def install_br(r, b):
     # ignore internal rpm dependencies, see lib/rpmns.c for list
     ignore_br = re.compile(r'^\s*(rpmlib|cpuinfo|getconf|uname|soname|user|group|mounted|diskspace|digest|gnupg|macro|envvar|running|sanitycheck|vcheck|signature|verify|exists|executable|readable|writable)\(.*')
@@ -122,18 +158,8 @@ def install_br(r, b):
     if len(conflicting) == 0:
         b.log_line("no conflicts found")
     else:
-        b.log_line("uninstalling conflicting packages")
-        err = close_killset(conflicting)
-        if err != "":
-            util.append_to(b.logfile, err)
-            b.log_line("error: conflicting packages uninstallation failed")
-        else:
-            k = string.join(conflicting.keys())
-            b.log_line("removing %s" % k)
-            res = chroot.run("poldek --noask --erase %s" % k, logfile = b.logfile, user = "root")
-            if res != 0:
-                b.log_line("package removal failed")
-                return res
+        if not uninstall(conflicting):
+            return False
     b.log_line("installing BR: %s" % br)
     res = chroot.run("poldek --noask --caplookup -Q -v --upgrade %s" % br,
             user = "root",

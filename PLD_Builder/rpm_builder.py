@@ -118,6 +118,8 @@ def build_rpm(r, b):
             b.log_line("error: build arch check (%s) failed" % cmd)
 
         if not res:
+            if ("no-install-br" not in r.flags) and install.uninstall_self_conflict(b):
+                res = 1
             if ("no-install-br" not in r.flags) and install.install_br(r, b):
                 res = 1
             if not res:
