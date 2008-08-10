@@ -18,6 +18,8 @@ hold = [
 
 def close_killset(killset):
     k = killset.keys()
+    if len(k) == 0:
+        return True
     rx = re.compile(r' marks ([^\s]+)-[^-]+-[^-]+$')
     errors = ""
     for p in k:
@@ -110,11 +112,9 @@ def uninstall_self_conflict(b):
         m = rx.search(l)
         if m: conflicting[m.group(1)] = 1
     f.close()
-    if len(conflicting) == 0:
-        b.log_line("no BuildConflicts found")
-    else:
-        if not uninstall(conflicting):
-            return False
+    if len(conflicting) and not uninstall(conflicting):
+        return False
+    b.log_line("no BuildConflicts found")
     return True
 
 def install_br(r, b):
@@ -138,7 +138,7 @@ def install_br(r, b):
     chroot.run("rm -rf %s" % tmpdir)
     if len(needed) == 0:
         b.log_line("no BR needed")
-        return
+        return True
     nbr = ""
     for bre in needed.keys():
         nbr = nbr + " " + re.escape(bre)
@@ -166,4 +166,5 @@ def install_br(r, b):
             logfile = b.logfile)
     if res != 0:
         b.log_line("error: BR installation failed")
-    return res
+        return False
+    return True
