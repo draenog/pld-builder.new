@@ -112,7 +112,7 @@ def uninstall_self_conflict(b):
         m = rx.search(l)
         if m: conflicting[m.group(1)] = 1
     f.close()
-    if len(conflicting) and not uninstall(conflicting):
+    if len(conflicting) and not uninstall(conflicting, b):
         return False
     b.log_line("no BuildConflicts found")
     return True
