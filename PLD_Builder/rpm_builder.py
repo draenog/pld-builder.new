@@ -21,8 +21,7 @@ import buildlogs
 import notify
 import build
 import report
-import upgrade
-import install_br
+import install
 
 # *HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*HACK*
 import socket
@@ -119,9 +118,9 @@ def build_rpm(r, b):
             b.log_line("error: build arch check (%s) failed" % cmd)
 
         if not res:
-            if ("no-install-br" not in r.flags) and install_br.install_br(r, b):
+            if ("no-install-br" not in r.flags) and install.install_br(r, b):
                 res = 1
-            else:
+            if not res:
                 cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb %s %s" % \
                             (tmpdir, config.nice, rpmbuild_opt, b.spec)
                 b.log_line("building RPM using: %s" % cmd)
@@ -156,7 +155,7 @@ def build_rpm(r, b):
             ll("test-build: not copying to " + rpm_cache_dir)
         ll("Begin-PLD-Builder-Info")
         if "upgrade" in r.flags:
-            b.upgraded = upgrade.upgrade_from_batch(r, b)
+            b.upgraded = install.upgrade_from_batch(r, b)
         else:
             ll("not upgrading")
         ll("End-PLD-Builder-Info")
