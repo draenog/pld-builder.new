@@ -159,7 +159,7 @@ def install_br(r, b):
     if len(conflicting) == 0:
         b.log_line("no conflicts found")
     else:
-        if not uninstall(conflicting):
+        if not uninstall(conflicting, b):
             return False
     b.log_line("installing BR: %s" % br)
     res = chroot.run("poldek --noask --caplookup -Q -v --upgrade %s" % br,
