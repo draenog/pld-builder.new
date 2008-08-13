@@ -20,7 +20,7 @@ def close_killset(killset):
     k = killset.keys()
     if len(k) == 0:
         return True
-    rx = re.compile(r' marks ([^\s]+)-[^-]+-[^-]+$')
+    rx = re.compile(r'^.* marks ([^\s]+?)-[^-]+-[^-]+\s.*$')
     errors = ""
     for p in k:
         if p in hold:
