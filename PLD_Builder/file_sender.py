@@ -89,6 +89,7 @@ def post_file(src, url):
         data = f.read()
         f.close()
         req = urllib2.Request(url, data)
+        req.add_header('X-Filename', os.path.basename(src))
         f = urllib2.urlopen(req)
         f.close()
     except Exception, e:
