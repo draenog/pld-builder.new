@@ -1,13 +1,10 @@
 #!/usr/bin/python
 
-host = ""
-port = 1234
-
-
 import string
 import cgi
 import time
 import StringIO
+from config import config, init_conf
 
 from os import curdir, sep
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
@@ -52,8 +49,12 @@ class MyHandler(BaseHTTPRequestHandler):
 
 def main():
 	try:
+		init_conf()
+		host = ""
+		port = config.request_handler_server_port
+
 		server = HTTPServer((host, port), MyHandler)
-		print 'started httpserver...'
+		print 'started httpserver on :%d...' % port
 		server.serve_forever()
 	except KeyboardInterrupt:
 		print '^C received, shutting down server'
