@@ -34,7 +34,9 @@ class MyHandler(BaseHTTPRequestHandler):
 			sio.write(query)
 			sio.seek(0)
 
-			if not request_handler.handle_request_main(sio):
+			filename = self.headers.getheader('x-filename')
+
+			if not request_handler.handle_request_main(sio, filename = filename):
 				self.send_error(500)
 				self.end_headers()
 				return

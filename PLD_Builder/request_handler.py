@@ -135,9 +135,15 @@ def handle_notification(r, user):
     os.chmod(path.req_queue_signed_file, 0644)
     q.unlock()
 
-def handle_request(f):
+def handle_request(f, filename = None):
     sio = StringIO.StringIO()
     util.sendfile(f, sio)
+
+    sio.seek(0)
+    if sio.read() == '':
+        log.alert('Empty body received. Filename: %s' % filename)
+        return False
+
     sio.seek(0)
     (em, body) = gpg.verify_sig(sio)
     user = acl.user_by_email(em)
@@ -165,10 +171,10 @@ def handle_request(f):
     status.pop()
     return True
 
-def handle_request_main(stream):
+def handle_request_main(stream, filename = None):
     init_conf("src")
     status.push("handling email request")
-    ret = handle_request(stream)
+    ret = handle_request(stream, filename = filename)
     status.pop()
     return ret
 
