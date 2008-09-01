@@ -105,7 +105,7 @@ def uninstall_self_conflict(b):
     tmpdir = "/tmp/BR." + b.b_id[0:6]
     f = chroot.popen("cd rpm/SPECS; TMPDIR=%s rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %s %s 2>&1" \
             % (tmpdir, rpmbuild_opt, b.spec))
-    rx = re.compile(r"\s+(\w+)\s+.*\s+conflicts with [^\s]+-[^-]+-[^-]+\.src$")
+    rx = re.compile(r"\s+([\w-]+)\s+.*\s+conflicts with [^\s]+-[^-]+-[^-]+\.src$")
     conflicting = {}
     for l in f.xreadlines():
         m = rx.search(l)
