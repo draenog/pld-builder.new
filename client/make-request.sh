@@ -37,8 +37,8 @@ if [ -f "$USER_CFG" ]; then
 	. $USER_CFG
 fi
 
-die () {
-	echo "$0: $*" 1>&2
+die() {
+	echo >&2 "$0: $*"
 	exit 1
 }
 
@@ -57,6 +57,8 @@ usage() {
 	echo "       set alt_kernel to VALUE"
 	echo "  --target VALUE"
 	echo "       set --target to VALUE"
+	echo "  --branch VALUE"
+	echo "       specify default branch for specs in request"
 	echo "  -t   --test-build"
 	echo "       Performs a 'test-build'. Package will be uploaded to test/ tree"
 	echo "       and won't be upgraded on builders"
@@ -134,6 +136,11 @@ while [ $# -gt 0 ] ; do
 
 		--target)
 			target=$2
+			shift
+			;;
+
+		--branch)
+			branch=$2
 			shift
 			;;
 
@@ -253,19 +260,21 @@ th-java) # fake "distro" for java available th architectures
 	;;
 esac
 
+branch=${branch:-$default_branch}
+
 specs=`for s in $specs; do
 	case "$s" in
 	*.spec:*) # spec with branch
 		echo $s
 		;;
 	*.spec) # spec without branch
-		echo $s:$default_branch
+		echo $s:$branch
 		;;
 	*:*) # package name with branch
 		echo $s | sed -e 's/:/.spec:/'
 		;;
 	*) # just package name
-		echo $s.spec:$default_branch
+		echo $s.spec:$branch
 		;;
 	esac
 done`
