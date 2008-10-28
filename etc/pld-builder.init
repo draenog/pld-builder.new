@@ -1,70 +1,86 @@
 #!/bin/sh
 #
-# pld-builder	perform adminstrator's tasks for pld-builder
+# pld-builder	perform adminstrator's tasks for PLD Linux Builder
 #
 # chkconfig:	345 99 01
 #
-# description:	perform adminstrator's tasks for pld-builder
+# description:	perform adminstrator's tasks for PLD Linux Builder
 
 
 # Source function library
 . /etc/rc.d/init.d/functions
 
-# define shell functions listed below on your own in /etc/sysconfig/pld-builder
-pld_builder_start () ok
-pld_builder_reload () ok
-pld_builder_restart () ok
-pld_builder_status () :
-pld_builder_stop () ok
+# Defaults
+CHROOTS=
 
 # Get service config - may override defaults
 [ -f /etc/sysconfig/pld-builder ] && . /etc/sysconfig/pld-builder
 
+mount_chroots() {
+	# mount /proc in chroots
+	local ret
+	for CHROOT in $CHROOTS; do
+		show "chroot: %s mount /proc" "$CHROOT"
+		ret=$(chroot $CHROOT mount /proc > /dev/null 2>&1; echo $?)
+		[ $ret -eq 0 ] && ok || fail
+	done
+}
+
+umount_chroots() {
+	local ret
+	for CHROOT in $CHROOTS; do
+		show "chroot: %s umount /proc" "$CHROOT"
+		ret=$(chroot $CHROOT umount /proc > /dev/null 2>&1; echo $?)
+		[ $ret -eq 0 ] && ok || fail
+	done
+}
+
+chroots_status() {
+	local ret
+	for CHROOT in $CHROOTS; do
+		show "chroot: %s is /proc mounted?" "$CHROOT"
+		ret=$(chroot $CHROOT mount -v 2> /dev/null | grep -q 'none.*/proc'; echo $?)
+		[ $ret -eq 0 ] && ok || fail
+	done
+}
+
 start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/pld-builder ]; then
-		msg_starting pld-builder
-		busy
-		pld_builder_start
-		RETVAL=0
+		if [ -z "$CHROOTS" ]; then
+			# no chroots configured. return and be silent
+			return
+		fi
+		msg_starting "PLD Linux Builder"
+		busy; echo
+		mount_chroots
+		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/pld-builder
 	else
-		msg_already_running pld-builder
+		msg_already_running "PLD Linux Builder"
 	fi
 }
 
 stop() {
 	if [ -f /var/lock/subsys/pld-builder ]; then
 		# Stop daemons.
-		msg_stopping pld-builder
-		busy
-		pld_builder_stop
+		msg_stopping "PLD Linux Builder"
+		busy; echo
+		umount_chroots
 		RETVAL=0
 		rm -f /var/lock/subsys/pld-builder
 	else
-		msg_not_running pld-builder
+		msg_not_running "PLD Linux Builder"
 	fi
 }
-
 
 condrestart() {
 	if [ -f /var/lock/subsys/pld-builder ]; then
 		stop
 		start
 	else
-		msg_not_running pld-builder
+		msg_not_running "PLD Linux Builder"
 		RETVAL=$1
-	fi
-}
-
-reload() {
-	if [ -f /var/lock/subsys/pld-builder ]; then
-		msg_reloading pld-builder
-		pld_builder_reload
-		RETVAL=$?
-	else
-		msg_not_running pld-builder
-		RETVAL=7
 	fi
 }
 
@@ -79,7 +95,6 @@ case "$1" in
   restart)
 	stop
 	start
-	exit $?
 	;;
   try-restart)
 	condrestart 0
@@ -88,7 +103,7 @@ case "$1" in
   	reload
 	;;
   status)
-	pld_builder_status
+	chroots_status
 	RETVAL=$?
 	;;
   *)
