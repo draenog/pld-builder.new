@@ -255,6 +255,10 @@ th-java) # fake "distro" for java available th architectures
 	builder_email="builderth@ep09.pld-linux.org"
 	default_builders="th-x86_64 th-athlon th-i686"
 	;;
+aidath)
+	builder_email="builderaidath@ep09.pld-linux.org"
+	default_builders="aidath-*"
+	;;
 *)
 	die "distro \`$distro' not known"
 	;;
