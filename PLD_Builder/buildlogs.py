@@ -38,13 +38,13 @@ class Buildlogs_Queue:
 
     def flush(self):
         def desc(l):
-            return """Target: %s/%s
+            return """Target: %s/%s,%s
 Builder: %s
 Time: %d
 Type: buildlog
 Requester: %s
 END
-""" % (config.buildlogs_url, l['name'], config.builder, time.time(), self.requester_email)
+""" % (config.buildlogs_url, l['name'], l['id'], config.builder, time.time(), self.requester_email)
         
         for l in self.queue:
             f = open(path.buildlogs_queue_dir + l['id'] + ".desc", "w")
