@@ -214,13 +214,13 @@ class Batch:
                 else:
                     bl_name = self.spec[:len(self.spec)-5]
                 lin_ar = b.replace('noauto-','')
-                path = "/%s/%s/%s,%s.bz2" % (lin_ar.replace('-','/'), s, bl_name, b_id)
+                path = "/%s/%s/%s,%s.bz2" % (lin_ar.replace('-','/'), s, bl_name, self.b_id)
                 is_ok = 0
                 if s == "OK":
                     is_ok = 1
                 bld = lin_ar.split('-')
                 link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s\">" \
-                     % (bld[0], bld[1], is_ok, bl_name, b_id)
+                     % (bld[0], bld[1], is_ok, bl_name, self.b_id)
                 link_post = "</a>"
             builders.append(link_pre + ("<font color='%s'><b>%s:%s</b></font>" %
                                         (c, b, s)) + link_post)
