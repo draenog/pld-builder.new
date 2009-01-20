@@ -67,13 +67,13 @@ def build_all(r, build_fnc):
                     notify.add_batch(batch, "OK")
                 batch.build_time = stopwatch.stop()
                 report.add_pld_builder_info(batch)
-                buildlogs.add(batch.logfile, failed = batch.build_failed)
+                buildlogs.add(batch.logfile, failed = batch.build_failed, id=r.id)
             else:
                 log.notice("not running command, not for me.")
                 batch.build_failed = 0
                 batch.log_line("queued command %s for other builders" % batch.command)
                 r.some_ok = 1
-                buildlogs.add(batch.logfile, failed = batch.build_failed)
+                buildlogs.add(batch.logfile, failed = batch.build_failed, id=r.id)
         elif can_build:
             log.notice("building %s" % batch.spec)
             stopwatch.start()
@@ -91,7 +91,7 @@ def build_all(r, build_fnc):
                 notify.add_batch(batch, "OK")
             batch.build_time = stopwatch.stop()
             report.add_pld_builder_info(batch)
-            buildlogs.add(batch.logfile, failed = batch.build_failed)
+            buildlogs.add(batch.logfile, failed = batch.build_failed, id=r.id)
         else:
             batch.build_failed = 1
             batch.skip_reason = "SKIPED [%s failed]" % failed_dep

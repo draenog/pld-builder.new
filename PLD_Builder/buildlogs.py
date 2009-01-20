@@ -17,11 +17,10 @@ class Buildlogs_Queue:
     def init(self, g):
         self.requester_email = g.requester_email
 
-    def add(self, logfile, failed):
+    def add(self, logfile, failed, id):
         # if /dev/null, don't even bother to store it
         if config.buildlogs_url == "/dev/null":
             return
-        id = util.uuid()
         name = re.sub(r"\.spec\.log", "", os.path.basename(logfile)) + "," + id + ".bz2"
         ret = os.system("bzip2 --best --force < %s > %s" \
                     % (logfile, path.buildlogs_queue_dir + id))
