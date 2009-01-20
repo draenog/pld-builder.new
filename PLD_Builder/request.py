@@ -93,7 +93,7 @@ class Group:
                  self.id, self.priority, string.join(self.flags)))
         f.write("<ul>\n")
         for b in self.batches:
-            b.dump_html(f)
+            b.dump_html(f, self.id)
         f.write("</ul>\n")
         f.write("</p>\n")
 
@@ -187,7 +187,7 @@ class Batch:
     def is_command(self):
         return self.command != ""
 
-    def dump_html(self, f):
+    def dump_html(self, f, rid):
         f.write("<li>\n")
         if self.is_command():
             desc = "SH: %s [%s]" % (self.command, ' '.join(self.command_flags))
@@ -214,13 +214,13 @@ class Batch:
                 else:
                     bl_name = self.spec[:len(self.spec)-5]
                 lin_ar = b.replace('noauto-','')
-                path = "/%s/%s/%s,%s.bz2" % (lin_ar.replace('-','/'), s, bl_name, self.gb_id)
+                path = "/%s/%s/%s,%s.bz2" % (lin_ar.replace('-','/'), s, bl_name, rid)
                 is_ok = 0
                 if s == "OK":
                     is_ok = 1
                 bld = lin_ar.split('-')
                 link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s\">" \
-                     % (bld[0], bld[1], is_ok, bl_name, self.gb_id)
+                     % (bld[0], bld[1], is_ok, bl_name, rid)
                 link_post = "</a>"
             builders.append(link_pre + ("<font color='%s'><b>%s:%s</b></font>" %
                                         (c, b, s)) + link_post)
