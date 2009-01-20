@@ -21,8 +21,8 @@ class Buildlogs_Queue:
         # if /dev/null, don't even bother to store it
         if config.buildlogs_url == "/dev/null":
             return
-        name = re.sub(r"\.spec\.log", "", os.path.basename(logfile)) + ".bz2"
         id = util.uuid()
+        name = re.sub(r"\.spec\.log", "", os.path.basename(logfile)) + "," + id + ".bz2"
         ret = os.system("bzip2 --best --force < %s > %s" \
                     % (logfile, path.buildlogs_queue_dir + id))
         if ret:
@@ -38,13 +38,13 @@ class Buildlogs_Queue:
 
     def flush(self):
         def desc(l):
-            return """Target: %s/%s,%s
+            return """Target: %s/%s
 Builder: %s
 Time: %d
 Type: buildlog
 Requester: %s
 END
-""" % (config.buildlogs_url, l['name'], l['id'], config.builder, time.time(), self.requester_email)
+""" % (config.buildlogs_url, l['name'], config.builder, time.time(), self.requester_email)
         
         for l in self.queue:
             f = open(path.buildlogs_queue_dir + l['id'] + ".desc", "w")
