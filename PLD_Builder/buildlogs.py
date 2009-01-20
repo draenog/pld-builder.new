@@ -55,9 +55,9 @@ queue = Buildlogs_Queue()
 def init(r):
     queue.init(r)
 
-def add(logfile, failed):
+def add(logfile, failed, id):
     "Add new buildlog with specified status."
-    queue.add(logfile, failed)
+    queue.add(logfile, failed, id)
 
 def flush():
     "Send buildlogs to server."
