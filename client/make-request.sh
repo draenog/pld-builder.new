@@ -82,7 +82,7 @@ usage() {
 	echo "       --remove-pkg"
 	echo "       shortcut for --command poldek -ev --noask ARGS"
 	echo "       --upgrade-pkg"
-	echo "       shortcut for --command poldek -uv ARGS"
+	echo "       shortcut for --command poldek --up -Uv ARGS"
 	echo "       --cvsup"
 	echo "       Updates builders infrastructure (outside chroot)"
 	echo "  -q   "
@@ -191,7 +191,7 @@ while [ $# -gt 0 ] ; do
 			shift
 			;;
 		--upgrade-pkg)
-			command="poldek -uv $2"
+			command="poldek --up -Uv $2"
 			f_upgrade=no
 			shift
 			;;
