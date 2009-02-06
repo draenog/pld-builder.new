@@ -333,11 +333,11 @@ def build_request(e):
         log.panic("xml: evil request <%s>" % e.nodeName)
 
 def parse_request(f):
-    d = parse(f)
+    d = parseString(f)
     return build_request(d.documentElement)
     
 def parse_requests(f):
-    d = parse(f)
+    d = parseString(f)
     res = []
     for r in d.documentElement.childNodes:
         if is_blank(r): continue

@@ -54,12 +54,12 @@ class B_Queue:
     def read(self):
         self._open()
         self.signers = []
-        if string.strip(self.fd.read()) == "":
+        body = self.fd.read()
+        if string.strip(body) == "":
             # empty file, don't choke
             self.requests = []
             return
-        self.fd.seek(0)
-        self.requests = request.parse_requests(self.fd)
+        self.requests = request.parse_requests(body)
 
     def _write_to(self, f):
         f.write("<queue>\n")

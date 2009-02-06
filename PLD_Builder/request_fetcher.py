@@ -77,7 +77,6 @@ def fetch_queue(control_url):
     if not u.can_do("sign_queue", "all"):
         log.alert("user %s is not allowed to sign my queue" % u.login)
         sys.exit(1)
-    body.seek(0)
     return request.parse_requests(body)
 
 def handle_reqs(builder, reqs):
