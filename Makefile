@@ -1,5 +1,5 @@
 PACKAGE		:= pld-builder
-VERSION		:= 0.2
+VERSION		:= 0.3
 
 # for make dist
 CVSROOT		:= :pserver:cvs@cvs.pld-linux.org:/cvsroot
