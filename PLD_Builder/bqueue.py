@@ -40,7 +40,7 @@ class B_Queue:
             f = gzip.open(self.name)
         else:
             f = open(self.name)
-        (signers, body) = gpg.verify_sig(f)
+        (signers, body) = gpg.verify_sig(f.read())
         self.signers = signers
         self.requests = request.parse_requests(body)
 
@@ -92,7 +92,7 @@ class B_Queue:
         sio = StringIO.StringIO()
         self._write_to(sio)
         sio.seek(0)
-        sio = gpg.sign(sio)
+        sio = gpg.sign(sio.read())
         if os.access(name, os.F_OK): os.unlink(name)
         if re.search(r"\.gz$", name):
             f = gzip.open(name, "w", 6)
