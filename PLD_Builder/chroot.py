@@ -2,8 +2,12 @@
 
 import os
 import re
-import md5
 import random
+
+try:
+    from hashlib import md5 as md5
+except ImportError:
+    from md5 import md5
 
 from config import config
 
@@ -42,7 +46,7 @@ def run(cmd, user = "builder", logfile = None, logstdout = None):
         return r
 
 def cp(file, outfile, user="builder", rm=False):
-    m = md5.new()
+    m = md5()
     m.update(str(random.sample(xrange(100000), 500)))
     digest = m.hexdigest()
 
