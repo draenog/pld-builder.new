@@ -69,7 +69,7 @@ def fetch_queue(control_url):
     f.close()
     sio.seek(0)
     f = gzip.GzipFile(fileobj = sio)
-    (signers, body) = gpg.verify_sig(f)
+    (signers, body) = gpg.verify_sig(f.read())
     u = acl.user_by_email(signers)
     if u == None:
         log.alert("queue.gz not signed with signature of valid user: %s" % signers)

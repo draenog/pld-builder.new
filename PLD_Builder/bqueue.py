@@ -98,6 +98,7 @@ class B_Queue:
             f = gzip.open(name, "w", 6)
         else:
             f = open(name, "w")
+        sio.seek(0)
         util.sendfile(sio, f)
         f.close()
 
