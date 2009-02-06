@@ -135,21 +135,16 @@ def handle_notification(r, user):
     os.chmod(path.req_queue_signed_file, 0644)
     q.unlock()
 
-def handle_request(f, filename = None):
-    sio = StringIO.StringIO()
-    util.sendfile(f, sio)
-
-    sio.seek(0)
-    if sio.read() == '':
+def handle_request(req, filename = None):
+    if req == '':
         log.alert('Empty body received. Filename: %s' % filename)
         return False
 
-    sio.seek(0)
-    (em, body) = gpg.verify_sig(sio)
+    (em, body) = gpg.verify_sig(req)
     user = acl.user_by_email(em)
     if user == None:
         # FIXME: security email here
-        sio.seek(0); keys = gpg.get_keys(sio)
+        keys = gpg.get_keys(req)
         log.alert("Invalid signature, missing/untrusted key, or '%s' not in acl. Keys in gpg batch: '%s'" % (em, keys))
         return False
 
@@ -171,15 +166,15 @@ def handle_request(f, filename = None):
     status.pop()
     return True
 
-def handle_request_main(stream, filename = None):
+def handle_request_main(req, filename = None):
     init_conf("src")
     status.push("handling email request")
-    ret = handle_request(stream, filename = filename)
+    ret = handle_request(req, filename = filename)
     status.pop()
     return ret
 
 def main():
-    sys.exit(not handle_request_main(sys.stdin))
+    sys.exit(not handle_request_main(sys.stdin.read()))
 
 if __name__ == '__main__':
     wrap.wrap(main)

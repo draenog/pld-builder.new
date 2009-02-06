@@ -4,7 +4,6 @@ import string
 import cgi
 import time
 import log
-import StringIO
 from config import config, init_conf
 
 from os import curdir, sep
@@ -28,13 +27,10 @@ class MyHandler(BaseHTTPRequestHandler):
 				return
 
 			query = self.rfile.read(length)
-			sio = StringIO.StringIO()
-			sio.write(query)
-			sio.seek(0)
 
 			filename = self.headers.getheader('x-filename')
 
-			if not request_handler.handle_request_main(sio, filename = filename):
+			if not request_handler.handle_request_main(query, filename = filename):
 				log.error("request_handler_server: handle_request_main(..., %s) failed" % filename)
 				self.send_error(500)
 				self.end_headers()
