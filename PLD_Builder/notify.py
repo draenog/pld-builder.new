@@ -18,7 +18,7 @@ class Notifier:
         sio = StringIO.StringIO()
         self.xml.write("</notification>\n")
         self.xml.seek(0)
-        sio.write(gpg.sign(self.xml))
+        sio.write(gpg.sign(self.xml.read()))
         self.xml = None
         sio.seek(0)
         notifyq.init(r)
