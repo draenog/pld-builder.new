@@ -3,6 +3,7 @@
 import string
 import cgi
 import time
+import log
 import StringIO
 from config import config, init_conf
 
@@ -34,6 +35,7 @@ class MyHandler(BaseHTTPRequestHandler):
 			filename = self.headers.getheader('x-filename')
 
 			if not request_handler.handle_request_main(sio, filename = filename):
+				log.error("request_handler_server: handle_request_main(..., %s) failed" % filename)
 				self.send_error(500)
 				self.end_headers()
 				return
@@ -44,6 +46,7 @@ class MyHandler(BaseHTTPRequestHandler):
 		except Exception, e:
 			self.send_error(500)
 			self.end_headers()
+			log.error("request_handler_server: exception: %s" % e)
 			raise
 			pass
 
