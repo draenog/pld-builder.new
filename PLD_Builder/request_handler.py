@@ -38,6 +38,7 @@ def check_double_id(id):
     return 0
 
 def handle_group(r, user):
+    lockf = None
     def fail_mail(msg):
         if len(r.batches) >= 1:
             spec = r.batches[0].spec
@@ -49,8 +50,9 @@ def handle_group(r, user):
         m.write_line(msg)
         m.send()
     
-    lock("request")
+    lockf = lock("request")
     if check_double_id(r.id):
+        lockf.close()
         return
         
 
@@ -58,15 +60,18 @@ def handle_group(r, user):
         if not user.can_do("src", config.builder, batch.branch):
             fail_mail("user %s is not allowed to src:%s:%s" \
                         % (user.get_login(), config.builder, batch.branch))
+            lockf.close()
             return
 
         if 'test-build' in r.flags and 'upgrade' in r.flags:
             fail_mail("it's forbidden to upgrade from a test build")
+            lockf.close()
             return
 
         if "upgrade" in r.flags and not user.can_do("upgrade", config.builder, batch.branch):
             fail_mail("user %s is not allowed to upgrade:%s:%s" \
                         % (user.get_login(), config.builder, batch.branch))
+            lockf.close()
             return
 
         batch.expand_builders(config.binary_builders)
@@ -77,11 +82,13 @@ def handle_group(r, user):
             if bld not in config.binary_builders and bld != config.builder:
                 fail_mail("I (src rpm builder '%s') do not handle binary builder '%s', only '%s'" % \
                         (config.builder, bld, string.join(config.binary_builders)))
+                lockf.close()
                 return
             if batch.is_command():
                 if not user.can_do("command", bld):
                     fail_mail("user %s is not allowed to command:%s" \
                                 % (user.get_login(), bld))
+                    lockf.close()
                     return
             elif not user.can_do("binary", bld, batch.branch):
                 pkg = batch.spec
@@ -90,6 +97,7 @@ def handle_group(r, user):
                 if not user.can_do("binary-" + pkg, bld, batch.branch):
                     fail_mail("user %s is not allowed to binary-%s:%s:%s" \
                                 % (user.get_login(), pkg, bld, batch.branch))
+                    lockf.close()
                     return
     
     r.priority = user.check_priority(r.priority,config.builder)
@@ -103,6 +111,7 @@ def handle_group(r, user):
     q.add(r)
     q.write()
     q.unlock()
+    lockf.close()
 
 def handle_notification(r, user):
     if not user.can_do("notify", r.builder):
