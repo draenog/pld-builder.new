@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import socket
 import string
 import cgi
 import time
@@ -47,6 +48,7 @@ class MyHandler(BaseHTTPRequestHandler):
 			pass
 
 def main():
+	socket.setdefaulttimeout(30)
 	try:
 		init_conf()
 		host = ""
