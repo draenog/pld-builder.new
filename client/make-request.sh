@@ -10,6 +10,9 @@ command_flags=
 gpg_opts=
 default_branch='HEAD'
 distro=
+url="http://ep09.pld-linux.org:1234/"
+
+[ -x /usr/bin/python ] && send_mode="python" || send_mode="mail"
 
 if [ -n "$HOME_ETC" ]; then
 	USER_CFG=$HOME_ETC/.requestrc
@@ -23,6 +26,8 @@ if [ ! -f "$USER_CFG" ]; then
 priority=2
 requester=deviloper@pld-linux.org
 default_key=deviloper@pld-linux.org
+send_mode="$send_mode"
+url="$url"
 mailer="/usr/sbin/sendmail -t"
 gpg_opts=""
 distro=th
@@ -36,6 +41,29 @@ fi
 if [ -f "$USER_CFG" ]; then
 	. $USER_CFG
 fi
+
+send_request() {
+        case "$send_mode" in
+        "mail")
+                cat - | $mailer
+                ;;
+        *)
+                cat - | python -c '
+import sys, urllib2
+
+try:
+        data = sys.stdin.read()
+        req = urllib2.Request(sys.argv[1], data)
+        f = urllib2.urlopen(req, timeout=10)
+        f.close()
+except Exception, e:
+        print >> sys.stderr, "Problem while sending request: %s" % e
+        sys.exit(1)
+print >> sys.stdout, "Requires posted."
+' "$url"
+                ;;
+        esac
+}
 
 die() {
 	echo >&2 "$0: $*"
@@ -407,4 +435,4 @@ $(echo "$req" | gpg --clearsign --default-key $default_key $gpg_opts)
 EOF
 }
 
-gen_email | $mailer
+gen_email | send_request
