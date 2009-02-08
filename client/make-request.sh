@@ -59,7 +59,7 @@ try:
 except Exception, e:
         print >> sys.stderr, "Problem while sending request: %s" % e
         sys.exit(1)
-print >> sys.stdout, "Requires posted."
+print >> sys.stdout, "Request queued."
 ' "$url"
                 ;;
         esac
