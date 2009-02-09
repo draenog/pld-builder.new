@@ -218,7 +218,7 @@ while [ $# -gt 0 ] ; do
 			f_upgrade=no
 			shift
 			;;
-		--upgrade-pkg)
+		--upgrade-pkg|-Uhv)
 			command="poldek --up -Uv $2"
 			f_upgrade=no
 			shift
