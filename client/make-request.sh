@@ -10,7 +10,7 @@ command_flags=
 gpg_opts=
 default_branch='HEAD'
 distro=
-url="http://ep09.pld-linux.org:1234/"
+url=
 
 [ -x /usr/bin/python ] && send_mode="python" || send_mode="mail"
 
@@ -22,7 +22,7 @@ fi
 
 if [ ! -f "$USER_CFG" ]; then
 	echo "Creating config file $USER_CFG. You *must* edit it."
-	cat >$USER_CFG <<'EOF'
+	cat > $USER_CFG <<EOF
 priority=2
 requester=deviloper@pld-linux.org
 default_key=deviloper@pld-linux.org
@@ -31,6 +31,7 @@ url="$url"
 mailer="/usr/sbin/sendmail -t"
 gpg_opts=""
 distro=th
+url="http://ep09.pld-linux.org:1234/"
 
 # defaults:
 f_upgrade=yes
@@ -43,12 +44,18 @@ if [ -f "$USER_CFG" ]; then
 fi
 
 send_request() {
-        case "$send_mode" in
-        "mail")
-                cat - | $mailer
-                ;;
-        *)
-                cat - | python -c '
+	# switch to mail mode, if no url set
+	[ -z "$url" ] && send_mode="mail"
+
+
+	case "$send_mode" in
+	"mail")
+		echo >&2 "* Sending using mail mode"
+		cat - | $mailer
+		;;
+	*)
+		echo >&2 "* Sending using http mode to $url"
+		cat - | python -c '
 import sys, urllib2
 
 try:
@@ -61,8 +68,8 @@ except Exception, e:
         sys.exit(1)
 print >> sys.stdout, "Request queued."
 ' "$url"
-                ;;
-        esac
+		;;
+	esac
 }
 
 die() {
@@ -278,10 +285,12 @@ ti)
 th)
 	builder_email="builderth@ep09.pld-linux.org"
 	default_builders="th-*"
+	url="http://ep09.pld-linux.org:1234/"
 	;;
 th-java) # fake "distro" for java available th architectures
 	builder_email="builderth@ep09.pld-linux.org"
 	default_builders="th-x86_64 th-athlon th-i686"
+	url="http://ep09.pld-linux.org:1234/"
 	;;
 aidath)
 	builder_email="builderaidath@ep09.pld-linux.org"
