@@ -183,7 +183,7 @@ def flush_queue(dir):
         e = emails.keys()
         m = mailer.Message()
         m.set_headers(to = string.join(e, ", "), 
-                      subject = "builder queue problem")
+                      subject = "[%s] builder queue problem" % config.builder)
         m.write("there were problems sending files from queue %s:\n" % dir)
         m.write("problem: %s\n" % problem)
         m.send()
