@@ -23,6 +23,7 @@ class MyHandler(BaseHTTPRequestHandler):
 			length = int(self.headers.getheader('content-length'))
 			ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
 			if ctype != 'application/x-www-form-urlencoded':
+                log.error("request_handler_server: [%s]: 401 Unauthorized" % client_address[0])
 				self.send_error(401)
 				self.end_headers()
 				return
@@ -32,7 +33,7 @@ class MyHandler(BaseHTTPRequestHandler):
 			filename = self.headers.getheader('x-filename')
 
 			if not request_handler.handle_request_main(query, filename = filename):
-				log.error("request_handler_server: handle_request_main(..., %s) failed" % filename)
+				log.error("request_handler_server: [%s]: handle_request_main(..., %s) failed" % (client_address[0], filename))
 				self.send_error(500)
 				self.end_headers()
 				return
@@ -43,7 +44,7 @@ class MyHandler(BaseHTTPRequestHandler):
 		except Exception, e:
 			self.send_error(500)
 			self.end_headers()
-			log.error("request_handler_server: exception: %s" % e)
+			log.error("request_handler_server: [%s]: exception: %s" % (client_address[0], e))
 			raise
 			pass
 
@@ -55,10 +56,10 @@ def main():
 		port = config.request_handler_server_port
 
 		server = HTTPServer((host, port), MyHandler)
-		print 'started httpserver on :%d...' % port
+		log.notice('request_handler_server: started on [%s:%d]...' % (host, port))
 		server.serve_forever()
 	except KeyboardInterrupt:
-		print '^C received, shutting down server'
+		log.notice('request_handler_server: ^C received, shutting down server')
 		server.socket.close()
 
 if __name__ == '__main__':
