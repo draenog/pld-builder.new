@@ -23,7 +23,7 @@ class MyHandler(BaseHTTPRequestHandler):
 			length = int(self.headers.getheader('content-length'))
 			ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
 			if ctype != 'application/x-www-form-urlencoded':
-                log.error("request_handler_server: [%s]: 401 Unauthorized" % client_address[0])
+				log.error("request_handler_server: [%s]: 401 Unauthorized" % client_address[0])
 				self.send_error(401)
 				self.end_headers()
 				return
