@@ -330,7 +330,7 @@ def build_request(e):
         # FIXME
         return Command(e)
     else:
-        log.panic("xml: evil request <%s>" % e.nodeName)
+        log.panic("xml: evil request [%s]" % e.nodeName)
 
 def parse_request(f):
     d = parseString(f)
