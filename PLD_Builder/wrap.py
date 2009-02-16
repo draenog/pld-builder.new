@@ -13,14 +13,14 @@ import status
 
 try:
     import mailer
-    def sendmail(trace, status):
+    def sendmail(trace):
         m = mailer.Message()
-        m.set_headers(to = status.admin, cc = ("%s, %s" % status.email, status.builder_list), subject = "fatal python exception")
+        m.set_headers(to = status.admin, cc = "%s, %s" % (status.email, status.builder_list), subject = "fatal python exception")
         m.write("%s\n" % trace)
-        m.write("during: %s\n" % status)
+        m.write("during: %s\n" % status.get())
         m.send()
 except:
-    def sendmail(trace, status):
+    def sendmail(trace):
         # don't use mailer.py; it safer this way
         f = os.popen("/usr/sbin/sendmail -i -t", "w")
         f.write("""Subject: builder failure
@@ -51,6 +51,6 @@ def wrap(main):
         log.alert(s.getvalue())
         log.alert("during: %s" % status.get())
 
-        sendmail(s.getvalue(), status.get())
+        sendmail(s.getvalue())
 
         sys.exit(1)
