@@ -59,7 +59,11 @@ class B_Queue:
             # empty file, don't choke
             self.requests = []
             return
-        self.requests = request.parse_requests(body)
+        try:
+            self.requests = request.parse_requests(body)
+        except Exception, e:
+            log.panic("error parsing %s: %s" % (self.name, e))
+            pass
 
     def _write_to(self, f):
         f.write("<queue>\n")
