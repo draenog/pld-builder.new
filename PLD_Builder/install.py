@@ -107,7 +107,7 @@ def uninstall_self_conflict(b):
             % (tmpdir, rpmbuild_opt, b.spec))
     # java-sun >= 1.5 conflicts with soprano-2.1.67-1.src
     # java-sun conflicts with soprano-2.1.67-1.src
-    rx = re.compile(r"\s+([\w-]+)\s+.*conflicts with [^\s]+-[^-]+-[^-]+\.src$")
+    rx = re.compile(r"\s+([\w-]+)\s+.*conflicts with [^\s]+-[^-]+-[^-]+\.src($| .*)")
     conflicting = {}
     for l in f.xreadlines():
         m = rx.search(l)
@@ -151,7 +151,7 @@ def install_br(r, b):
     # check conflicts in BRed packages
     b.log_line("checking conflicting packages in BRed packages")
     f = chroot.popen("poldek --test --noask --caplookup -Q -v --upgrade %s" % br, user = "root")
-    rx = re.compile(r".*conflicts with installed ([^\s]+)-[^-]+-[^-]+ .*")
+    rx = re.compile(r".*conflicts with installed ([^\s]+)-[^-]+-[^-]+($| .*)")
     conflicting = {}
     for l in f.xreadlines():
         b.log_line("poldek: %s" % l.rstrip())
