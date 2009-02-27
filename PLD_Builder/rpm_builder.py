@@ -103,6 +103,7 @@ def build_rpm(r, b):
     tmpdir = "/tmp/B." + b.b_id[0:6]
     if res:
         b.log_line("error: installing src rpm failed")
+        res = "FAIL_SRPM_INSTALL"
         res = 1
     else:
         prepare_env()
@@ -115,13 +116,14 @@ def build_rpm(r, b):
             (tmpdir, config.nice, rpmbuild_opt, b.spec)
         res = chroot.run(cmd, logfile = b.logfile)
         if res != 0:
+            res = "UNSUPP"
             b.log_line("error: build arch check (%s) failed" % cmd)
 
         if not res:
             if ("no-install-br" not in r.flags) and not install.uninstall_self_conflict(b):
-                res = 1
+                res = "FAIL_DEPS_UNINSTALL"
             if ("no-install-br" not in r.flags) and not install.install_br(r, b):
-                res = 1
+                res = "FAIL_DEPS_INSTALL"
             if not res:
                 cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb %s %s" % \
                             (tmpdir, config.nice, rpmbuild_opt, b.spec)
@@ -129,10 +131,11 @@ def build_rpm(r, b):
                 res = chroot.run(cmd, logfile = b.logfile)
                 files = util.collect_files(b.logfile)
                 if len(files) > 0:
+                    res = "OK"
                     r.chroot_files.extend(files)
                 else:
                     b.log_line("error: No files produced.")
-                    res = 1 # FIXME: is it error?
+                    res = "FAIL_NOFILES"
                 b.files = files
 
     chroot.run("rm -rf %s; cd rpm/SPECS; rpmbuild --nodeps --nobuild " \

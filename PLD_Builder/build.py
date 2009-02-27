@@ -83,12 +83,12 @@ def build_all(r, build_fnc):
             batch.requester_email=r.requester_email
             batch.build_failed = build_fnc(r, batch)
             if batch.build_failed:
-                log.notice("building %s FAILED" % batch.spec)
-                notify.add_batch(batch, "FAIL")
+                log.notice("building %s FAILED (%s)" % batch.spec, batch.build_failed)
+                notify.add_batch(batch, batch.build_failed)
             else:
                 r.some_ok = 1
-                log.notice("building %s OK" % batch.spec)
-                notify.add_batch(batch, "OK")
+                log.notice("building %s OK (%s)" % batch.spec, batch.build_failed)
+                notify.add_batch(batch, batch.build_failed)
             batch.build_time = stopwatch.stop()
             report.add_pld_builder_info(batch)
             buildlogs.add(batch.logfile, failed = batch.build_failed, id=r.id)

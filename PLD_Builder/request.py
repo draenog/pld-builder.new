@@ -168,7 +168,8 @@ class Batch:
         ok = 1
         for b in self.builders:
             s = self.builders_status[b]
-            if not (s == "OK" or s == "FAIL" or s == "SKIP"):
+            if not s in ["OK", "FAIL", "FAIL_SRPM_INSTALL", "FAIL_DEPS_UNINSTALL", "FAIL_DEPS_INSTALL",
+                    "FAIL_NOFILES", "SKIP", "UNSUPP"]:
                 ok = 0
         return ok
             
@@ -200,15 +201,18 @@ class Batch:
             s = self.builders_status[b]
             if s == "OK":
                 c = "green"
-            elif s == "FAIL":
+            elif s in ["FAIL", "FAIL_SRPM_INSTALL", "FAIL_DEPS_UNINSTALL", "FAIL_DEPS_INSTALL", "FAIL_NOFILES"]:
                 c = "red"
             elif s == "SKIP":
                 c = "blue"
+            elif s == "UNSUPP":
+                c = "yellow"
             else:
                 c = "black"
             link_pre = ""
             link_post = ""
-            if (s == "OK" or s == "FAIL") and len(self.spec) > 5:
+            if (s in ["OK", "FAIL", "FAIL_SRPM_INSTALL", "FAIL_DEPS_UNINSTALL", "FAIL_DEPS_INSTALL", 
+                    "FAIL_NOFILES", "SKIP", "UNSUPP"] and len(self.spec) > 5:
                 if self.is_command():
                     bl_name = "command"
                 else:
@@ -306,7 +310,7 @@ class Notification:
             if c.nodeName == "batch":
                 id = attr(c, "id")
                 status = attr(c, "status")
-                if status != "OK" and status != "FAIL" and status != "SKIP":
+                if status not in ["OK", "FAIL", "FAIL_SRPM_INSTALL", "FAIL_DEPS_UNINSTALL", "FAIL_DEPS_INSTALL", "FAIL_NOFILES", "SKIP", "UNSUPP"]:
                     log.panic("xml notification: bad status: %s" % self.status)
                 self.batches[id] = status
             else:
