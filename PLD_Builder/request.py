@@ -206,7 +206,7 @@ class Batch:
             elif s == "SKIP":
                 c = "blue"
             elif s == "UNSUPP":
-                c = "yellow"
+                c = "fuchsia"
             else:
                 c = "black"
             link_pre = ""
