@@ -211,8 +211,8 @@ class Batch:
                 c = "black"
             link_pre = ""
             link_post = ""
-            if (s in ["OK", "FAIL", "FAIL_SRPM_INSTALL", "FAIL_DEPS_UNINSTALL", "FAIL_DEPS_INSTALL", 
-                    "FAIL_NOFILES", "SKIP", "UNSUPP"] and len(self.spec) > 5:
+            if s in ["OK", "FAIL", "FAIL_SRPM_INSTALL", "FAIL_DEPS_UNINSTALL", "FAIL_DEPS_INSTALL", "FAIL_NOFILES",
+                    "SKIP", "UNSUPP"] and len(self.spec) > 5:
                 if self.is_command():
                     bl_name = "command"
                 else:
