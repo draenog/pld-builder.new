@@ -103,14 +103,14 @@ def build_srpm(r, b):
     if len(files) > 0:
         if len(files) > 1:
             util.append_to(b.logfile, "error: More than one file produced: %s" % files)
-            res = "FAIL"
+            res = "FAIL_TOOMANYFILES"
         last = files[len(files) - 1]
         b.src_rpm_file = last
         b.src_rpm = os.path.basename(last)
         r.chroot_files.extend(files)
     else:
         util.append_to(b.logfile, "error: No files produced.")
-        res = "FAIL_NOFILES"
+        res = "FAIL"
     if res == 0 and not "test-build" in r.flags:
         for pref in config.tag_prefixes:
             util.append_to(b.logfile, "Tagging with prefix: %s" % pref)

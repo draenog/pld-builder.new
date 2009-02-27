@@ -135,7 +135,11 @@ def build_rpm(r, b):
                     r.chroot_files.extend(files)
                 else:
                     b.log_line("error: No files produced.")
-                    res = "FAIL_NOFILES"
+                    last_section = util.find_last_section(b.logfile)
+                    if last_section == None:
+                        res = "FAIL"
+                    else:
+                        res = "FAIL_%s" % last_section.upper()
                 b.files = files
 
     chroot.run("rm -rf %s; cd rpm/SPECS; rpmbuild --nodeps --nobuild " \

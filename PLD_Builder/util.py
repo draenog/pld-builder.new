@@ -50,11 +50,23 @@ def clean_tmp(dir):
     os.system("rm -f %s/* 2>/dev/null; rmdir %s 2>/dev/null" % (dir, dir))
 
 def collect_files(log):
-    f = open(log)
+    f = open(log, 'r')
     rx = re.compile(r"^Wrote: (/home.*\.rpm)$")
     files = []
     for l in f.xreadlines():
         m = rx.search(l)
         if m:
             files.append(m.group(1))
+    f.close()
     return files
+
+def find_last_section(log):
+    f = open(log, 'r')
+    rx = re.compile(r"^Executing\(%(\w+)\).*$")
+    last_section = None
+    for l in f:
+        m = rx.search(l)
+        if m:
+            last = m.group(1)
+    f.close()
+    return last_section
