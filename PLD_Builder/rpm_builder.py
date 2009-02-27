@@ -131,7 +131,6 @@ def build_rpm(r, b):
                 res = chroot.run(cmd, logfile = b.logfile)
                 files = util.collect_files(b.logfile)
                 if len(files) > 0:
-                    res = "OK"
                     r.chroot_files.extend(files)
                 else:
                     b.log_line("error: No files produced.")
