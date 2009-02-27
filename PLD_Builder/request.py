@@ -311,7 +311,7 @@ class Notification:
                 id = attr(c, "id")
                 status = attr(c, "status")
                 if status not in ["OK", "FAIL", "FAIL_SRPM_INSTALL", "FAIL_DEPS_UNINSTALL", "FAIL_DEPS_INSTALL", "FAIL_NOFILES", "SKIP", "UNSUPP"]:
-                    log.panic("xml notification: bad status: %s" % self.status)
+                    log.panic("xml notification: bad status: %s" % status)
                 self.batches[id] = status
             else:
                 log.panic("xml: evil notification child (%s)" % c.nodeName)
