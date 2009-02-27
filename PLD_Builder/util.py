@@ -67,6 +67,6 @@ def find_last_section(log):
     for l in f:
         m = rx.search(l)
         if m:
-            last = m.group(1)
+            last_section = m.group(1)
     f.close()
     return last_section
