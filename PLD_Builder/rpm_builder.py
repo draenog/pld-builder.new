@@ -104,7 +104,6 @@ def build_rpm(r, b):
     if res:
         b.log_line("error: installing src rpm failed")
         res = "FAIL_SRPM_INSTALL"
-        res = 1
     else:
         prepare_env()
         chroot.run("install -m 700 -d %s" % tmpdir)
@@ -115,7 +114,7 @@ def build_rpm(r, b):
         cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bp --short-circuit --nodeps --define 'prep exit 0' %s %s" % \
             (tmpdir, config.nice, rpmbuild_opt, b.spec)
         res = chroot.run(cmd, logfile = b.logfile)
-        if res != 0:
+        if res:
             res = "UNSUPP"
             b.log_line("error: build arch check (%s) failed" % cmd)
 
@@ -129,6 +128,8 @@ def build_rpm(r, b):
                             (tmpdir, config.nice, rpmbuild_opt, b.spec)
                 b.log_line("building RPM using: %s" % cmd)
                 res = chroot.run(cmd, logfile = b.logfile)
+                if res:
+                    res = "FAIL"
                 files = util.collect_files(b.logfile)
                 if len(files) > 0:
                     r.chroot_files.extend(files)
