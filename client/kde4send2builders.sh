@@ -12,6 +12,8 @@ usage() {
 	echo "     set distro, probably th or ti will fit the most"
 	echo "  -at  --with-auto-tag"
 	echo "     send with current autotag, default no"
+	echo "  -b   --builder VALUE"
+	echo "     choose a particular builder, default all"
 	echo "  -h   --help"
 	echo "     show this help"
 	echo ""
@@ -30,6 +32,7 @@ usage() {
 DIST=
 ATAG=no
 SENDPRIO=
+BUILDER=
 
 LIBS="kde4-kdelibs.spec kde4-kdepimlibs.spec"
 BASE="kde4-kdebase-runtime.spec kde4-kdebase-workspace.spec kde4-kdebase.spec"
@@ -56,6 +59,11 @@ while [ $# -gt 0 ]; do
 
 		--with-auto-tag | -at )
 			ATAG=yes
+			shift
+			;;
+
+		--builder | -b )
+			BUILDER=$2
 			shift
 			;;
 
@@ -110,5 +118,9 @@ else
 	SENDPRIO=$specs
 fi
 
+if [ -z $BUILDER ]; then
+	./pld-builder.new/client/make-request.sh -d $DIST -r $SENDPRIO
+	exit 0
+fi
 
-./pld-builder.new/client/make-request.sh -d $DIST -r $SENDPRIO
+./pld-builder.new/client/make-request.sh -d $DIST -b $BUILDER -r $SENDPRIO
