@@ -63,7 +63,7 @@ while [ $# -gt 0 ]; do
 			;;
 
 		--builder | -b )
-			BUILDER=$2
+			BUILDER="$BUILDER $2"
 			shift
 			;;
 
