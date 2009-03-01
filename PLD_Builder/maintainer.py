@@ -56,6 +56,7 @@ def handle_bin():
         chroot.run("cd /spools/ready; rm -f %s" % ' '.join(rmpkgs[i:i+1000]), 'root')
         i=i+1000
     f.close()
+    chroot.run("poldek --mo=nodiff --mkidxz -s /spools/ready")
 
 if __name__ == '__main__':
     init_conf()
