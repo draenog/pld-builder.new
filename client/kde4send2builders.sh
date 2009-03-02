@@ -1,7 +1,10 @@
 #!/bin/bash
-# author: Bartosz Świątek (shadzik@pld-linux.org)
+# Author: Bartosz Świątek (shadzik@pld-linux.org)
 #
 # helps sending kde4 specs in proper order with or without autotags
+
+# TODO:
+# - get rid of bashism: SENDPRIO+="$spec:$LAST_AUTOTAG "
 
 usage() {
 	echo "Usage: $0 OPTIONS SPECS"
@@ -83,35 +86,35 @@ while [ $# -gt 0 ]; do
 done
 
 specs=`for s in $specs; do
-        case "$s" in
-        all) # all kde4 specs
-                echo $LIBS $BASE $OTHER $KOFFICE
-                ;;
-        libs) # kde4 libs and pimlibs
-                echo $LIBS
-                ;;
-        base) # kde4-kdebase-*
-                echo $BASE
-                ;;
-        other) # kde4-*
-                echo $OTHER
-                ;;
-        koffice) # kde4-koffice
-                echo $KOFFICE
-                ;;
-        almost-all) # all but koffice
-                echo $LIBS $BASE $OTHER
-                ;;
-        *) # not listed ones
-                echo $s
-                ;;
-        esac
+	case "$s" in
+	all) # all kde4 specs
+			echo $LIBS $BASE $OTHER $KOFFICE
+			;;
+	libs) # kde4 libs and pimlibs
+			echo $LIBS
+			;;
+	base) # kde4-kdebase-*
+			echo $BASE
+			;;
+	other) # kde4-*
+			echo $OTHER
+			;;
+	koffice) # kde4-koffice
+			echo $KOFFICE
+			;;
+	almost-all) # all but koffice
+			echo $LIBS $BASE $OTHER
+			;;
+	*) # not listed ones
+			echo $s
+			;;
+	esac
 done`
 
 
 if [ "$ATAG" == "yes" ]; then
 	for spec in $specs; do
-		LAST_AUTOTAG=$(cvs status -v SPECS/$spec |grep auto-$DIST |head -1 |awk '{print $1}')
+		LAST_AUTOTAG=$(cvs status -v SPECS/$spec | awk -vdist=ac '!/Sticky/ && $0 ~ "auto-" dist "-"{if (!a++) print $1}')
 		SENDPRIO+="$spec:$LAST_AUTOTAG "
 	done
 else
