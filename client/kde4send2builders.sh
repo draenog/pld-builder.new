@@ -1,5 +1,7 @@
 #!/bin/bash
-# Author: Bartosz Świątek (shadzik@pld-linux.org)
+# Authors:
+# - Bartosz Świątek (shadzik@pld-linux.org)
+# - Elan Ruusamäe (glen@pld-linux.org)
 #
 # helps sending kde4 specs in proper order with or without autotags
 
@@ -114,7 +116,7 @@ done`
 
 if [ "$ATAG" == "yes" ]; then
 	for spec in $specs; do
-		LAST_AUTOTAG=$(cvs status -v SPECS/$spec | awk -vdist=ac '!/Sticky/ && $0 ~ "auto-" dist "-"{if (!a++) print $1}')
+		LAST_AUTOTAG=$(cvs status -v SPECS/$spec | awk -vdist=$DIST '!/Sticky/ && $0 ~ "auto-" dist "-"{if (!a++) print $1}')
 		SENDPRIO+="$spec:$LAST_AUTOTAG "
 	done
 else
