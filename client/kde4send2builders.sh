@@ -1,5 +1,5 @@
 #!/bin/bash
-# author: Bartosz ¦wi±tek (shadzik@pld-linux.org)
+# author: Bartosz ÅšwiÄ…tek (shadzik@pld-linux.org)
 #
 # helps sending kde4 specs in proper order with or without autotags
 
