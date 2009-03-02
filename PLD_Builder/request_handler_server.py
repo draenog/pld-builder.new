@@ -5,6 +5,7 @@ import string
 import cgi
 import time
 import log
+import sys
 from config import config, init_conf
 
 from os import curdir, sep
@@ -55,7 +56,13 @@ def main():
 		host = ""
 		port = config.request_handler_server_port
 
-		server = HTTPServer((host, port), MyHandler)
+		try:
+			server = HTTPServer((host, port), MyHandler)
+		except Exception, e:
+			log.notice("request_handler_server: can't start server on [%s:%d]: %s" % (host, port, e))
+			print >> sys.stderr, "ERROR: Can't start server on [%s:%d]: %s" % (host, port, e)
+			sys.exit(1)
+
 		log.notice('request_handler_server: started on [%s:%d]...' % (host, port))
 		server.serve_forever()
 	except KeyboardInterrupt:
