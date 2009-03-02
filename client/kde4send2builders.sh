@@ -38,6 +38,7 @@ DIST=
 ATAG=no
 SENDPRIO=
 BUILDER=
+SPECDIR=$(rpm -E %_specdir)
 
 LIBS="kde4-kdelibs.spec kde4-kdepimlibs.spec"
 BASE="kde4-kdebase-runtime.spec kde4-kdebase-workspace.spec kde4-kdebase.spec"
@@ -116,7 +117,7 @@ done`
 
 if [ "$ATAG" == "yes" ]; then
 	for spec in $specs; do
-		LAST_AUTOTAG=$(cvs status -v SPECS/$spec | awk -vdist=$DIST '!/Sticky/ && $1 ~ "^auto-" dist "-"{if (!a++) print $1}')
+		LAST_AUTOTAG=$(cd $SPECDIR && cvs status -v $spec | awk -vdist=$DIST '!/Sticky/ && $1 ~ "^auto-" dist "-"{if (!a++) print $1}')
 		SENDPRIO+="$spec:$LAST_AUTOTAG "
 	done
 else
