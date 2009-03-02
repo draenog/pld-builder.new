@@ -116,7 +116,7 @@ done`
 
 if [ "$ATAG" == "yes" ]; then
 	for spec in $specs; do
-		LAST_AUTOTAG=$(cvs status -v SPECS/$spec | awk -vdist=$DIST '!/Sticky/ && $0 ~ "auto-" dist "-"{if (!a++) print $1}')
+		LAST_AUTOTAG=$(cvs status -v SPECS/$spec | awk -vdist=$DIST '!/Sticky/ && $1 ~ "^auto-" dist "-"{if (!a++) print $1}')
 		SENDPRIO+="$spec:$LAST_AUTOTAG "
 	done
 else
@@ -124,8 +124,7 @@ else
 fi
 
 if [ -z $BUILDER ]; then
-	./pld-builder.new/client/make-request.sh -d $DIST -r $SENDPRIO
-	exit 0
+	exec ./make-request.sh -d $DIST -r $SENDPRIO
 fi
 
-./pld-builder.new/client/make-request.sh -d $DIST -b $BUILDER -r $SENDPRIO
+exec ./make-request.sh -d $DIST -b $BUILDER -r $SENDPRIO
