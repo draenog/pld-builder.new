@@ -1,0 +1,29 @@
+#!/bin/sh
+sock=$(dirname "$0")/request_handler_server.sock 
+daemon=0
+attach=0
+
+if [ x"$1" = x"--daemon" -o x"$1" = x"-d" ]; then
+	daemon=1
+fi
+if [ x"$1" = x"--attach" -o x"$1" = x"-a" ]; then
+	attach=1
+fi
+
+if [ ! -S $sock ]; then
+	daemon=1
+fi
+
+if [ "$daemon" = 1 ]; then
+	cd $(dirname $sock)
+	echo "Starting request_handler_server"
+	rm -f $sock
+	exec dtach -n $(basename $sock) -r none python request_handler_server.py
+	exit 1
+fi
+
+# attach to session
+if [ "$attach" = 1 ]; then
+	echo "Attaching to request_handler_server"
+	exec dtach -a $sock
+fi
