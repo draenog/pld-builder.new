@@ -126,6 +126,7 @@ fi
 
 if [ -z $BUILDER ]; then
 	exec ./make-request.sh -d $DIST -r $SENDPRIO
+	exit 0
 fi
 
 exec ./make-request.sh -d $DIST -b $BUILDER -r $SENDPRIO
