@@ -5,6 +5,7 @@ import string
 import time
 import xml.sax.saxutils
 import fnmatch
+import os
 
 import util
 import log
