@@ -45,7 +45,7 @@ class Group:
         self.priority = 2
         self.time = time.time()
         self.requester = ""
-        self.max_jobs = min(os.sysconf('SC_NPROCESSORS_ONLN'), config.max_jobs)
+        self.max_jobs = max(min(os.sysconf('SC_NPROCESSORS_ONLN'), config.max_jobs), 1)
         self.requester_email = ""
         self.flags = string.split(attr(e, "flags", ""))
         for c in e.childNodes:
@@ -62,7 +62,7 @@ class Group:
             elif c.nodeName == "time":
                 self.time = int(text(c))
             elif c.nodeName == "maxjobs":
-                self.max_jobs = min(int(text(c)), config.max_jobs)
+                self.max_jobs = max(min(int(text(c)), config.max_jobs), 1)
             else:
                 log.panic("xml: evil group child (%s)" % c.nodeName)
         # note that we also check that group is sorted WRT deps
