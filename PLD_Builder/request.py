@@ -9,6 +9,7 @@ import fnmatch
 import util
 import log
 from acl import acl
+from config import config
 
 __all__ = ['parse_request', 'parse_requests']
     
@@ -43,6 +44,7 @@ class Group:
         self.priority = 2
         self.time = time.time()
         self.requester = ""
+        self.max_jobs = min(os.sysconf('SC_NPROCESSORS_ONLN'), config.max_jobs)
         self.requester_email = ""
         self.flags = string.split(attr(e, "flags", ""))
         for c in e.childNodes:
@@ -58,6 +60,8 @@ class Group:
                 self.priority = int(text(c))
             elif c.nodeName == "time":
                 self.time = int(text(c))
+            elif c.nodeName == "maxjobs":
+                self.max_jobs = min(int(text(c)), config.max_jobs)
             else:
                 log.panic("xml: evil group child (%s)" % c.nodeName)
         # note that we also check that group is sorted WRT deps
@@ -86,11 +90,11 @@ class Group:
         f.write("\n")
 
     def dump_html(self, f):
-        f.write("<p><b>%d</b>. %s from %s <small>%s, %d, %s</small><br/>\n" % \
+        f.write("<p><b>%d</b>. %s from %s <small>%s, prio=%d, jobs=%d, %s</small><br/>\n" % \
                 (self.no,
                  escape(time.strftime("%Y.%m.%d %H:%M:%S", time.localtime(self.time))),
                  escape(self.requester),
-                 self.id, self.priority, string.join(self.flags)))
+                 self.id, self.priority, self.max_jobs, string.join(self.flags)))
         f.write("<ul>\n")
         for b in self.batches:
             b.dump_html(f, self.id)
@@ -102,9 +106,10 @@ class Group:
        <group id="%s" no="%d" flags="%s">
          <requester email='%s'>%s</requester>
          <time>%d</time>
-         <priority>%d</priority>\n""" % (self.id, self.no, string.join(self.flags),
+         <priority>%d</priority>
+         <maxjobs>%d</maxjobs>\n""" % (self.id, self.no, string.join(self.flags),
                     escape(self.requester_email), escape(self.requester), 
-                    self.time, self.priority))
+                    self.time, self.priority, self.max_jobs))
         for b in self.batches:
             b.write_to(f)
         f.write("       </group>\n\n")
