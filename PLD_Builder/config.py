@@ -65,6 +65,7 @@ class Builder_Conf:
         self.src_builder = string.strip(get("src_builder", ""))
         self.tag_prefixes = string.split(get("tag_prefixes", ""))
         self.max_keep_time = int(get("max_keep_time", 168))*60*60
+        self.max_jobs = int(get("max_jobs", "1"))
         self.bot_email = get("bot_email", "")
         self.control_url = get("control_url")
         self.request_handler_server_port = int(get("request_handler_server_port", 1234))
@@ -95,7 +96,6 @@ class Builder_Conf:
         self.rpmqa_filename = get("rpmqa_filename")
         self.job_slots = int(get("job_slots"))
         self.max_load = float(get("max_load"))
-        self.max_jobs = int(get("max_jobs", "1"))
         self.rpm_cache_dir = get("rpm_cache_dir", "/spools/ready")
         self.builder_user = get("builder_user", "builder")
         self.sudo_chroot_wrapper = get("sudo_chroot_wrapper", "")
