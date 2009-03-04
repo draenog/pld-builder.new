@@ -130,7 +130,10 @@ def build_rpm(r, b):
                 cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb --define '_smp_mflags -j%d' %s %s" % \
                             (tmpdir, config.nice, max_jobs, rpmbuild_opt, b.spec)
                 b.log_line("building RPM using: %s" % cmd)
+                begin_time = time.time()
                 res = chroot.run(cmd, logfile = b.logfile)
+                end_time = time.time()
+                b.log_line("ended at: %s, done in %s" % time.asctime(), time.strftime("%Hh %Mm %Ss", time.gmtime(end_time - begin_time)))
                 if res:
                     res = "FAIL"
                 files = util.collect_files(b.logfile)
