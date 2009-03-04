@@ -6,6 +6,7 @@ import time
 import xml.sax.saxutils
 import fnmatch
 import os
+import urllib
 
 import util
 import log
@@ -228,7 +229,7 @@ class Batch:
                     is_ok = 1
                 bld = lin_ar.split('-')
                 link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s\">" \
-                     % (bld[0], bld[1], is_ok, bl_name, rid)
+                     % (urllib.quote(bld[0]), urllib.quote(bld[1]), urllib.quote(is_ok), urllib.quote(bl_name), urllib.quote(rid))
                 link_post = "</a>"
             builders.append(link_pre + ("<font color='%s'><b>%s:%s</b></font>" %
                                         (c, b, s)) + link_post)
