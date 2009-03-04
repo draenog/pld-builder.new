@@ -124,8 +124,11 @@ def build_rpm(r, b):
             if ("no-install-br" not in r.flags) and not install.install_br(r, b):
                 res = "FAIL_DEPS_INSTALL"
             if not res:
+                max_jobs = 1
+                if r.max_jobs > 0:
+                    max_jobs = min(config.max_jobs, r.max_jobs)
                 cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb --define '_smp_mflags -j%d' %s %s" % \
-                            (tmpdir, config.nice, r.max_jobs, rpmbuild_opt, b.spec)
+                            (tmpdir, config.nice, max_jobs, rpmbuild_opt, b.spec)
                 b.log_line("building RPM using: %s" % cmd)
                 res = chroot.run(cmd, logfile = b.logfile)
                 if res:
