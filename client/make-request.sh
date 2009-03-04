@@ -105,6 +105,7 @@ usage() {
 	echo "       Disables package upgrade (for use with -r)"
 	echo "  -ni  -no-install-br"
 	echo "       Do not install missing BuildRequires (--nodeps)"
+	echo "  -j   Number of parallel jobs for single build"
 	echo "  -f   --flag"
 	echo "  -d   --distro"
 	echo "       Specify value for \$distro"
@@ -198,6 +199,11 @@ while [ $# -gt 0 ] ; do
 
 		--no-install-br | -ni )
 			flags="$flags no-install-br"
+			;;
+
+		-j )
+			jobs="$2"
+			shift
 			;;
 
 		--flag | -f )
@@ -366,6 +372,9 @@ gen_req() {
 	echo "<group id='$id' no='0' flags='$flags'>"
 	echo "	<time>$(date +%s)</time>"
 	echo "	<priority>$priority</priority>"
+	if [ -n "$jobs" ]; then
+		echo "	<maxjobs>$jobs</maxjobs>"
+	fi
 	echo
 
 	if [ "$command" != "" ] ; then
@@ -382,6 +391,9 @@ gen_req() {
 	else
 
 	echo >&2 "* Using priority $priority"
+	if [ -n "$jobs" ]; then
+		echo >&2 "* Using jobs $jobs"
+	fi
 	echo >&2 "* Using email $builder_email"
 	echo >&2 "* Build mode: $build_mode"
 	if [ "$f_upgrade" = "yes" ] ; then
