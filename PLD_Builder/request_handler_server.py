@@ -6,6 +6,7 @@ import cgi
 import time
 import log
 import sys
+import traceback
 from config import config, init_conf
 
 from os import curdir, sep
@@ -45,7 +46,7 @@ class MyHandler(BaseHTTPRequestHandler):
 		except Exception, e:
 			self.send_error(500)
 			self.end_headers()
-			log.error("request_handler_server: [%s]: exception: %s" % (self.client_address[0], e))
+			log.error("request_handler_server: [%s]: exception: %s\n%s" % (self.client_address[0], e, traceback.format_exc()))
 			raise
 			pass
 
