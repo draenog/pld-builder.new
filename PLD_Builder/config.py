@@ -65,7 +65,7 @@ class Builder_Conf:
         self.src_builder = string.strip(get("src_builder", ""))
         self.tag_prefixes = string.split(get("tag_prefixes", ""))
         self.max_keep_time = int(get("max_keep_time", 168))*60*60
-        self.max_jobs = int(get("max_jobs", "1"))
+        self.max_jobs = int(get("max_jobs"))
         self.bot_email = get("bot_email", "")
         self.control_url = get("control_url")
         self.request_handler_server_port = int(get("request_handler_server_port", 1234))
