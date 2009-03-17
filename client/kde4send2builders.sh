@@ -65,7 +65,6 @@ while [ $# -gt 0 ]; do
 
 		--with-auto-tag | -at )
 			ATAG=yes
-			shift
 			;;
 
 		--builder | -b )
@@ -124,6 +123,6 @@ else
 	SENDPRIO=$specs
 fi
 
-exec ./make-request.sh -d $DIST ${BUILDER:+-b $BUILDER} -r $SENDPRIO
+exec ~/rpm/pld-builder.new/client/make-request.sh -d $DIST ${BUILDER:+-b $BUILDER} -r $SENDPRIO
 echo >&2 "Failed to execute ./make-request.sh!"
 exit 1
