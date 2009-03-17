@@ -123,6 +123,7 @@ else
 	SENDPRIO=$specs
 fi
 
-exec ~/rpm/pld-builder.new/client/make-request.sh -d $DIST ${BUILDER:+-b $BUILDER} -r $SENDPRIO
+dir=$(dirname "$0")
+exec $dir/make-request.sh -d $DIST ${BUILDER:+-b $BUILDER} -r $SENDPRIO
 echo >&2 "Failed to execute ./make-request.sh!"
 exit 1
