@@ -1,12 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 # Authors:
 # - Bartosz Świątek (shadzik@pld-linux.org)
 # - Elan Ruusamäe (glen@pld-linux.org)
 #
 # helps sending kde4 specs in proper order with or without autotags
-
-# TODO:
-# - get rid of bashism: SENDPRIO+="$spec:$LAST_AUTOTAG "
 
 usage() {
 	echo "Usage: $0 OPTIONS SPECS"
@@ -117,13 +114,13 @@ done`
 if [ "$ATAG" == "yes" ]; then
 	for spec in $specs; do
 		LAST_AUTOTAG=$(cd $SPECDIR && cvs status -v $spec | awk -vdist=$DIST '!/Sticky/ && $1 ~ "^auto-" dist "-"{if (!a++) print $1}')
-		SENDPRIO+="$spec:$LAST_AUTOTAG "
+		SENDPRIO="$SENDPRIO $spec:$LAST_AUTOTAG "
 	done
 else
 	SENDPRIO=$specs
 fi
 
 dir=$(dirname "$0")
-exec $dir/make-request.sh -d $DIST ${BUILDER:+-b $BUILDER} -r $SENDPRIO
+exec $dir/make-request.sh ${DIST:+-d $DIST} ${BUILDER:+-b $BUILDER} -r $SENDPRIO
 echo >&2 "Failed to execute ./make-request.sh!"
 exit 1
