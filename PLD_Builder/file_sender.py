@@ -70,8 +70,8 @@ def rsync_file(src, target, host):
         rsync += " --password-file .rsync.pass"
     f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
     problem = f.read()
-    res = f.close()
-    if password != None: os.unlink(".rsync.pass")
+    if password != None:
+        os.unlink(".rsync.pass")
     return f.close()
 
 def rsync_ssh_file(src, target):
