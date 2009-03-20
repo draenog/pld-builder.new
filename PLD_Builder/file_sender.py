@@ -79,7 +79,6 @@ def rsync_ssh_file(src, target):
     rsync = "rsync --verbose --archive -e ssh"
     f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
     problem = f.read()
-    res = f.close()
     return f.close()
 
 def post_file(src, url):
