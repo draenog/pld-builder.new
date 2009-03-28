@@ -21,12 +21,13 @@ usage() {
 	echo ""
 	echo "Choose SPECS out of:"
 	echo ""
-	echo "all - all kde4-* (libs, base, other, koffice)"
+	echo "all - all kde4-* (libs, base, other, koffice, l10n)"
 	echo "libs - kde4-kdelibs and kde4-kdepimlibs"
 	echo "base - kde4-kdebase*"
 	echo "other - all other kde4-* except libs and base"
 	echo "koffice - kde4-koffice"
-	echo "almost-all - all but koffice"
+	echo "l10n - kde4-l10n"
+	echo "almost-all - all but koffice and l10n"
 	echo ""
 	exit 0
 }
@@ -48,10 +49,12 @@ kde4-kdeartwork.spec \
 kde4-kdegames.spec \
 kde4-kdewebdev.spec \
 kde4-kdeutils.spec \
+kde4-kdeaccessibility \
 kde4-kdeedu.spec \
 kde4-kdesdk.spec \
 kde4-kdebindings.spec"
 KOFFICE="kde4-koffice.spec"
+L10N="kde4-l10n.spec"
 
 while [ $# -gt 0 ]; do
 	case "$1" in
@@ -87,7 +90,7 @@ done
 specs=`for s in $specs; do
 	case "$s" in
 	all) # all kde4 specs
-			echo $LIBS $BASE $OTHER $KOFFICE
+			echo $LIBS $BASE $OTHER $KOFFICE L10N
 			;;
 	libs) # kde4 libs and pimlibs
 			echo $LIBS
@@ -101,7 +104,10 @@ specs=`for s in $specs; do
 	koffice) # kde4-koffice
 			echo $KOFFICE
 			;;
-	almost-all) # all but koffice
+	l10n) # kde4-l10n
+			echo $L10N
+			;;
+	almost-all) # all but koffice and l10n
 			echo $LIBS $BASE $OTHER
 			;;
 	*) # not listed ones
