@@ -91,7 +91,7 @@ def prepare_env():
     chroot.run("test ! -e /dev/urandom && mknod /dev/urandom c 1 9 && chmod 644 /dev/urandom", 'root')
     chroot.run("test ! -e /dev/zero && mknod /dev/zero c 1 5 && chmod 666 /dev/zero", 'root')
     # try to limit network access for builder account
-    chroot.run("/bin/setfacl -m u:builder:--- /etc/resolv.conf")
+    chroot.run("/bin/setfacl -m u:builder:--- /etc/resolv.conf", 'root')
 
 def build_rpm(r, b):
     status.push("building %s" % b.spec)
