@@ -49,6 +49,9 @@ class Builder_Conf:
         
         p.readfp(open(path.builder_conf))
 
+        self.admin_email = get("admin_email")
+        self.email = self.admin_email
+
         if p.has_option("all", "syslog"):
             f = p.get("all", "syslog")
             if f != "":
@@ -65,11 +68,9 @@ class Builder_Conf:
         self.src_builder = string.strip(get("src_builder", ""))
         self.tag_prefixes = string.split(get("tag_prefixes", ""))
         self.max_keep_time = int(get("max_keep_time", 168))*60*60
-        self.max_jobs = int(get("max_jobs"))
         self.bot_email = get("bot_email", "")
         self.control_url = get("control_url")
         self.request_handler_server_port = int(get("request_handler_server_port", 1234))
-        self.admin_email = get("admin_email")
         self.builder_list = get("builder_list", "")
         self.gen_upinfo = get("gen_upinfo", "yes")
         if self.gen_upinfo == 'no':
@@ -78,16 +79,16 @@ class Builder_Conf:
             self.gen_upinfo = True
         status.admin = self.admin_email
         status.builder_list = self.builder_list
-        self.email = self.admin_email
+        self.max_jobs = int(get("max_jobs"))
 
         if builder == "all":
             return
 
+        self.email = get("email")
         if builder not in p.sections():
             log.panic("builder %s not in config file" % builder)
         self.arch = get("arch")
         self.chroot = get("chroot")
-        self.email = get("email")
         self.buildlogs_url = get("buildlogs_url", "/dev/null")
         self.ftp_url = get("ftp_url")
         self.notify_url = get("notify_url")
