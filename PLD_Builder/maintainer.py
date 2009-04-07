@@ -21,7 +21,7 @@ def clean_dir(path, max):
                 os.unlink(path+'/'+i)
 
 def send_rpmqa():
-    tmp = path.build_dir + util.uuid() + '/'
+    tmp = path.build_dir + '/' + util.uuid() + '/'
     os.mkdir(tmp)
     log = tmp + config.rpmqa_filename
     open(log, 'a').write("Query done at: %s\n" % datetime.datetime.now().isoformat(' '))
@@ -35,7 +35,7 @@ def send_rpmqa():
 
 def handle_src():
     send_rpmqa()
-    clean_dir(path.www_dir+'srpms', 2592000) # a month
+    clean_dir(path.www_dir+'/srpms', 2592000) # a month
 
 def handle_bin():
     send_rpmqa()
@@ -61,7 +61,7 @@ def handle_bin():
 if __name__ == '__main__':
     init_conf()
     bb=config.binary_builders[:]
-    clean_dir(path.spool_dir+'builds', 2592000) # a month
+    clean_dir(path.spool_dir+'/builds', 2592000) # a month
     if config.src_builder:
         try:
             init_conf(config.src_builder)

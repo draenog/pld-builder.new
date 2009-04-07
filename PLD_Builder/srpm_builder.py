@@ -69,7 +69,7 @@ def store_binary_request(r):
     os.chmod(path.max_req_no_file, 0644)
 
 def transfer_file(r, b):
-    local = path.srpms_dir + r.id + "/" + b.src_rpm
+    local = path.srpms_dir + '/' + r.id + "/" + b.src_rpm
     f = b.src_rpm_file
     # export files from chroot
     chroot.cp(f, outfile = local, rm = True)
@@ -77,7 +77,7 @@ def transfer_file(r, b):
     ftp.add(local)
 
     if config.gen_upinfo and 'test-build' not in r.flags:
-        fname = path.srpms_dir + r.id + "/" + b.src_rpm + ".uploadinfo"
+        fname = path.srpms_dir + '/' + r.id + "/" + b.src_rpm + ".uploadinfo"
         f = open(fname, "w")
         f.write("info:build:%s:requester:%s\ninfo:build:%s:requester_email:%s\nfile:SRPMS:%s\nEND\n" % (b.gb_id, b.requester, b.gb_id, b.requester_email, b.src_rpm))
         f.close()
@@ -125,8 +125,8 @@ def build_srpm(r, b):
     return res
 
 def handle_request(r):
-    os.mkdir(path.srpms_dir + r.id)
-    os.chmod(path.srpms_dir + r.id, 0755)
+    os.mkdir(path.srpms_dir + '/' + r.id)
+    os.chmod(path.srpms_dir + '/' + r.id, 0755)
     ftp.init(r)
     buildlogs.init(r)
     build.build_all(r, build_srpm)

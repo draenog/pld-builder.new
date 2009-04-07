@@ -32,9 +32,9 @@ class FTP_Queue:
             return
         name = os.path.basename(file)
         id = util.uuid()
-        shutil.copy(file, path.ftp_queue_dir + id)
+        shutil.copy(file, path.ftp_queue_dir + '/' + id)
         self.queue.append({'name': name, 'id': id, 'type': type})
-        st = os.stat(path.ftp_queue_dir + id)
+        st = os.stat(path.ftp_queue_dir + '/' + id)
         self.status += "%10d %s\n" % (st.st_size, name)
 
     def flush(self):
@@ -48,13 +48,13 @@ END
 """ % (self.url, l['name'], config.builder, time.time(), l['type'], self.requester_email)
         
         for l in self.queue:
-            f = open(path.ftp_queue_dir + l['id'] + ".desc", "w")
+            f = open(path.ftp_queue_dir + '/' + l['id'] + ".desc", "w")
             f.write(desc(l))
             f.close()
 
     def kill(self):
         for l in self.queue:
-            os.unlink(path.ftp_queue_dir + l)
+            os.unlink(path.ftp_queue_dir + '/' + l)
 
 queue = FTP_Queue()
 

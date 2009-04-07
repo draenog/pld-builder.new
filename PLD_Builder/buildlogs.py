@@ -23,13 +23,13 @@ class Buildlogs_Queue:
             return
         name = re.sub(r"\.spec\.log", "", os.path.basename(logfile)) + "," + id + ".bz2"
         ret = os.system("bzip2 --best --force < %s > %s" \
-                    % (logfile, path.buildlogs_queue_dir + id))
+                    % (logfile, path.buildlogs_queue_dir + '/' + id))
         if ret:
             log.error("bzip2 compression of %s failed; does bzip2 binary exist?" % (logfile))
 
         if failed: s = "FAIL"
         else: s = "OK"
-        f = open(path.buildlogs_queue_dir + id + ".info", "w")
+        f = open(path.buildlogs_queue_dir + '/' + id + ".info", "w")
         f.write("Status: %s\nEND\n" % s)
         f.close()
 
@@ -46,7 +46,7 @@ END
 """ % (config.buildlogs_url, l['name'], config.builder, time.time(), self.requester_email)
         
         for l in self.queue:
-            f = open(path.buildlogs_queue_dir + l['id'] + ".desc", "w")
+            f = open(path.buildlogs_queue_dir + '/' + l['id'] + ".desc", "w")
             f.write(desc(l))
             f.close()
 

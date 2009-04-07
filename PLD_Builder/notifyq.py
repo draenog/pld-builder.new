@@ -20,7 +20,7 @@ class Notify_Queue:
         
     def add(self, file):
         id = util.uuid()
-        f = open(path.notify_queue_dir + id, 'w')
+        f = open(path.notify_queue_dir + '/' + id, 'w')
         f.write(file.read())
         f.close()
         self.queue.append({'id': id})
@@ -36,13 +36,13 @@ END
 """ % (self.notify_url, l['id'], config.builder, time.time(), self.requester_email)
         
         for l in self.queue:
-            f = open(path.notify_queue_dir + l['id'] + ".desc", "w")
+            f = open(path.notify_queue_dir + '/' + l['id'] + ".desc", "w")
             f.write(desc(l))
             f.close()
 
     def kill(self):
         for l in self.queue:
-            os.unlink(path.notify_queue_dir + l)
+            os.unlink(path.notify_queue_dir + '/' + l)
 
 queue = Notify_Queue()
 

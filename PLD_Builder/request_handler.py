@@ -123,7 +123,7 @@ def handle_notification(r, user):
     r.apply_to(q)
     for r in not_fin:
         if r.is_done():
-            util.clean_tmp(path.srpms_dir + r.id)
+            util.clean_tmp(path.srpms_dir + '/' + r.id)
     now = time.time()
     def leave_it(r):
         # for ,,done'' set timeout to 4d
@@ -131,7 +131,7 @@ def handle_notification(r, user):
             return False
         # and for not ,,done'' set it to 20d
         if r.time + 20 * 24 * 60 * 60 < now:
-            util.clean_tmp(path.srpms_dir + r.id)
+            util.clean_tmp(path.srpms_dir + '/' + r.id)
             return False
         return True
     q.requests = filter(leave_it, q.requests)

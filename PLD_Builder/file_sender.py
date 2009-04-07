@@ -120,20 +120,20 @@ def send_file(src, target):
 def maybe_flush_queue(dir):
     retry_delay = 0
     try:
-        f = open(dir + "retry-at")
+        f = open(dir + "/retry-at")
         last_retry = int(string.strip(f.readline()))
         retry_delay = int(string.strip(f.readline()))
         f.close()
         if last_retry + retry_delay > time.time():
             return
-        os.unlink(dir + "retry-at")
+        os.unlink(dir + "/retry-at")
     except:
         pass
         
     status.push("flushing %s" % dir)
 
     if flush_queue(dir):
-        f = open(dir + "retry-at", "w")
+        f = open(dir + "/retry-at", "w")
         if retry_delay in retries_times:
             idx = retries_times.index(retry_delay)
             if idx < len(retries_times) - 1: idx += 1
