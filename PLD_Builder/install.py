@@ -152,12 +152,12 @@ def install_br(r, b):
     b.log_line("checking conflicting packages in BRed packages")
     f = chroot.popen("poldek --test --noask --caplookup -Q -v --upgrade %s" % br, user = "root")
     # phonon-devel-4.3.1-1.i686 conflicts with qt4-phonon-devel-4.5.0-6.i686
-    rx = re.compile(r".*conflicts with( installed|) ([^\s]+)-[^-]+-[^-]+($| .*)")
+    rx = re.compile(r".*conflicts with( installed|) (?P<name>[^\s]+)-[^-]+-[^-]+($| .*)")
     conflicting = {}
     for l in f.xreadlines():
         b.log_line("poldek: %s" % l.rstrip())
         m = rx.search(l)
-        if m: conflicting[m.group(1)] = 1
+        if m: conflicting[m.group('name')] = 1
     f.close()
     if len(conflicting) == 0:
         b.log_line("no conflicts found")
