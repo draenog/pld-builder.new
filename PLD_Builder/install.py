@@ -158,7 +158,8 @@ def install_br(r, b):
     b.log_line("checking conflicting packages in BRed packages")
     f = chroot.popen("poldek --test --noask --caplookup -Q -v --upgrade %s" % br, user = "root")
     # phonon-devel-4.3.1-1.i686 conflicts with qt4-phonon-devel-4.5.0-6.i686
-    rx = re.compile(r".*conflicts with( installed|) (?P<name>[^\s]+)-[^-]+-[^-]+($| .*)")
+    # jdbc-stdext >= 2.0 is required by installed java-struts-1.3.10-1.noarch
+    rx = re.compile(r".*(conflicts with|is required by)( installed|) (?P<name>[^\s]+)-[^-]+-[^-]+($| .*)")
     conflicting = {}
     for l in f.xreadlines():
         b.log_line("poldek: %s" % l.rstrip())
