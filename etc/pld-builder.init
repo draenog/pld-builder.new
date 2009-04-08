@@ -39,7 +39,7 @@ chroots_status() {
 	local ret
 	for CHROOT in $CHROOTS; do
 		show "chroot: %s is /proc mounted?" "$CHROOT"
-		ret=$(chroot $CHROOT mount -v 2> /dev/null | grep -q 'none.*/proc'; echo $?)
+		ret=$(chroot $CHROOT mount 2> /dev/null | grep -q 'none.*/proc'; echo $?)
 		[ $ret -eq 0 ] && ok || fail
 	done
 }
