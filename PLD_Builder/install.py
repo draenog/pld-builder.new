@@ -20,7 +20,7 @@ def close_killset(killset):
     k = killset.keys()
     if len(k) == 0:
         return True
-    rx = re.compile(r'^.* marks ([^\s]+?)-[^-]+-[^-]+\s.*$')
+    rx = re.compile(r'^.* marks (?P<name>[^\s]+?)-[^-]+-[^-]+\s.*$')
     errors = ""
     for p in k:
         if p in hold:
@@ -33,7 +33,7 @@ def close_killset(killset):
             for l in f.xreadlines():
                 m = rx.search(l)
                 if m:
-                    pkg = m.group(1)
+                    pkg = m.group('name')
                     if pkg in hold:
                         errors += "cannot remove %s because it's required " \
                                   "by %s, that is crucial\n" % (p, pkg)
@@ -50,10 +50,10 @@ def close_killset(killset):
 def upgrade_from_batch(r, b):
     f = chroot.popen("rpm --test -F %s 2>&1" % string.join(b.files), user = "root")
     killset = {}
-    rx = re.compile(r' \(installed\) ([^\s]+)-[^-]+-[^-]+$')
+    rx = re.compile(r' \(installed\) (?P<name>[^\s]+)-[^-]+-[^-]+$')
     for l in f.xreadlines():
         m = rx.search(l)
-        if m: killset[m.group(1)] = 1
+        if m: killset[m.group('name')] = 1
     f.close()
     if len(killset) != 0:
         err = close_killset(killset)
@@ -107,13 +107,13 @@ def uninstall_self_conflict(b):
             % (tmpdir, rpmbuild_opt, b.spec))
     # java-sun >= 1.5 conflicts with soprano-2.1.67-1.src
     # java-sun conflicts with soprano-2.1.67-1.src
-    rx = re.compile(r"\s+([\w-]+)\s+.*conflicts with [^\s]+-[^-]+-[^-]+\.src($| .*)")
+    rx = re.compile(r"\s+(?P<name>[\w-]+)\s+.*conflicts with [^\s]+-[^-]+-[^-]+\.src($| .*)")
     conflicting = {}
     for l in f.xreadlines():
         m = rx.search(l)
         if m:
             b.log_line("rpmbuild: %s" % l.rstrip())
-            conflicting[m.group(1)] = 1
+            conflicting[m.group('name')] = 1
     f.close()
     if len(conflicting) and not uninstall(conflicting, b):
         return False
@@ -129,14 +129,14 @@ def install_br(r, b):
     cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild --nobuild %s %s 2>&1" \
                 % (tmpdir, b.bconds_string(), b.spec)
     f = chroot.popen(cmd)
-    rx = re.compile(r"^\s*([^\s]+) .*is needed by")
+    rx = re.compile(r"^\s*(?P<name>[^\s]+) .*is needed by")
     needed = {}
     b.log_line("checking BR")
     for l in f.xreadlines():
         b.log_line("rpm: %s" % l.rstrip())
         m = rx.search(l)
         if m and not ignore_br.match(l):
-            needed[m.group(1)] = 1
+            needed[m.group('name')] = 1
     f.close()
     chroot.run("rm -rf %s" % tmpdir)
     if len(needed) == 0:
