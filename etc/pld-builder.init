@@ -46,32 +46,34 @@ chroots_status() {
 
 start() {
 	# Check if the service is already running?
-	if [ ! -f /var/lock/subsys/pld-builder ]; then
-		if [ -z "$CHROOTS" ]; then
-			# no chroots configured. return and be silent
-			return
-		fi
-		msg_starting "PLD Linux Builder"
-		busy; echo
-		mount_chroots
-		RETVAL=$?
-		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/pld-builder
-	else
+	if [ -f /var/lock/subsys/pld-builder ]; then
 		msg_already_running "PLD Linux Builder"
+		return
 	fi
+
+	if [ -z "$CHROOTS" ]; then
+		# no chroots configured. return and be silent
+		return
+	fi
+	msg_starting "PLD Linux Builder"
+	busy; echo
+	mount_chroots
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/pld-builder
 }
 
 stop() {
-	if [ -f /var/lock/subsys/pld-builder ]; then
-		# Stop daemons.
-		msg_stopping "PLD Linux Builder"
-		busy; echo
-		umount_chroots
-		RETVAL=0
-		rm -f /var/lock/subsys/pld-builder
-	else
+	if [ ! -f /var/lock/subsys/pld-builder ]; then
 		msg_not_running "PLD Linux Builder"
+		return
 	fi
+
+	# Stop daemons.
+	msg_stopping "PLD Linux Builder"
+	busy; echo
+	umount_chroots
+	RETVAL=0
+	rm -f /var/lock/subsys/pld-builder
 }
 
 condrestart() {
@@ -99,23 +101,16 @@ case "$1" in
   try-restart)
 	condrestart 0
 	;;
-  reload|force-reload)
-  	reload
+  force-reload)
+	condrestart 7
 	;;
   status)
 	chroots_status
 	RETVAL=$?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|force-reload|status}"
 	exit 3
 	;;
 esac
-
-unset -f pld_builder_start
-unset -f pld_builder_restart
-unset -f pld_builder_reload
-unset -f pld_builder_status
-unset -f pld_builder_stop
-
 exit $RETVAL
