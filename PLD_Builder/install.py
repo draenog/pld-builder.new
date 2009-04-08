@@ -121,27 +121,33 @@ def uninstall_self_conflict(b):
     return True
 
 def install_br(r, b):
-    # ignore internal rpm dependencies, see lib/rpmns.c for list
-    ignore_br = re.compile(r'^\s*(rpmlib|cpuinfo|getconf|uname|soname|user|group|mounted|diskspace|digest|gnupg|macro|envvar|running|sanitycheck|vcheck|signature|verify|exists|executable|readable|writable)\(.*')
+    def get_missing_br(r, b):
+        # ignore internal rpm dependencies, see lib/rpmns.c for list
+        ignore_br = re.compile(r'^\s*(rpmlib|cpuinfo|getconf|uname|soname|user|group|mounted|diskspace|digest|gnupg|macro|envvar|running|sanitycheck|vcheck|signature|verify|exists|executable|readable|writable)\(.*')
 
-    tmpdir = "/tmp/BR." + b.b_id[0:6]
-    chroot.run("install -m 700 -d %s" % tmpdir)
-    cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild --nobuild %s %s 2>&1" \
-                % (tmpdir, b.bconds_string(), b.spec)
-    f = chroot.popen(cmd)
-    rx = re.compile(r"^\s*(?P<name>[^\s]+) .*is needed by")
-    needed = {}
-    b.log_line("checking BR")
-    for l in f.xreadlines():
-        b.log_line("rpm: %s" % l.rstrip())
-        m = rx.search(l)
-        if m and not ignore_br.match(l):
-            needed[m.group('name')] = 1
-    f.close()
-    chroot.run("rm -rf %s" % tmpdir)
+        tmpdir = "/tmp/BR." + b.b_id[0:6]
+        chroot.run("install -m 700 -d %s" % tmpdir)
+        cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild --nobuild %s %s 2>&1" \
+                    % (tmpdir, b.bconds_string(), b.spec)
+        f = chroot.popen(cmd)
+        rx = re.compile(r"^\s*(?P<name>[^\s]+) .*is needed by")
+        needed = {}
+        b.log_line("checking BR")
+        for l in f.xreadlines():
+            b.log_line("rpm: %s" % l.rstrip())
+            m = rx.search(l)
+            if m and not ignore_br.match(l):
+                needed[m.group('name')] = 1
+        f.close()
+        chroot.run("rm -rf %s" % tmpdir)
+        return needed
+
+    needed = get_missing_br(r, b);
+
     if len(needed) == 0:
         b.log_line("no BR needed")
         return True
+
     nbr = ""
     for bre in needed.keys():
         nbr = nbr + " " + re.escape(bre)
@@ -164,6 +170,19 @@ def install_br(r, b):
     else:
         if not uninstall(conflicting, b):
             return False
+
+    # recheck BuildRequires since above uninstallation could remove some required deps
+    needed = get_missing_br(r, b);
+
+    if len(needed) == 0:
+        b.log_line("no BR needed")
+        return True
+    
+    nbr = ""
+    for bre in needed.keys():
+        nbr = nbr + " " + re.escape(bre)
+    br = string.strip(nbr)
+
     b.log_line("installing BR: %s" % br)
     res = chroot.run("poldek --noask --caplookup -Q -v --upgrade %s" % br,
             user = "root",
