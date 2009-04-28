@@ -91,7 +91,7 @@ def build_srpm(r, b):
                     tag_test=""
     else:
                     tag_test=" -Tp %s -tt" % (config.tag_prefixes[0],)
-    cmd = ("cd rpm/SPECS; nice -n %s ./builder %s -bs %s -r %s %s %s %s 2>&1" %
+    cmd = ("cd rpm/packages; nice -n %s ./builder %s -bs %s -r %s %s %s %s 2>&1" %
              (config.nice, builder_opts, b.bconds_string(), b.branch, 
               tag_test, b.kernel_string(), b.spec))
     util.append_to(b.logfile, "request from: %s" % r.requester)
@@ -118,9 +118,10 @@ def build_srpm(r, b):
                         (b.branch, pref, b.spec), logfile = b.logfile)
     if res == 0:
         transfer_file(r, b)
-    chroot.run("cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
+    packagedir = "rpm/packages/%s" % b.spec[:-5]
+    chroot.run("cd %s; rpmbuild --nodeps --nobuild --define '_specdir %s' --define '_sourcedir %s' " \
                          "--clean --rmspec --rmsource %s" % \
-                         b.spec, logfile = b.logfile)
+                         (packagedir, packagedir, b.spec), logfile = b.logfile)
     status.pop()
     return res
 
