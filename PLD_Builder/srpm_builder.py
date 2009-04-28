@@ -123,7 +123,7 @@ def build_srpm(r, b):
     chroot.run("cd %s; rpmbuild --nodeps --nobuild --define '_specdir %s' --define '_sourcedir %s' " \
             "--clean --rmspec --rmsource %s" % \
             (packagedir, packagedir, packagedir, b.spec), logfile = b.logfile)
-    chroot.run("rm -rf %s" % packagedir)
+    chroot.run("rm -rf %s" % packagedir, logfile = b.logfile)
     status.pop()
     return res
 
