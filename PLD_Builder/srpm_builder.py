@@ -120,7 +120,8 @@ def build_srpm(r, b):
     if res == 0:
         transfer_file(r, b)
     packagedir = "/home/users/builder/rpm/packages/%s" % b.spec[:-5]
-    shutil.rmtree(packagedir)
+    if os.path.isdir(packagedir):
+        shutil.rmtree(packagedir)
     status.pop()
     return res
 
