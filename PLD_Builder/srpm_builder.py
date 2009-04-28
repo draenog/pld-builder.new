@@ -7,6 +7,7 @@ import os
 import StringIO
 import sys
 import re
+import shutil
 import atexit
 
 import gpg
@@ -114,14 +115,12 @@ def build_srpm(r, b):
     if res == 0 and not "test-build" in r.flags:
         for pref in config.tag_prefixes:
             util.append_to(b.logfile, "Tagging with prefix: %s" % pref)
-            res = chroot.run("cd rpm/SPECS; ./builder -r %s -Tp %s -Tv %s" % \
+            res = chroot.run("cd rpm/packages; ./builder -r %s -Tp %s -Tv %s" % \
                         (b.branch, pref, b.spec), logfile = b.logfile)
     if res == 0:
         transfer_file(r, b)
-    packagedir = "rpm/packages/%s" % b.spec[:-5]
-    chroot.run("cd %s; rpmbuild --nodeps --nobuild --define '_specdir %s' --define '_sourcedir %s' " \
-                         "--clean --rmspec --rmsource %s" % \
-                         (packagedir, packagedir, packagedir, b.spec), logfile = b.logfile)
+    packagedir = "/home/users/builder/rpm/packages/%s" % b.spec[:-5]
+    shutil.rmtree(packagedir)
     status.pop()
     return res
 
