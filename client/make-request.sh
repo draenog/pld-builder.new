@@ -227,7 +227,7 @@ while [ $# -gt 0 ] ; do
 			shift
 			;;
 		--remove-pkg)
-			command="poldek -ev --noask $2"
+			command="for a in $2; do poldek -ev --noask \$a; done"
 			f_upgrade=no
 			shift
 			;;
