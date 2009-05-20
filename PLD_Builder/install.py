@@ -67,7 +67,6 @@ def upgrade_from_batch(r, b):
             res = chroot.run("rpm -e %s" % k, logfile = b.logfile, user = "root")
             if res != 0:
                 b.log_line("package removal failed")
-                return False
             else:
                 b.log_line("packages removed sucessfuly")
         else:
