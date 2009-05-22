@@ -67,6 +67,7 @@ def upgrade_from_batch(r, b):
             res = chroot.run("rpm -e %s" % k, logfile = b.logfile, user = "root")
             if res != 0:
                 b.log_line("package removal failed")
+                return False
             else:
                 b.log_line("packages removed sucessfuly")
         else:
@@ -90,12 +91,11 @@ def uninstall(conflicting, b):
         b.log_line("error: conflicting packages uninstallation failed")
         return False
     else:
-        k = string.join(conflicting.keys())
-        b.log_line("removing %s" % k)
-        res = chroot.run("poldek --noask --erase %s" % k, logfile = b.logfile, user = "root")
-        if res != 0:
-            b.log_line("package removal failed")
-            return False
+        for k in conflicting.keys():
+            b.log_line("removing %s" % k)
+            res = chroot.run("poldek --noask --erase %s" % k, logfile = b.logfile, user = "root")
+            if res != 0:
+                b.log_line("package %s removal failed" % k)
     return True
 
 def uninstall_self_conflict(b):
