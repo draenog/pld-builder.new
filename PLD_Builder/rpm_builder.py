@@ -162,7 +162,7 @@ def build_rpm(r, b):
         rpm_cache_dir = config.rpm_cache_dir
         if "test-build" not in r.flags:
             # NOTE: copying to cache dir doesn't mean that build failed, so ignore result
-            b.log_line("copy rpm files to cache_dir=%s" % rpm_cache_dir)
+            b.log_line("copy rpm files to cache_dir: %s" % rpm_cache_dir)
             chroot.run(
                     "cp -f %s %s && poldek --mo=nodiff --mkidxz -s %s/" % \
                         (string.join(b.files), rpm_cache_dir, rpm_cache_dir),
