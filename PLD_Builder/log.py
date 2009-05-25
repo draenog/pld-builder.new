@@ -9,6 +9,10 @@ import path
 builder = ""
 do_syslog = 0
 
+# string containing last log entry,
+# as the code is flawed to get this otherwise
+_last_log = ""
+
 def log(p, s):
     if do_syslog:
         try:
@@ -18,6 +22,7 @@ def log(p, s):
     f = open(path.log_file, "a")
     f.write("%s [%s]: %s\n" % (time.asctime(), builder, s))
     f.close()
+    _last_log = s
     
 def panic(s):
     log(syslog.LOG_ALERT, "PANIC: %s" % s)
@@ -39,3 +44,6 @@ def open_syslog(name, f):
     global do_syslog
     do_syslog = 1
     syslog.openlog(name, syslog.LOG_PID, f)
+
+def last_log():
+    return _last_log
