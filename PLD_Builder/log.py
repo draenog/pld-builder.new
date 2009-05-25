@@ -14,6 +14,9 @@ do_syslog = 0
 _last_log = ""
 
 def log(p, s):
+    global _last_log
+    _last_log = s
+
     if do_syslog:
         try:
             syslog.syslog(p, str(s))
@@ -22,7 +25,6 @@ def log(p, s):
     f = open(path.log_file, "a")
     f.write("%s [%s]: %s\n" % (time.asctime(), builder, s))
     f.close()
-    _last_log = s
     
 def panic(s):
     log(syslog.LOG_ALERT, "PANIC: %s" % s)
