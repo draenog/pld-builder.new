@@ -35,8 +35,9 @@ class MyHandler(BaseHTTPRequestHandler):
 			filename = self.headers.getheader('x-filename')
 
 			if not request_handler.handle_request_main(query, filename = filename):
+				error = log.last_log();
 				log.error("request_handler_server: [%s]: handle_request_main(..., %s) failed" % (self.client_address[0], filename))
-				self.send_error(500)
+				self.send_error(500, "%s: request failed. last error: %s" % (filename, error))
 				self.end_headers()
 				return
 
@@ -44,7 +45,7 @@ class MyHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 
 		except Exception, e:
-			self.send_error(500)
+			self.send_error(500, "%s: %s" % (filename, e))
 			self.end_headers()
 			log.error("request_handler_server: [%s]: exception: %s\n%s" % (self.client_address[0], e, traceback.format_exc()))
 			raise
