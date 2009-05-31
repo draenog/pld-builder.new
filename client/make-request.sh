@@ -61,12 +61,12 @@ import sys, urllib2
 try:
         data = sys.stdin.read()
         req = urllib2.Request(sys.argv[1], data)
-        f = urllib2.urlopen(req, timeout=10)
+        f = urllib2.urlopen(req, timeout = 10)
         f.close()
 except Exception, e:
-        print >> sys.stderr, "Problem while sending request: %s" % e
+        print >> sys.stderr, "Problem while sending request via HTTP: %s" % e
         sys.exit(1)
-print >> sys.stdout, "Request queued."
+print >> sys.stdout, "Request queued via HTTP."
 ' "$url"
 		;;
 	esac
