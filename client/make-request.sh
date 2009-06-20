@@ -85,7 +85,7 @@ usage() {
 	echo "       Source additional config file (after $USER_CFG), useful when"
 	echo "       when sending build requests to Ac/Th from the same account"
 	echo "  -b 'BUILDER BUILDER ...'  --builder='BUILDER BUILDER ...'"
-	echo "       Sends request to given builders"
+	echo "       Sends request to given builders (in 'version-arch' format)"
 	echo "  --with VALUE --without VALUE"
 	echo "       Build package with(out) a given bcond"
 	echo "  --kernel VALUE"
@@ -249,9 +249,9 @@ while [ $# -gt 0 ] ; do
 			;;
 
 		--gpg-opts | -g )
-			 gpg_opts="$2"
-			 shift
-			 ;;
+			gpg_opts="$2"
+			shift
+			;;
 
 		--help | -h )
 			usage
