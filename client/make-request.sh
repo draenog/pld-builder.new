@@ -100,7 +100,7 @@ usage() {
 	echo "  -r   --ready-build"
 	echo "       Build and upgrade package and upload it to ready/ tree"
 	echo "  -u   --upgrade"
-	echo "       Forces package upgrade (for use with -t)"
+	echo "       Forces package upgrade (for use with -c or -q, not -t)"
 	echo "  -n   --no-upgrade"
 	echo "       Disables package upgrade (for use with -r)"
 	echo "  -ni  -no-install-br"
