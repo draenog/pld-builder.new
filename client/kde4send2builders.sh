@@ -121,7 +121,8 @@ done`
 if [ "$ATAG" == "yes" ]; then
 	for spec in $specs; do
 		PKG=$(echo $spec |sed -e 's/.spec//g')
-		LAST_AUTOTAG=$(cd $SPECDIR && cvs -z3 up packages/$PKG/$spec && cvs status -v packages/$PKG/$spec | awk -vdist=$DIST '!/Sticky/ && $1 ~ "^auto-" dist "-"{if (!a++) print $1}')
+		LAST_AUTOTAG=$(cd $SPECDIR && cvs -z3 get -A packages/$PKG/$spec >/dev/null 2>&1 && cvs status -v packages/$PKG/$spec | awk -vdist=$DIST '!/Sticky/ && $1 ~ "^auto-" dist "-"{if (!a++) print $1}')
+		sleep 1
 		SENDPRIO="$SENDPRIO $spec:$LAST_AUTOTAG "
 	done
 else
