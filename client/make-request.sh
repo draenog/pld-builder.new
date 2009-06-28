@@ -312,22 +312,22 @@ branch=${branch:-$default_branch}
 specs=`for s in $specs; do
 	case "$s" in
 	*.spec:*) # spec with branch
-		echo $s
+		basename $s
 		;;
 	*.spec) # spec without branch
-		echo $s:$branch
+		echo $(basename $s):$branch
 		;;
 	*:*) # package name with branch
-		echo $s | sed -e 's/:/.spec:/'
+		basename $s | sed -e 's/:/.spec:/'
 		;;
 	*) # just package name
-		echo $s.spec:$branch
+		echo $(basename $s).spec:$branch
 		;;
 	esac
 done`
 
 if [[ "$requester" != *@* ]] ; then
-		requester="$requester@pld-linux.org"
+	requester="$requester@pld-linux.org"
 fi
 
 if [ -z "$builders" ] ; then
