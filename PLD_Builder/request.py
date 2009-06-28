@@ -149,6 +149,8 @@ class Batch:
                 self.src_rpm = text(c)
             elif c.nodeName == "spec":
                 self.spec = text(c)
+                if self.spec.find('/') != -1:
+                    log.panic("xml: evil specname (%s)" % self.spec)
             elif c.nodeName == "command":
                 self.spec = "COMMAND"
                 self.command = text(c)
