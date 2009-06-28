@@ -18,10 +18,9 @@ if [ ! -S $sock ]; then
 	daemon=1
 fi
 
-# attach to session
-if [ "$attach" = 1 ]; then
-	echo "Attaching to request_handler_server"
-	exec dtach -a $sock
+# if none of the modes attach to it
+if [ $daemon = 0 -a $attach = 0 ]; then
+	attach=1
 fi
 
 if [ "$daemon" = 1 ]; then
@@ -29,5 +28,12 @@ if [ "$daemon" = 1 ]; then
 	rm -f $sock
 	cd $(dirname $sock)
 	exec dtach -n $(basename $sock) -r none python request_handler_server.py
+	exit 1
+fi
+
+# attach to session
+if [ "$attach" = 1 ]; then
+	echo "Attaching to request_handler_server"
+	exec dtach -a $sock
 	exit 1
 fi
