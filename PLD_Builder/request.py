@@ -148,10 +148,9 @@ class Batch:
             if c.nodeName == "src-rpm":
                 self.src_rpm = text(c)
             elif c.nodeName == "spec":
-                s = text(c)
                 # normalize specname, specname is used as buildlog and we don't
                 # want to be exposed to directory traversal attacks
-                self.spec = s.split('/')[-1]
+                self.spec = text(c).split('/')[-1]
             elif c.nodeName == "command":
                 self.spec = "COMMAND"
                 self.command = text(c)
