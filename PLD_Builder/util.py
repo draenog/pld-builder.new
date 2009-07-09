@@ -62,10 +62,13 @@ def collect_files(log):
 
 def find_last_section(log):
     f = open(log, 'r')
-    rx = re.compile(r"^Executing\(%(\w+)\).*$")
+    rx1 = re.compile(r"^Executing\(%(\w+)\).*$")
+    rx2 = re.compile(r"^Processing (files):.*$")
     last_section = None
     for l in f:
-        m = rx.search(l)
+        m = rx1.search(l)
+        if not m:
+            m = rx2.search(l)
         if m:
             last_section = m.group(1)
     f.close()
