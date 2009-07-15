@@ -51,7 +51,7 @@ def pick_request(q):
     ret = q.requests[0]
     return ret
 
-def check_skip_build(r):
+def check_skip_build(r, b):
     src_url = config.control_url + "/srpms/" + r.id + "/skipme"
     good  = True
     b.log_line("checking if we should skip the build")
@@ -127,7 +127,7 @@ def build_rpm(r, b):
     status.push("building %s" % b.spec)
     b.log_line("request from: %s" % r.requester)
 
-    if check_skip_build(r):
+    if check_skip_build(r, b):
         b.log_line("build skipped due to src builder request")
         res = "SKIP_REQUESTED"
         return res
