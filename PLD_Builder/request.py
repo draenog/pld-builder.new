@@ -177,7 +177,7 @@ class Batch:
         ok = 1
         for b in self.builders:
             s = self.builders_status[b]
-            if not status.startswith("OK") and not status.startswith("SKIP") and not status.startswith("UNSUPP") and not s.startswith("FAIL"):
+            if not s.startswith("OK") and not s.startswith("SKIP") and not s.startswith("UNSUPP") and not s.startswith("FAIL"):
                 ok = 0
         return ok
             
@@ -219,7 +219,7 @@ class Batch:
                 c = "black"
             link_pre = ""
             link_post = ""
-            if (status.startswith("OK") or status.startswith("SKIP") or status.startswith("UNSUPP") or s.startswith("FAIL")) and len(self.spec) > 5:
+            if (s.startswith("OK") or s.startswith("SKIP") or s.startswith("UNSUPP") or s.startswith("FAIL")) and len(self.spec) > 5:
                 if self.is_command():
                     bl_name = "command"
                 else:
