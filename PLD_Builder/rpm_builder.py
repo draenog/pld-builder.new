@@ -54,6 +54,7 @@ def pick_request(q):
 def check_skip_build(r):
     src_url = config.control_url + "/srpms/" + r.id + "/skipme"
     good  = True
+    b.log_line("checking if we should skip the build")
     while not good:
         try:
             good=True
@@ -68,6 +69,7 @@ def check_skip_build(r):
         http_code = f.getcode()
         if http_code == 200:
             f.close()
+            b.log_line("checking if we should skip the build: yes")
             return True
     return False
 
