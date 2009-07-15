@@ -69,7 +69,6 @@ def check_skip_build(r, b):
         http_code = f.getcode()
         if http_code == 200:
             f.close()
-            b.log_line("checking if we should skip the build: yes")
             return True
     return False
 
