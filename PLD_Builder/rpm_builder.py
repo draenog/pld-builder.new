@@ -60,7 +60,6 @@ def check_skip_build(r, b):
             f = urllib2.urlopen(src_url)
             good = True
         except urllib2.HTTPError, error:
-                f.close()
                 return False
         except urllib2.URLError, error:
             # see errno.h
@@ -86,7 +85,6 @@ def fetch_src(r, b):
             # fail in a way where cron job will retry
             msg = "unable to fetch file, http code: %d" % error.code
             b.log_line(msg)
-            f.close()
             raise IOError, msg
         except urllib2.URLError, error:
             # see errno.h
