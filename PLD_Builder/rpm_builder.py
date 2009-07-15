@@ -65,9 +65,12 @@ def check_skip_build(r, b):
                 continue
             else:
                 return False
-        if hasattr(f, 'getcode') and f.getcode() == 200:
-            f.close()
-            return True
+        if hasattr(f, 'getcode'):
+            if f.getcode() == 200:
+                f.close()
+                return True
+        else:
+            b.log_line("checking unsupported, please upgrade python to >= 2.6")
         f.close()
     return False
 
