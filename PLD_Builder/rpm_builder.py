@@ -57,33 +57,31 @@ def check_skip_build(r, b):
     b.log_line("checking if we should skip the build")
     while not good:
         try:
-            good=True
             f = urllib.urlopen(src_url)
+            good = True
         except IOError, error:
             if error[1][0] == 60 or error[1][0] == 110 or error[1][0] == -3 or error[1][0] == 111 or error[1][0] == 61:
-                good=False
                 b.log_line("unable to connect... trying again")
                 continue
             else:
                 return False
-        http_code = f.getcode()
-        if http_code == 200:
+        if f.getcode() == 200:
             f.close()
             return True
+        f.close()
     return False
 
 def fetch_src(r, b):
     src_url = config.control_url + "/srpms/" + r.id + "/" + b.src_rpm
     b.log_line("fetching %s" % src_url)
     start = time.time()
-    good=False
+    good = False
     while not good:
         try:
-            good=True
             f = urllib.urlopen(src_url)
+            good = True
         except IOError, error:
             if error[1][0] == 60 or error[1][0] == 110 or error[1][0] == -3 or error[1][0] == 111 or error[1][0] == 61:
-                good=False
                 b.log_line("unable to connect... trying again")
                 continue
             else:
