@@ -177,7 +177,7 @@ class Batch:
         ok = 1
         for b in self.builders:
             s = self.builders_status[b]
-            if not s in ["OK", "SKIP", "UNSUPP" ] and not s.startswith("FAIL"):
+            if not status.startswith("OK") and not status.startswith("SKIP") and not status.startswith("UNSUPP") and not s.startswith("FAIL"):
                 ok = 0
         return ok
             
@@ -207,19 +207,19 @@ class Batch:
         builders = []
         for b in self.builders:
             s = self.builders_status[b]
-            if s == "OK":
+            if s.startswith("OK"):
                 c = "green"
             elif s.startswith("FAIL"):
                 c = "red"
-            elif s == "SKIP":
+            elif s.startswith("SKIP"):
                 c = "blue"
-            elif s == "UNSUPP":
+            elif s.startswith("UNSUPP"):
                 c = "fuchsia"
             else:
                 c = "black"
             link_pre = ""
             link_post = ""
-            if (s in ["OK", "SKIP", "UNSUPP" ] or s.startswith("FAIL")) and len(self.spec) > 5:
+            if (status.startswith("OK") or status.startswith("SKIP") or status.startswith("UNSUPP") or s.startswith("FAIL")) and len(self.spec) > 5:
                 if self.is_command():
                     bl_name = "command"
                 else:
@@ -227,7 +227,7 @@ class Batch:
                 lin_ar = b.replace('noauto-','')
                 path = "/%s/%s/%s,%s.bz2" % (lin_ar.replace('-','/'), s, bl_name, rid)
                 is_ok = 0
-                if s == "OK":
+                if s.startswith("OK"):
                     is_ok = 1
                 bld = lin_ar.split('-')
                 link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s\">" \
@@ -317,7 +317,7 @@ class Notification:
             if c.nodeName == "batch":
                 id = attr(c, "id")
                 status = attr(c, "status")
-                if status not in ["OK", "SKIP", "UNSUPP"] and not status.startswith("FAIL"):
+                if not status.startswith("OK") and not status.startswith("SKIP") and not status.startswith("UNSUPP") and not status.startswith("FAIL"):
                     log.panic("xml notification: bad status: %s" % status)
                 self.batches[id] = status
             else:
