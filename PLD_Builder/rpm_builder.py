@@ -68,9 +68,8 @@ def check_skip_build(r, b):
                 return False
         except urllib2.HTTPError, error:
                 f.close()
-                return True
-        else:
-            b.log_line("checking unsupported, please upgrade python to >= 2.6")
+                return False
+        return True
         f.close()
     return False
 
