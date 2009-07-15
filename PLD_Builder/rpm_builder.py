@@ -69,8 +69,28 @@ def fetch_src(r, b):
                 raise
         http_code = f.getcode()
         if http_code != 200:
-            b.log_line("unable to fetch file, http code: %d" % http_code)
-            raise IOError, "unable to fetch file, http code: %d" % http_code
+            # if .uploadinfo also doesn't exist this means that someone
+            # deleted files at src builder side and we should fail then
+            try:
+                fui = urllib.urlopen(src_url + '.uploadinfo')
+            except IOError, error:
+                f.close()
+                # cron job will retry then
+                raise
+            if fui.get_code() != 200:
+                # no uploadinfo, so we can fail with this job in a way
+                # that it will be skipped from queue
+                b.log_line("uploadinfo file doesn't exists or is inaccesible, http code: %d" % http_code)
+                f.close()
+                fui.close()
+                return False
+            else:
+                # uploadinfo file exists but we weren't able to fetch original file,
+                # so we fail in a way where cron job will retry
+                b.log_line("unable to fetch file, http code: %d" % http_code)
+                f.close()
+                fui.close()
+                raise IOError, "unable to fetch file, http code: %d" % http_code
 
     o = chroot.popen("cat > %s" % b.src_rpm, mode = "w")
 
