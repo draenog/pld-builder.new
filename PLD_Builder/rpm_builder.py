@@ -70,7 +70,7 @@ def fetch_src(r, b):
         http_code = f.getcode()
         if http_code != 200:
             b.log_line("unable to fetch file, http code: %d" % http_code)
-            raise
+            raise IOError
 
     o = chroot.popen("cat > %s" % b.src_rpm, mode = "w")
 
