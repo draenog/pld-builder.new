@@ -51,6 +51,26 @@ def pick_request(q):
     ret = q.requests[0]
     return ret
 
+def check_skip_build(r):
+    src_url = config.control_url + "/srpms/" + r.id + "/skipme"
+    good  = True
+    while not good:
+        try:
+            good=True
+            f = urllib.urlopen(src_url)
+        except IOError, error:
+            if error[1][0] == 60 or error[1][0] == 110 or error[1][0] == -3 or error[1][0] == 111 or error[1][0] == 61:
+                good=False
+                b.log_line("unable to connect... trying again")
+                continue
+            else:
+                return False
+        http_code = f.getcode()
+        if http_code == 200:
+            f.close()
+            return True
+    return False
+
 def fetch_src(r, b):
     src_url = config.control_url + "/srpms/" + r.id + "/" + b.src_rpm
     b.log_line("fetching %s" % src_url)
@@ -69,28 +89,11 @@ def fetch_src(r, b):
                 raise
         http_code = f.getcode()
         if http_code != 200:
-            # if .uploadinfo also doesn't exist this means that someone
-            # deleted files at src builder side and we should fail then
-            try:
-                fui = urllib.urlopen(src_url + '.uploadinfo')
-            except IOError, error:
+                # fail in a way where cron job will retry
+                msg = "unable to fetch file, http code: %d" % http_code
+                b.log_line(msg)
                 f.close()
-                # cron job will retry then
-                raise
-            if fui.getcode() != 200:
-                # no uploadinfo, so we can fail with this job in a way
-                # that it will be skipped from queue
-                b.log_line("uploadinfo file doesn't exists or is inaccesible - failing to skip this build (http code: %d)" % http_code)
-                f.close()
-                fui.close()
-                return False
-            else:
-                # uploadinfo file exists but we weren't able to fetch original file,
-                # so we fail in a way where cron job will retry
-                b.log_line("unable to fetch file, http code: %d" % http_code)
-                f.close()
-                fui.close()
-                raise IOError, "unable to fetch file, http code: %d" % http_code
+                raise IOError, msg
 
     o = chroot.popen("cat > %s" % b.src_rpm, mode = "w")
 
@@ -121,6 +124,12 @@ def prepare_env():
 def build_rpm(r, b):
     status.push("building %s" % b.spec)
     b.log_line("request from: %s" % r.requester)
+
+    if check_skip_build(r):
+        b.log_line("build skipped due to src builder request")
+        res = "SKIP_REQUESTED"
+        return res
+
     b.log_line("started at: %s" % time.asctime())
     fetch_src(r, b)
     b.log_line("installing srpm: %s" % b.src_rpm)
