@@ -65,7 +65,7 @@ def fetch_src(r, b):
                 good=False
                 b.log_line("unable to connect... trying again")
             else:
-                f = urllib.urlopen(src_url) # So we get the exception logged :)
+                raise
 
     o = chroot.popen("cat > %s" % b.src_rpm, mode = "w")
 
