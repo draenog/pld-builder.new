@@ -5,7 +5,7 @@ import os
 import atexit
 import time
 import string
-import urllib
+import urllib2
 
 from config import config, init_conf
 from bqueue import B_Queue
@@ -57,16 +57,16 @@ def check_skip_build(r, b):
     b.log_line("checking if we should skip the build")
     while not good:
         try:
-            f = urllib.urlopen(src_url)
+            f = urllib2.urlopen(src_url)
             good = True
-        except IOError, error:
-            if error[1][0] == 60 or error[1][0] == 110 or error[1][0] == -3 or error[1][0] == 111 or error[1][0] == 61:
+        except urllib2.URLError, error:
+            # see errno.h
+            if error.reason[0] in [-3, 60, 61, 110, 111]:
                 b.log_line("unable to connect... trying again")
                 continue
             else:
                 return False
-        if hasattr(f, 'getcode'):
-            if f.getcode() == 200:
+        except urllib2.HTTPError, error:
                 f.close()
                 return True
         else:
@@ -81,22 +81,21 @@ def fetch_src(r, b):
     good = False
     while not good:
         try:
-            f = urllib.urlopen(src_url)
+            f = urllib2.urlopen(src_url)
             good = True
-        except IOError, error:
-            if error[1][0] == 60 or error[1][0] == 110 or error[1][0] == -3 or error[1][0] == 111 or error[1][0] == 61:
+        except urllib2.URLError, error:
+            # see errno.h
+            if error.reason[0] in [-3, 60, 61, 110, 111]:
                 b.log_line("unable to connect... trying again")
                 continue
             else:
                 raise
-        if hasattr(f, 'getcode'):
-            http_code = f.getcode()
-            if http_code != 200:
-                    # fail in a way where cron job will retry
-                    msg = "unable to fetch file, http code: %d" % http_code
-                    b.log_line(msg)
-                    f.close()
-                    raise IOError, msg
+        except urllib2.HTTPError, error:
+            # fail in a way where cron job will retry
+            msg = "unable to fetch file, http code: %d" % error.code
+            b.log_line(msg)
+            f.close()
+            raise IOError, msg
 
     o = chroot.popen("cat > %s" % b.src_rpm, mode = "w")
 
