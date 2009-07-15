@@ -64,6 +64,7 @@ def fetch_src(r, b):
             if error[1][0] == 60 or error[1][0] == 110 or error[1][0] == -3 or error[1][0] == 111 or error[1][0] == 61:
                 good=False
                 b.log_line("unable to connect... trying again")
+                continue
             else:
                 raise
         http_code = f.getcode()
