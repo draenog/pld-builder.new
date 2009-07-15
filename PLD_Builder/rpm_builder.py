@@ -80,7 +80,7 @@ def fetch_src(r, b):
             if fui.getcode() != 200:
                 # no uploadinfo, so we can fail with this job in a way
                 # that it will be skipped from queue
-                b.log_line("uploadinfo file doesn't exists or is inaccesible, http code: %d" % http_code)
+                b.log_line("uploadinfo file doesn't exists or is inaccesible - failing to skip this build (http code: %d)" % http_code)
                 f.close()
                 fui.close()
                 return False
