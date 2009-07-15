@@ -65,7 +65,7 @@ def check_skip_build(r, b):
                 continue
             else:
                 return False
-        if f.has_attr('getcode') and f.getcode() == 200:
+        if f.hasattr('getcode') and f.getcode() == 200:
             f.close()
             return True
         f.close()
@@ -86,7 +86,7 @@ def fetch_src(r, b):
                 continue
             else:
                 raise
-        if f.has_attr('getcode'):
+        if f.hasattr('getcode'):
             http_code = f.getcode()
             if http_code != 200:
                     # fail in a way where cron job will retry
