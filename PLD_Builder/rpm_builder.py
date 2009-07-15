@@ -65,7 +65,7 @@ def check_skip_build(r, b):
                 continue
             else:
                 return False
-        if f.getcode() == 200:
+        if f.has_attr('getcode') and f.getcode() == 200:
             f.close()
             return True
         f.close()
@@ -86,13 +86,14 @@ def fetch_src(r, b):
                 continue
             else:
                 raise
-        http_code = f.getcode()
-        if http_code != 200:
-                # fail in a way where cron job will retry
-                msg = "unable to fetch file, http code: %d" % http_code
-                b.log_line(msg)
-                f.close()
-                raise IOError, msg
+        if f.has_attr('getcode'):
+            http_code = f.getcode()
+            if http_code != 200:
+                    # fail in a way where cron job will retry
+                    msg = "unable to fetch file, http code: %d" % http_code
+                    b.log_line(msg)
+                    f.close()
+                    raise IOError, msg
 
     o = chroot.popen("cat > %s" % b.src_rpm, mode = "w")
 
