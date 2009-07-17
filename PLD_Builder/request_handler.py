@@ -74,9 +74,15 @@ def handle_group(r, user):
             lockf.close()
             return
 
-        batch.expand_builders(config.binary_builders)
+        # src builder handles only special commands
+        if batch.is_command() and batch.command in ["cvs up"]:
+            batch.expand_builders(config.binary_builders + [config.src_builder])
+        else:
+            batch.expand_builders(config.binary_builders)
+
         if not batch.is_command() and config.builder in batch.builders:
             batch.builders.remove(config.builder)
+
         for bld in batch.builders:
             batch.builders_status[bld] = '?'
             if bld not in config.binary_builders and bld != config.builder:
