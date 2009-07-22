@@ -75,7 +75,7 @@ def handle_group(r, user):
             return
 
         # src builder handles only special commands
-        if batch.is_command() and batch.command in ["cvs up"]:
+        if batch.is_command() and (batch.command in ["cvs up"] or config.builder in batch.builders):
             batch.expand_builders(config.binary_builders + [config.src_builder])
         else:
             batch.expand_builders(config.binary_builders)
