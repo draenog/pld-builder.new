@@ -19,6 +19,7 @@ import loop
 import chroot
 import ftp
 import buildlogs
+import notify
 import status
 import build
 import report
