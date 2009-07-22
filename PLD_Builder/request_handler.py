@@ -91,6 +91,12 @@ def handle_group(r, user):
                 lockf.close()
                 return
             if batch.is_command():
+                if "no-chroot" in batch.command_flags:
+                    if not user.can_do("command-no-chroot", bld):
+                        fail_mail("user %s is not allowed to command-no-chroot:%s" \
+                                % (user.get_login(), bld))
+                        lockf.close()
+                        return
                 if not user.can_do("command", bld):
                     fail_mail("user %s is not allowed to command:%s" \
                                 % (user.get_login(), bld))
