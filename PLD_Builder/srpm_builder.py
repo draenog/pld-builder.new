@@ -137,6 +137,7 @@ def handle_request(r):
     report.send_cia_report(r, is_src = True)
     store_binary_request(r)
     ftp.flush()
+    notify.send(r)
 
 def main():
     init_conf("src")
