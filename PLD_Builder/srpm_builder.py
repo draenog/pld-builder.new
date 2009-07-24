@@ -128,8 +128,6 @@ def build_srpm(r, b):
     status.pop()
     if res:
         res = "FAIL"
-    else:
-        res = "OK"
     return res
 
 def handle_request(r):
