@@ -126,6 +126,10 @@ def build_srpm(r, b):
             (packagedir, packagedir, packagedir, b.spec), logfile = b.logfile)
     chroot.run("rm -rf %s" % packagedir, logfile = b.logfile)
     status.pop()
+    if res:
+        res = "FAIL"
+    else:
+        res = "OK"
     return res
 
 def handle_request(r):
