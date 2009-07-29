@@ -43,7 +43,6 @@ LIBS="kde4-kdelibs.spec kde4-kdepimlibs.spec kde4-kdelibs-experimental.spec"
 BASE="kde4-kdebase-runtime.spec kde4-kdebase-workspace.spec kde4-kdebase.spec kde4-oxygen-icons.spec"
 OTHER="kde4-kdemultimedia.spec kde4-kdegraphics.spec \
 kde4-kdenetwork.spec \
-kde4-kdeplasma-addons.spec \
 kde4-kdepim.spec \
 kde4-kdeadmin.spec \
 kde4-kdeartwork.spec \
@@ -52,6 +51,7 @@ kde4-kdewebdev.spec \
 kde4-kdeutils.spec \
 kde4-kdeaccessibility \
 kde4-kdeedu.spec \
+kde4-kdeplasma-addons.spec \
 kde4-kdesdk.spec \
 kde4-kdebindings.spec"
 KOFFICE="kde4-koffice.spec"
