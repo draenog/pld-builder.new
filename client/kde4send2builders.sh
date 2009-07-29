@@ -39,8 +39,8 @@ BUILDER=
 #SPECDIR=$(rpm -E %_specdir)
 SPECDIR=~/rpm
 
-LIBS="kde4-kdelibs.spec kde4-kdepimlibs.spec"
-BASE="kde4-kdebase-runtime.spec kde4-kdebase-workspace.spec kde4-kdebase.spec"
+LIBS="kde4-kdelibs.spec kde4-kdepimlibs.spec kde4-kdelibs-experimental.spec"
+BASE="kde4-kdebase-runtime.spec kde4-kdebase-workspace.spec kde4-kdebase.spec kde4-oxygen-icons.spec"
 OTHER="kde4-kdemultimedia.spec kde4-kdegraphics.spec \
 kde4-kdenetwork.spec \
 kde4-kdeplasma-addons.spec \
@@ -93,7 +93,7 @@ specs=`for s in $specs; do
 	all) # all kde4 specs
 			echo $LIBS $BASE $OTHER $KOFFICE L10N
 			;;
-	libs) # kde4 libs and pimlibs
+	libs) # kde4 libs, libs-experimental and pimlibs
 			echo $LIBS
 			;;
 	base) # kde4-kdebase-*
