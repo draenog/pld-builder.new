@@ -44,6 +44,7 @@ BASE="kde4-kdebase-runtime.spec kde4-kdebase-workspace.spec kde4-kdebase.spec kd
 OTHER="kde4-kdemultimedia.spec kde4-kdegraphics.spec \
 kde4-kdenetwork.spec \
 kde4-kdepim.spec \
+kde4-kdepim-runtime.spec \
 kde4-kdeadmin.spec \
 kde4-kdeartwork.spec \
 kde4-kdegames.spec \
@@ -52,8 +53,8 @@ kde4-kdeutils.spec \
 kde4-kdeaccessibility \
 kde4-kdeedu.spec \
 kde4-kdeplasma-addons.spec \
-kde4-kdesdk.spec \
-kde4-kdebindings.spec"
+kde4-kdesdk.spec"
+#kde4-kdebindings.spec"
 KOFFICE="kde4-koffice.spec"
 L10N="kde4-l10n.spec"
 
