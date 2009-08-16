@@ -164,7 +164,7 @@ def handle_request(req, filename = None):
     keys = gpg.get_keys(req)
     (em, body) = gpg.verify_sig(req)
     if not em:
-        log.alert("Invalid signature, missing/untrusted key. Keys in gpg batch: '%s'" % keys
+        log.alert("Invalid signature, missing/untrusted key. Keys in gpg batch: '%s'" % keys)
         return False
     user = acl.user_by_email(em)
     if user == None:
