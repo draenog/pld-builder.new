@@ -85,7 +85,14 @@ def fetch_src(r, b):
             # fail in a way where cron job will retry
             msg = "unable to fetch file, http code: %d" % error.code
             b.log_line(msg)
-            raise IOError, msg
+            queue_time = time.time() - r.time
+            # 6 hours
+            if queue_time > 0 && < (6 * 60 * 60):
+                raise IOError, msg
+            else:
+                msg = "too long in queue, failing"
+                b.log_line(msg)
+                return False
         except urllib2.URLError, error:
             # see errno.h
             if error.errno in [-3, 60, 61, 110, 111]:
