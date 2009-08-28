@@ -16,6 +16,7 @@ usage() {
 	echo "     send with current autotag, default no"
 	echo "  -b   --builder VALUE"
 	echo "     choose a particular builder, default all"
+	echo "  -p   --priority VALUE (default: 2)"
 	echo "  -h   --help"
 	echo "     show this help"
 	echo ""
@@ -36,6 +37,7 @@ DIST=
 ATAG=no
 SENDPRIO=
 BUILDER=
+PRIO=2
 #SPECDIR=$(rpm -E %_specdir)
 SPECDIR=~/rpm
 
@@ -72,6 +74,10 @@ while [ $# -gt 0 ]; do
 		--builder | -b )
 			BUILDER="$BUILDER $2"
 			shift
+			;;
+		
+		--priority | -p )
+			PRIO=$2
 			;;
 
 		--help | -h )
