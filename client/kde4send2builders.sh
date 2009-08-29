@@ -78,6 +78,7 @@ while [ $# -gt 0 ]; do
 		
 		--priority | -p )
 			PRIO=$2
+			shift
 			;;
 
 		--help | -h )
@@ -137,6 +138,6 @@ else
 fi
 
 dir=$(dirname "$0")
-exec $dir/make-request.sh ${DIST:+-d $DIST} ${BUILDER:+-b $BUILDER} -r $SENDPRIO
+exec $dir/make-request.sh ${DIST:+-d $DIST} ${BUILDER:+-b $BUILDER} -p $PRIO -r $SENDPRIO
 echo >&2 "Failed to execute ./make-request.sh!"
 exit 1
