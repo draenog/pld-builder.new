@@ -99,7 +99,7 @@ done
 specs=`for s in $specs; do
 	case "$s" in
 	all) # all kde4 specs
-			echo $LIBS $BASE $OTHER $KOFFICE L10N
+			echo $LIBS $BASE $OTHER $KOFFICE $L10N
 			;;
 	libs) # kde4 libs, libs-experimental and pimlibs
 			echo $LIBS
