@@ -5,6 +5,7 @@ import os
 import atexit
 import time
 import string
+import urllib
 import urllib2
 
 from config import config, init_conf
@@ -57,7 +58,8 @@ def check_skip_build(r, b):
     b.log_line("checking if we should skip the build")
     while not good:
         try:
-            f = urllib2.urlopen(src_url)
+            headers = urllib.urlencode( { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } )
+            f = urllib2.urlopen(src_url, headers)
             good = True
         except urllib2.HTTPError, error:
                 return False
@@ -79,7 +81,8 @@ def fetch_src(r, b):
     good = False
     while not good:
         try:
-            f = urllib2.urlopen(src_url)
+            headers = urllib.urlencode( { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } )
+            f = urllib2.urlopen(src_url, headers)
             good = True
         except urllib2.HTTPError, error:
             # fail in a way where cron job will retry

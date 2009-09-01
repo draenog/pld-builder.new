@@ -3,6 +3,7 @@
 import string
 import signal
 import os
+import urllib
 import urllib2
 import StringIO
 import sys
@@ -40,7 +41,8 @@ def has_new(control_url):
     signal.signal(signal.SIGALRM, alarmalarm)
     signal.alarm(300)
     try:
-        f = urllib2.urlopen(control_url + "/max_req_no")
+        headers = urllib.urlencode( { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } )
+        f = urllib2.urlopen(control_url + "/max_req_no", headers)
         count = int(string.strip(f.readline()))
         signal.alarm(0)
     except Exception, e:
@@ -58,7 +60,8 @@ def fetch_queue(control_url):
     socket.setdefaulttimeout(240)
     signal.alarm(300)
     try:
-        f = urllib2.urlopen(control_url + "/queue.gz")
+        headers = urllib.urlencode( { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } )
+        f = urllib2.urlopen(control_url + "/queue.gz", headers)
         signal.alarm(0)
     except Exception, e:
         signal.alarm(0)
