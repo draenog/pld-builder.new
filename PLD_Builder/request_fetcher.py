@@ -3,7 +3,7 @@
 import string
 import signal
 import os
-import urllib
+import urllib2
 import StringIO
 import sys
 import gzip
@@ -40,7 +40,7 @@ def has_new(control_url):
     signal.signal(signal.SIGALRM, alarmalarm)
     signal.alarm(300)
     try:
-        f = urllib.urlopen(control_url + "/max_req_no")
+        f = urllib2.urlopen(control_url + "/max_req_no")
         count = int(string.strip(f.readline()))
         signal.alarm(0)
     except Exception, e:
@@ -58,7 +58,7 @@ def fetch_queue(control_url):
     socket.setdefaulttimeout(240)
     signal.alarm(300)
     try:
-        f = urllib.urlopen(control_url + "/queue.gz")
+        f = urllib2.urlopen(control_url + "/queue.gz")
         signal.alarm(0)
     except Exception, e:
         signal.alarm(0)
