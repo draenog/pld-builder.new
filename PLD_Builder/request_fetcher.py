@@ -41,8 +41,9 @@ def has_new(control_url):
     signal.signal(signal.SIGALRM, alarmalarm)
     signal.alarm(300)
     try:
-        headers = urllib.urlencode( { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } )
-        f = urllib2.urlopen(control_url + "/max_req_no", headers)
+        headers = { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+        req = urllib2.Request(url=control_url + "/max_req_no", headers=headers)
+        f = urllib2.urlopen(req)
         count = int(string.strip(f.readline()))
         signal.alarm(0)
     except Exception, e:
@@ -60,8 +61,9 @@ def fetch_queue(control_url):
     socket.setdefaulttimeout(240)
     signal.alarm(300)
     try:
-        headers = urllib.urlencode( { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } )
-        f = urllib2.urlopen(control_url + "/queue.gz", headers)
+        headers = { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+        req = urllib2.Request(url=control_url + "/queue.gz", headers=headers)
+        f = urllib2.urlopen(req)
         signal.alarm(0)
     except Exception, e:
         signal.alarm(0)
