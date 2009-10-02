@@ -46,9 +46,10 @@ END
 """ % (config.buildlogs_url, l['name'], config.builder, time.time(), self.requester_email)
         
         for l in self.queue:
-            f = open(path.buildlogs_queue_dir + '/' + l['id'] + ".desc", "w")
+            f = open(path.buildlogs_queue_dir + '/' + l['id'] + ".desc.tmp", "w")
             f.write(desc(l))
             f.close()
+            os.rename(path.buildlogs_queue_dir + '/' + l['id'] + ".desc.tmp", path.buildlogs_queue_dir + '/' + l['id'] + ".desc")
 
 queue = Buildlogs_Queue()
 
