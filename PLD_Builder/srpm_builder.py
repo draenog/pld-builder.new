@@ -146,8 +146,8 @@ def main():
     init_conf("src")
     if lock("building-srpm", non_block = 1) == None:
         return
-    status.push("srpm: processing queue")
     while True:
+        status.push("srpm: processing queue")
         q = B_Queue(path.queue_file)
         if not q.lock(1):
             return
