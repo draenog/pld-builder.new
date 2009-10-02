@@ -23,7 +23,7 @@ def log(p, s):
         except TypeError:
             syslog.syslog(p, repr(s))
     f = open(path.log_file, "a")
-    f.write("%s [%s]: %s\n" % (time.asctime(), builder, s))
+    f.write("%s: %s [%s]: %s\n" % (os.path.basename(sys.argv[0]), time.asctime(), builder, s))
     f.close()
     
 def panic(s):
