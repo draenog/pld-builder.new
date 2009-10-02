@@ -147,17 +147,20 @@ def main():
     if lock("building-srpm", non_block = 1) == None:
         return
     status.push("srpm: processing queue")
-    q = B_Queue(path.queue_file)
-    if not q.lock(1): return
-    q.read()
-    if q.requests == []: return
-    r = pick_request(q)
-    q.write()
-    q.unlock()
-    status.pop()
-    status.push("srpm: handling request from %s" % r.requester)
-    handle_request(r)
-    status.pop()
+    while True:
+        q = B_Queue(path.queue_file)
+        if not q.lock(1):
+            return
+        q.read()
+        if q.requests == []:
+            return
+        r = pick_request(q)
+        q.write()
+        q.unlock()
+        status.pop()
+        status.push("srpm: handling request from %s" % r.requester)
+        handle_request(r)
+        status.pop()
 
 if __name__ == '__main__':
     loop.run_loop(main)
