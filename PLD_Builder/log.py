@@ -1,5 +1,6 @@
 # vi: encoding=utf-8 ts=8 sts=4 sw=4 et
 
+import os
 import sys
 import time
 import syslog
