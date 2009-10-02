@@ -163,4 +163,4 @@ def main():
         status.pop()
 
 if __name__ == '__main__':
-    loop.run_loop(main)
+    main()
