@@ -97,6 +97,7 @@ def post_file(src, url):
     return 0
 
 def send_file(src, target):
+    global problem
     try:
         log.notice("sending %s to %s (size %d bytes)" % (src, target, os.stat(src).st_size))
         m = re.match('rsync://([^/]+)/.*', target)
@@ -115,6 +116,7 @@ def send_file(src, target):
             return post_file(src, target)
         log.alert("unsupported protocol: %s" % target)
     except OSError, e:
+        problem = e
         log.error("send_file(%s, %s): %s" % (src, target, e))
         return False
     return True
