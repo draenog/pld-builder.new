@@ -115,7 +115,7 @@ def send_file(src, target):
             return post_file(src, target)
         log.alert("unsupported protocol: %s" % target)
     except OSError, e:
-        log.error("send_file(%s, %s): %s" % (src, target, e)
+        log.error("send_file(%s, %s): %s" % (src, target, e))
         return False
     return True
 
