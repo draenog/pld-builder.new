@@ -102,18 +102,18 @@ def send_file(src, target):
         log.notice("sending %s to %s (size %d bytes)" % (src, target, os.stat(src).st_size))
         m = re.match('rsync://([^/]+)/.*', target)
         if m:
-            return rsync_file(src, target, host = m.group(1))
+            return not rsync_file(src, target, host = m.group(1))
         if target != "" and target[0] == '/':
-            return copy_file(src, target)
+            return not copy_file(src, target)
         m = re.match('scp://([^@:]+@[^/:]+)(:|)(.*)', target)
         if m:
-            return scp_file(src, m.group(1) + ":" + m.group(3))
+            return not scp_file(src, m.group(1) + ":" + m.group(3))
         m = re.match('ssh\+rsync://([^@:]+@[^/:]+)(:|)(.*)', target)
         if m:
-            return rsync_ssh_file(src, m.group(1) + ":" + m.group(3))
+            return not rsync_ssh_file(src, m.group(1) + ":" + m.group(3))
         m = re.match('http://.*', target)
         if m:
-            return post_file(src, target)
+            return not post_file(src, target)
         log.alert("unsupported protocol: %s" % target)
     except OSError, e:
         problems[src] = e
