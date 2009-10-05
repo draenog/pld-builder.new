@@ -23,7 +23,7 @@ class Buildlogs_Queue:
         if config.buildlogs_url == "/dev/null":
             return
         blogfile = os.path.basename(logfile)
-        name = re.sub(r"\.spec\.log", "", blogfile) + "," + id + '.' + blogfile + ".bz2"
+        name = re.sub(r"\.spec\.log", "", blogfile) + "," + id + ".bz2"
         ret = os.system("bzip2 --best --force < %s > %s" \
                     % (logfile, path.buildlogs_queue_dir + '/' + id + '.' + blogfile))
         if ret:
