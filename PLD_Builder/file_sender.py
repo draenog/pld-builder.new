@@ -37,9 +37,9 @@ def read_name_val(file):
     return None
 
 def scp_file(src, target):
-    global problem
+    global problems
     f = os.popen("scp -v -B %s %s 2>&1 < /dev/null" % (src, target))
-    problem = f.read()
+    problems[src] = f.read()
     return f.close()
 
 def copy_file(src, target):
@@ -47,13 +47,13 @@ def copy_file(src, target):
         shutil.copyfile(src, target)
         return 0
     except:
-        global problem
+        global problems
         exctype, value = sys.exc_info()[:2]
-        problem = "cannot copy file: %s" % traceback.format_exception_only(exctype, value)
+        problem[src] = "cannot copy file: %s" % traceback.format_exception_only(exctype, value)
         return 1
 
 def rsync_file(src, target, host):
-    global problem
+    global problems
     p = open(path.rsync_password_file, "r")
     password = None
     for l in p.xreadlines():
@@ -69,20 +69,20 @@ def rsync_file(src, target, host):
         p.close()
         rsync += " --password-file .rsync.pass"
     f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
-    problem = f.read()
+    problems[src] = f.read()
     if password != None:
         os.unlink(".rsync.pass")
     return f.close()
 
 def rsync_ssh_file(src, target):
-    global problem
+    global problems
     rsync = "rsync --verbose --archive -e ssh"
     f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
-    problem = f.read()
+    problems[src] = f.read()
     return f.close()
 
 def post_file(src, url):
-    global problem
+    global problems
     try:
         f = open(src, 'r')
         data = f.read()
@@ -92,12 +92,12 @@ def post_file(src, url):
         f = urllib2.urlopen(req)
         f.close()
     except Exception, e:
-        problem = e
+        problems[src] = e
         return e
     return 0
 
 def send_file(src, target):
-    global problem
+    global problems
     try:
         log.notice("sending %s to %s (size %d bytes)" % (src, target, os.stat(src).st_size))
         m = re.match('rsync://([^/]+)/.*', target)
@@ -116,7 +116,7 @@ def send_file(src, target):
             return post_file(src, target)
         log.alert("unsupported protocol: %s" % target)
     except OSError, e:
-        problem = e
+        problems[src] = e
         log.error("send_file(%s, %s): %s" % (src, target, e))
         return False
     return True
@@ -181,6 +181,9 @@ def flush_queue(dir):
     if error != None:
         emails = {}
         emails[config.admin_email] = 1
+        pr = ""
+        for src, msg in problems.iteritems():
+            pr = pr + "[src: %s]\n\n%s" % (src, msg)
         for d in remaining:
             if d.has_key('Requester'):
                 emails[d['Requester']] = 1
@@ -189,14 +192,15 @@ def flush_queue(dir):
         m.set_headers(to = string.join(e, ", "), 
                       subject = "[%s] builder queue problem" % config.builder)
         m.write("there were problems sending files from queue %s:\n" % dir)
-        m.write("problem: %s\n" % problem)
+        m.write("problems:\n")
+        m.write("%s\n", pr)
         m.send()
-        log.error("error sending files from %s: %s" % (dir, problem))
+        log.error("error sending files from %s:\n%s\n" % (dir, pr))
         return 1
 
     return 0
 
-problem = ""
+problems = {}
 
 def main():
     if lock.lock("sending-files", non_block = 1) == None:
