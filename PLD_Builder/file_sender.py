@@ -97,25 +97,27 @@ def post_file(src, url):
     return 0
 
 def send_file(src, target):
-    log.notice("sending %s to %s (size %d bytes)" % (src, target, os.stat(src).st_size))
-    m = re.match('rsync://([^/]+)/.*', target)
-    if m:
-        return rsync_file(src, target, host = m.group(1))
-    if target != "" and target[0] == '/':
-        return copy_file(src, target)
-    m = re.match('scp://([^@:]+@[^/:]+)(:|)(.*)', target)
-    if m:
-        return scp_file(src, m.group(1) + ":" + m.group(3))
-    m = re.match('ssh\+rsync://([^@:]+@[^/:]+)(:|)(.*)', target)
-    if m:
-        return rsync_ssh_file(src, m.group(1) + ":" + m.group(3))
-    m = re.match('http://.*', target)
-    if m:
-        return post_file(src, target)
-    log.alert("unsupported protocol: %s" % target)
-    # pretend everything went OK, so file is removed from queue,
-    # and doesn't cause any additional problems
-    return 0
+    try:
+        log.notice("sending %s to %s (size %d bytes)" % (src, target, os.stat(src).st_size))
+        m = re.match('rsync://([^/]+)/.*', target)
+        if m:
+            return rsync_file(src, target, host = m.group(1))
+        if target != "" and target[0] == '/':
+            return copy_file(src, target)
+        m = re.match('scp://([^@:]+@[^/:]+)(:|)(.*)', target)
+        if m:
+            return scp_file(src, m.group(1) + ":" + m.group(3))
+        m = re.match('ssh\+rsync://([^@:]+@[^/:]+)(:|)(.*)', target)
+        if m:
+            return rsync_ssh_file(src, m.group(1) + ":" + m.group(3))
+        m = re.match('http://.*', target)
+        if m:
+            return post_file(src, target)
+        log.alert("unsupported protocol: %s" % target)
+    except OSError, e:
+        log.error("send_file(%s, %s): %s" % (src, target, e)
+        return False
+    return True
 
 def maybe_flush_queue(dir):
     retry_delay = 0
@@ -159,19 +161,20 @@ def flush_queue(dir):
     q.sort(mycmp)
     
     error = None
-    remaining = q
+    # copy of q
+    remaining = q[:]
     for d in q:
-        if send_file(d['_file'], d['Target']):
+        if not send_file(d['_file'], d['Target']):
             error = d
-            break
+            continue
         if os.access(d['_file'] + ".info", os.F_OK):
-            if send_file(d['_file'] + ".info", d['Target'] + ".info"):
+            if not send_file(d['_file'] + ".info", d['Target'] + ".info"):
                 error = d
-                break
+                continue
             os.unlink(d['_file'] + ".info")
         os.unlink(d['_file'])
         os.unlink(d['_desc'])
-        remaining = q[1:]
+        remaining.remove(d)
         
     if error != None:
         emails = {}
