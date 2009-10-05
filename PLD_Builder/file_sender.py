@@ -183,7 +183,7 @@ def flush_queue(dir):
         emails[config.admin_email] = 1
         pr = ""
         for src, msg in problems.iteritems():
-            pr = pr + "[src: %s]\n\n%s" % (src, msg)
+            pr = pr + "[src: %s]\n\n%s\n" % (src, msg)
         for d in remaining:
             if d.has_key('Requester'):
                 emails[d['Requester']] = 1
