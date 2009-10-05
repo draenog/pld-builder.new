@@ -13,6 +13,7 @@ class Buildlogs_Queue:
     def __init__(self):
         self.queue = []
         self.some_failed = 0
+        self.requester_email = None
 
     def init(self, g):
         self.requester_email = g.requester_email
