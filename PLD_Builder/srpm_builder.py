@@ -150,10 +150,12 @@ def main():
         status.push("srpm: processing queue")
         q = B_Queue(path.queue_file)
         if not q.lock(1):
+            status.pop()
             return
         q.read()
         if q.requests == []:
             q.unlock()
+            status.pop()
             return
         r = pick_request(q)
         q.write()
