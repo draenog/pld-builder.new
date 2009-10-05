@@ -193,7 +193,7 @@ def flush_queue(dir):
                       subject = "[%s] builder queue problem" % config.builder)
         m.write("there were problems sending files from queue %s:\n" % dir)
         m.write("problems:\n")
-        m.write("%s\n", pr)
+        m.write("%s\n" % pr)
         m.send()
         log.error("error sending files from %s:\n%s\n" % (dir, pr))
         return 1
