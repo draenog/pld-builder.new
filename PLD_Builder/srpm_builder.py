@@ -153,6 +153,7 @@ def main():
             return
         q.read()
         if q.requests == []:
+            q.unlock()
             return
         r = pick_request(q)
         q.write()
