@@ -39,8 +39,11 @@ def read_name_val(file):
 def scp_file(src, target):
     global problems
     f = os.popen("scp -v -B %s %s 2>&1 < /dev/null" % (src, target))
-    problems[src] = f.read()
-    return f.close()
+    p = f.read()
+    ret = f.close()
+    if ret:
+        problems[src] = f.read()
+    return ret
 
 def copy_file(src, target):
     try:
@@ -69,17 +72,23 @@ def rsync_file(src, target, host):
         p.close()
         rsync += " --password-file .rsync.pass"
     f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
-    problems[src] = f.read()
+    p = f.read()
     if password != None:
         os.unlink(".rsync.pass")
-    return f.close()
+    ret = f.close()
+    if ret:
+        problems[src] = p
+    return ret
 
 def rsync_ssh_file(src, target):
     global problems
     rsync = "rsync --verbose --archive -e ssh"
     f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
-    problems[src] = f.read()
-    return f.close()
+    p = f.read()
+    ret = f.close()
+    if ret:
+        problems[src] = p
+    return ret
 
 def post_file(src, url):
     global problems
