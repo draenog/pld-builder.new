@@ -85,6 +85,7 @@ def handle_group(r, user):
 
         for bld in batch.builders:
             batch.builders_status[bld] = '?'
+            batch.builders_status_time[bld] = time.time()
             if bld not in config.binary_builders and bld != config.builder:
                 fail_mail("I (src rpm builder '%s') do not handle binary builder '%s', only '%s'" % \
                         (config.builder, bld, string.join(config.binary_builders)))

@@ -129,6 +129,7 @@ class Batch:
         self.bconds_without = []
         self.builders = []
         self.builders_status = {}
+        self.builders_status_time = {}
         self.kernel = ""
         self.target = []
         self.branch = ""
@@ -166,6 +167,7 @@ class Batch:
             elif c.nodeName == "builder":
                 self.builders.append(text(c))
                 self.builders_status[text(c)] = attr(c, "status", "?")
+                self.builders_status_time[text(c)] = attr(c, "time", "0")
             elif c.nodeName == "with":
                 self.bconds_with.append(text(c))
             elif c.nodeName == "without":
@@ -281,8 +283,8 @@ class Batch:
         for b in self.bconds_without:
             f.write("           <without>%s</without>\n" % escape(b))
         for b in self.builders:
-            f.write("           <builder status='%s'>%s</builder>\n" % \
-                                                (escape(self.builders_status[b]), escape(b)))
+            f.write("           <builder status='%s' time='%s'>%s</builder>\n" % \
+                    (escape(self.builders_status[b]), self.builders_status_time[b], escape(b)))
         f.write("         </batch>\n")
         
     def log_line(self, l):
@@ -329,6 +331,7 @@ class Notification:
                 for b in r.batches:
                     if self.batches.has_key(b.b_id):
                         b.builders_status[self.builder] = self.batches[b.b_id]
+                        b.builders_status_time[self.builder] = time.time()
 
 def build_request(e):
     if e.nodeType != Element.ELEMENT_NODE:
