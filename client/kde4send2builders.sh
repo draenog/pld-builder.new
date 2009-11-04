@@ -129,7 +129,7 @@ done`
 if [ "$ATAG" == "yes" ]; then
 	for spec in $specs; do
 		PKG=$(echo $spec |sed -e 's/.spec//g')
-		LAST_AUTOTAG=$(cd $SPECDIR && cvs -z3 get -A packages/$PKG/$spec >/dev/null 2>&1 && cvs status -v packages/$PKG/$spec | awk -vdist=$DIST '!/Sticky/ && $1 ~ "^auto-" dist "-"{if (!a++) print $1}')
+		LAST_AUTOTAG=$(cd $SPECDIR/packages && ./builder -g -ns $PKG/$spec >/dev/null 2>&1 && cvs status -v $PKG/$spec | awk -vdist=$DIST '!/Sticky/ && $1 ~ "^auto-" dist "-"{if (!a++) print $1}')
 		sleep 1
 		SENDPRIO="$SENDPRIO $spec:$LAST_AUTOTAG "
 	done
@@ -138,6 +138,6 @@ else
 fi
 
 dir=$(dirname "$0")
-exec $dir/make-request.sh ${DIST:+-d $DIST} ${BUILDER:+-b $BUILDER} -p $PRIO -r $SENDPRIO
+exec $dir/make-request.sh ${DIST:+-d $DIST} ${BUILDER:+-b "$BUILDER"} -p $PRIO -r $SENDPRIO
 echo >&2 "Failed to execute ./make-request.sh!"
 exit 1
