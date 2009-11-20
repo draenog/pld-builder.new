@@ -94,7 +94,7 @@ def fetch_src(r, b):
             if error.code != 404 or (queue_time >= 0 and queue_time < (6 * 60 * 60)):
                 raise IOError, msg
             else:
-                msg = "in queue for mor than 6 hours, download failing"
+                msg = "in queue for more than 6 hours, download failing"
                 b.log_line(msg)
                 return False
         except urllib2.URLError, error:
