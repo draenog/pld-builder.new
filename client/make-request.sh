@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# prevent "*" from being expanded in builders var
+cd /usr/share/empty
+
 builders=
 specs=
 with=
