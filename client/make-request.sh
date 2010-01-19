@@ -63,11 +63,12 @@ import sys, urllib2
 
 try:
         data = sys.stdin.read()
-        req = urllib2.Request(sys.argv[1], data)
+        url = sys.argv[1]
+        req = urllib2.Request(url, data)
         f = urllib2.urlopen(req, timeout = 10)
         f.close()
 except Exception, e:
-        print >> sys.stderr, "Problem while sending request via HTTP: %s" % e
+        print >> sys.stderr, "Problem while sending request via HTTP: %s: %s" % (url, e)
         sys.exit(1)
 print >> sys.stdout, "Request queued via HTTP."
 ' "$url"
@@ -382,9 +383,9 @@ gen_req() {
 
 	if [ "$command" != "" ] ; then
 		bid=$(uuidgen)
-		echo >&2 "* Command: $command"
+		echo -E >&2 "* Command: $command"
 		echo "	<batch id='$bid' depends-on=''>"
-		echo "		 <command flags='$command_flags'>$(echo "$command" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g')</command>"
+		echo "		 <command flags='$command_flags'>$(echo -E "$command" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g')</command>"
 		echo "		 <info></info>"
 		for b in $builders; do
 			echo >&2 "* Builder: $b"
