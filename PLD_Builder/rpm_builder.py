@@ -176,8 +176,8 @@ def build_rpm(r, b):
                 max_jobs = max(min(int(os.sysconf('SC_NPROCESSORS_ONLN') * 1.5), config.max_jobs), 1)
                 if r.max_jobs > 0:
                     max_jobs = max(min(config.max_jobs, r.max_jobs), 1)
-                cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb --define '_smp_mflags -j%d' %s %s" % \
-                            (tmpdir, config.nice, max_jobs, rpmbuild_opt, b.spec)
+                cmd = "echo build-id: %s; cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb --define '_smp_mflags -j%d' %s %s" % \
+                            (r.id, tmpdir, config.nice, max_jobs, rpmbuild_opt, b.spec)
                 b.log_line("building RPM using: %s" % cmd)
                 begin_time = time.time()
                 res = chroot.run(cmd, logfile = b.logfile)
