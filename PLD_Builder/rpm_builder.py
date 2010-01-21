@@ -123,11 +123,11 @@ def fetch_src(r, b):
 
 def prepare_env():
     chroot.run("test ! -f /proc/uptime && mount /proc", 'root')
-    chroot.run("test ! -e /dev/full && mknod /dev/full c 1 7 && chmod 666 /dev/full", 'root')
-    chroot.run("test ! -e /dev/null && mknod /dev/null c 1 3 && chmod 666 /dev/null", 'root')
-    chroot.run("test ! -e /dev/random && mknod /dev/random c 1 8 && chmod 644 /dev/random", 'root')
-    chroot.run("test ! -e /dev/urandom && mknod /dev/urandom c 1 9 && chmod 644 /dev/urandom", 'root')
-    chroot.run("test ! -e /dev/zero && mknod /dev/zero c 1 5 && chmod 666 /dev/zero", 'root')
+    chroot.run("test ! -c /dev/full && rm -f /dev/full && mknod -m 666 /dev/full c 1 7", 'root')
+    chroot.run("test ! -c /dev/null && rm -f /dev/null && mknod -m 666 /dev/null c 1 3", 'root')
+    chroot.run("test ! -c /dev/random && rm -f /dev/random && mknod -m 644 /dev/random c 1 8", 'root')
+    chroot.run("test ! -c /dev/urandom && rm -f /dev/urandom && mknod -m 644 /dev/urandom c 1 9", 'root')
+    chroot.run("test ! -c /dev/zero && rm -f /dev/zero && mknod -m 666 /dev/zero c 1 5", 'root')
     # try to limit network access for builder account
     chroot.run("/bin/setfacl -m u:builder:--- /etc/resolv.conf", 'root')
 
