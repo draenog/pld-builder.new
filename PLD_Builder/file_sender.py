@@ -42,7 +42,7 @@ def scp_file(src, target):
     p = f.read()
     ret = f.close()
     if ret:
-        problems[src] = f.read()
+        problems[src] = p
     return ret
 
 def copy_file(src, target):
