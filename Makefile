@@ -1,5 +1,5 @@
 PACKAGE		:= pld-builder
-VERSION		:= 0.4
+VERSION		:= 0.5
 SNAP		:= $(shell date +%Y%m%d)
 
 # for make dist
