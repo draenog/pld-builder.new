@@ -1,0 +1,60 @@
+new bin builder setup
+
+packages and chroot
+~~~~~~~~~~~~~~~~~~~
+1. install pld-builder from ac-ready on target host
+
+2. create chroot /srv/chroot
+# mkdir -p /srv/chroot
+
+- instal distro gpg key as default ac config packages are signed and sign verify enabled in config:
+# rpm -r /srv/chroot --import /etc/pki/rpm-gpg/PLD-2.0-Ac-GPG-key.asc
+
+- install pld-builder-chroot from ac-ready
+  as vserver-packages is usually hidden, so you must install it manually with --noignore
+# poldek -r /srv/chroot -u vserver-packages --noignore
+# poldek -r /srv/chroot -u pld-builder-chroot --sn ac --sn ac-ready
+
+- setup /srv/chroot/etc/resolv.conf so if you enter manually you can work with poldek
+# cat /etc/resolv.conf > /srv/chroot/etc/resolv.conf
+
+
+gpg keys
+~~~~~~~~
+1. import src builder key to bin builder so it can download queue.gz
+
+src-builder$ gpg --export KEYID --armor > ac-src.asc
+bin-builder$ gpg --import < ac-src.asc
+
+2. generate new key for bin builder and import it to src builder so it can
+   accept spool/notify messages
+
+gpg --gen-key on target host
+3. import that public key to src builder keyring
+bin-builder$ gpg --export KEYID --armor > ac-ppc.asc
+src-builder$ gpg --import < ac-ppc.asc
+buildersrc# sudo -H -u buildsrc gpg --import < ~/ac-ppc.asc
+ 
+ssh keys
+~~~~~~~~
+
+generate key on bin builder and add it to authorized_keys of ftp account
+
+i.e account where you push your uploads:
+[ac-ppc]
+ftp_url = scp://fpldac@ep09.pld-linux.org:ftp/.tree/.incoming/ppc/
+
+buildlogs
+~~~~~~~~~
+buildlogs are copied with rsync. ask buidlogs.pld-linux.org admin to allow your ip
+
+sudo access
+~~~~~~~~~~~
+make sure builder user (who runs crons) can sudo chroot to the chroots:
+builder ALL=(ALL) NOPASSWD: /usr/sbin/chroot /home/users/builder/chroot-ac *
+
+testing
+~~~~~~~
+
+keep /var/lib/pld-builder/spool/log running with tail -f
+run the cronjobs under builder account.
