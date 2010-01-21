@@ -128,6 +128,7 @@ def prepare_env():
     chroot.run("test ! -c /dev/random && rm -f /dev/random && mknod -m 644 /dev/random c 1 8", 'root')
     chroot.run("test ! -c /dev/urandom && rm -f /dev/urandom && mknod -m 644 /dev/urandom c 1 9", 'root')
     chroot.run("test ! -c /dev/zero && rm -f /dev/zero && mknod -m 666 /dev/zero c 1 5", 'root')
+    chroot.run("chmod a+r /var/lib/rpm/Packages", 'root')
     # try to limit network access for builder account
     chroot.run("/bin/setfacl -m u:builder:--- /etc/resolv.conf", 'root')
 
