@@ -122,17 +122,24 @@ def fetch_src(r, b):
         b.log_line("fetched %d bytes, %.1f K/s" % (bytes, bytes / 1024.0 / t))
 
 def prepare_env():
-    chroot.run("test ! -f /proc/uptime && mount /proc", 'root')
-    chroot.run("test ! -c /dev/full && rm -f /dev/full && mknod -m 666 /dev/full c 1 7", 'root')
-    chroot.run("test ! -c /dev/null && rm -f /dev/null && mknod -m 666 /dev/null c 1 3", 'root')
-    chroot.run("test ! -c /dev/random && rm -f /dev/random && mknod -m 644 /dev/random c 1 8", 'root')
-    chroot.run("test ! -c /dev/urandom && rm -f /dev/urandom && mknod -m 644 /dev/urandom c 1 9", 'root')
-    chroot.run("test ! -c /dev/zero && rm -f /dev/zero && mknod -m 666 /dev/zero c 1 5", 'root')
-    # make neccessary files readable for builder user
-    # TODO: see if they really aren't readable for builder
-    chroot.run("for db in Packages Name Basenames Providename Pubkeys; do db=/var/lib/rpm/$db; test -f $db && chmod a+r $db; done", 'root')
-    # try to limit network access for builder account
-    chroot.run("/bin/setfacl -m u:builder:--- /etc/resolv.conf", 'root')
+    chroot.run("""
+        test ! -f /proc/uptime && mount /proc
+        test ! -c /dev/full && rm -f /dev/full && mknod -m 666 /dev/full c 1 7
+        test ! -c /dev/null && rm -f /dev/null && mknod -m 666 /dev/null c 1 3
+        test ! -c /dev/random && rm -f /dev/random && mknod -m 644 /dev/random c 1 8
+        test ! -c /dev/urandom && rm -f /dev/urandom && mknod -m 644 /dev/urandom c 1 9
+        test ! -c /dev/zero && rm -f /dev/zero && mknod -m 666 /dev/zero c 1 5
+
+        # make neccessary files readable for builder user
+        # TODO: see if they really aren't readable for builder
+        for db in Packages Name Basenames Providename Pubkeys; do
+            db=/var/lib/rpm/$db
+            test -f $db && chmod a+r $db
+        done
+
+        # try to limit network access for builder account
+        /bin/setfacl -m u:builder:--- /etc/resolv.conf
+    """, 'root')
 
 def build_rpm(r, b):
     status.push("building %s" % b.spec)
