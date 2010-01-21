@@ -128,7 +128,9 @@ def prepare_env():
     chroot.run("test ! -c /dev/random && rm -f /dev/random && mknod -m 644 /dev/random c 1 8", 'root')
     chroot.run("test ! -c /dev/urandom && rm -f /dev/urandom && mknod -m 644 /dev/urandom c 1 9", 'root')
     chroot.run("test ! -c /dev/zero && rm -f /dev/zero && mknod -m 666 /dev/zero c 1 5", 'root')
-    chroot.run("chmod a+r /var/lib/rpm/Packages", 'root')
+    # make neccessary files readable for builder user
+    # TODO: see if they really aren't readable for builder
+    chroot.run("for db in Packages Name Basenames Providename Pubkey; do db=/var/lib/rpm/$db; chmod a+r $db; done", 'root')
     # try to limit network access for builder account
     chroot.run("/bin/setfacl -m u:builder:--- /etc/resolv.conf", 'root')
 
