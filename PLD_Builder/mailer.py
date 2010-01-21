@@ -73,10 +73,11 @@ class Message:
         util.sendfile(self.body, f)
 
     def send(self):
-        if not os.path.exists("/usr/sbin/sendmail"):
-            log.alert("/usr/sbin/sendmail doesn't exists: can't send email")
+        if not os.path.exists("/usr/lib/sendmail"):
+            # TODO: dump to file?
+            log.alert("/usr/lib/sendmail doesn't exist: Can't send email")
             return False
-        send_sendmail = "/usr/sbin/sendmail -i -t -f %s" % config.admin_email
+        send_sendmail = "/usr/lib/sendmail -i -t -f %s" % config.admin_email
         f = os.popen(send_sendmail, "w")
         try:
             self.write_to(f)
