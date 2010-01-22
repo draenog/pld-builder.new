@@ -167,7 +167,7 @@ def build_rpm(r, b):
         b.default_target(config.arch)
         rpmbuild_opt = "%s %s %s" % (b.target_string(), b.kernel_string(), b.bconds_string())
         # check for build arch before filling BR
-        cmd = "cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bp --short-circuit --nodeps --define 'prep exit 0' %s %s" % \
+        cmd = "cd rpm/SPECS; TMPDIR=%s exec nice -n %s rpmbuild -bp --short-circuit --nodeps --define 'prep exit 0' %s %s" % \
             (tmpdir, config.nice, rpmbuild_opt, b.spec)
         res = chroot.run(cmd, logfile = b.logfile)
         if res:
@@ -183,7 +183,7 @@ def build_rpm(r, b):
                 max_jobs = max(min(int(os.sysconf('SC_NPROCESSORS_ONLN') * 1.5), config.max_jobs), 1)
                 if r.max_jobs > 0:
                     max_jobs = max(min(config.max_jobs, r.max_jobs), 1)
-                cmd = "echo build-id: %s; cd rpm/SPECS; TMPDIR=%s nice -n %s rpmbuild -bb --define '_smp_mflags -j%d' %s %s" % \
+                cmd = "echo build-id: %s; cd rpm/SPECS; TMPDIR=%s exec nice -n %s rpmbuild -bb --define '_smp_mflags -j%d' %s %s" % \
                             (r.id, tmpdir, config.nice, max_jobs, rpmbuild_opt, b.spec)
                 b.log_line("building RPM using: %s" % cmd)
                 begin_time = time.time()
