@@ -283,11 +283,13 @@ ac)
 	builder_email="builder-ac@pld-linux.org"
 	default_builders="ac-*"
 	default_branch="AC-branch"
+	url="http://ep09.pld-linux.org:1289/"
 	;;
 ac-java) # fake "distro" for java available ac architectures
 	builder_email="builder-ac@pld-linux.org"
 	default_builders="ac-i586 ac-i686 ac-athlon ac-amd64"
 	default_branch="AC-branch"
+	url="http://ep09.pld-linux.org:1289/"
 	;;
 ac-xen) # fake "distro" for xen-enabled architectures
 	builder_email="builder-ac@pld-linux.org"
