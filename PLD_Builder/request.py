@@ -138,6 +138,7 @@ class Batch:
         self.spec = ""
         self.command = ""
         self.command_flags = []
+        self.skip = []
         self.gb_id = ""
         self.b_id = attr(e, "id")
         self.depends_on = string.split(attr(e, "depends-on"))
@@ -162,6 +163,8 @@ class Batch:
                 self.kernel = text(c)
             elif c.nodeName == "target":
                 self.target.append(text(c))
+            elif c.nodeName == "skip":
+                self.skip.append(text(c))
             elif c.nodeName == "branch":
                 self.branch = text(c)
             elif c.nodeName == "builder":

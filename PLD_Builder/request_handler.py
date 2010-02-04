@@ -54,7 +54,6 @@ def handle_group(r, user):
     if check_double_id(r.id):
         lockf.close()
         return
-        
 
     for batch in r.batches:
         if not user.can_do("src", config.builder, batch.branch):
@@ -79,6 +78,26 @@ def handle_group(r, user):
             batch.expand_builders(config.binary_builders + [config.src_builder])
         else:
             batch.expand_builders(config.binary_builders)
+
+        if batch.skip:
+            msg = ""
+            for id in batch.skip:
+                if os.path.isdir(path.srpms_dir + '/' + id):
+                    fd = open(path.srpms_dir + '/' + id + '/skipme', 'w')
+                    fd.write("skip request %s" % (user.get_login()))
+                    fd.close()
+                    log.notice("skip request %s by %s" % (id, user.get_login()))
+                    msg = msg + "skip %s\n" % id
+                else:
+                    msg = msg + "no srpm dir for %s\n" % id
+
+            m = user.message_to()
+            m.set_headers(subject = "skip request")
+            m.write_line(msg)
+            m.send()
+
+            lockf.close()
+            return
 
         if not batch.is_command() and config.builder in batch.builders:
             batch.builders.remove(config.builder)
@@ -174,7 +193,7 @@ def handle_request(req, filename = None):
         return False
 
     acl.set_current_user(user)
-    status.push("email from %s" % user.login)
+    status.push("request from %s" % user.login)
     r = request.parse_request(body)
     if r.kind == 'group':
         handle_group(r, user)

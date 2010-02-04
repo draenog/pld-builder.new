@@ -96,6 +96,8 @@ usage() {
 	echo "       set alt_kernel to VALUE"
 	echo "  --target VALUE"
 	echo "       set --target to VALUE"
+	echo "  -s BUILD_ID, --skip BUILD_ID[,BUILD_ID][,BUILD_ID]"
+	echo "       mark build ids on src builder to be skipped"
 	echo "  --branch VALUE"
 	echo "       specify default branch for specs in request"
 	echo "  -t   --test-build"
@@ -176,6 +178,13 @@ while [ $# -gt 0 ] ; do
 
 		--target)
 			target=$2
+			shift
+			;;
+
+		-s|--skip)
+			f_upgrade=no
+			build_mode=test
+			skip=$2
 			shift
 			;;
 
@@ -369,7 +378,7 @@ for s in $specs; do
 done
 
 if [ "$ok" = "" ] ; then
-	if [ "$command" = "" ] ; then
+	if [ -z "$command" -a -z "$skip" ]; then
 		die "no specs passed"
 	fi
 else
@@ -400,6 +409,16 @@ gen_req() {
 		for b in $builders; do
 			echo >&2 "* Builder: $b"
 			echo "		 <builder>$b</builder>"
+		done
+		echo "	</batch>"
+
+	elif [ "$skip" ]; then
+		bid=$(uuidgen)
+		echo "	<batch id='$bid' depends-on=''>"
+		for s in {$skip,}; do
+			[ "$s" ] || continue
+		 	echo >&2 "* Skip: $s"
+			echo "<skip>$s</skip>"
 		done
 		echo "	</batch>"
 	else
