@@ -222,6 +222,12 @@ while [ $# -gt 0 ] ; do
 
 		--command | -c )
 			command="$2"
+			if [ $command = - ]; then
+				echo >&2 "Reading command from STDIN"
+				echo >&2 "---"
+				command=$(cat)
+				echo >&2 "---"
+			fi
 			f_upgrade=no
 			shift
 			;;
