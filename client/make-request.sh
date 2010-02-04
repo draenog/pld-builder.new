@@ -222,7 +222,7 @@ while [ $# -gt 0 ] ; do
 
 		--command | -c )
 			command="$2"
-			if [ $command = - ]; then
+			if [ "$command" = - ]; then
 				echo >&2 "Reading command from STDIN"
 				echo >&2 "---"
 				command=$(cat)
@@ -391,7 +391,9 @@ gen_req() {
 		bid=$(uuidgen)
 		echo -E >&2 "* Command: $command"
 		echo "	<batch id='$bid' depends-on=''>"
-		echo "		 <command flags='$command_flags'>$(echo -E "$command" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g')</command>"
+		echo "		 <command flags='$command_flags'>"
+		echo -E "$command" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g'
+		echo "</command>"
 		echo "		 <info></info>"
 		for b in $builders; do
 			echo >&2 "* Builder: $b"
@@ -462,7 +464,7 @@ Message-Id: <$id@$(hostname)>
 X-New-PLD-Builder: request
 X-Requester-Version: \$Id$
 
-$(echo "$req" | gpg --clearsign --default-key $default_key $gpg_opts)
+$(echo -E "$req" | gpg --clearsign --default-key $default_key $gpg_opts)
 EOF
 }
 
