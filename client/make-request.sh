@@ -184,6 +184,7 @@ while [ $# -gt 0 ] ; do
 		-s|--skip)
 			f_upgrade=no
 			build_mode=test
+			priority=-1
 			skip=$2
 			shift
 			;;
