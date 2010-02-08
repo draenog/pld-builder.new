@@ -23,7 +23,7 @@ def run_command(batch):
 
     # rewrite special "skip:BUILD_ID into touch
     if command[:5] == "skip:":
-        c = "set -x; echo SKIPME; echo SKIPME >&2;"
+        c = ""
         for id in command[5:].split(','):
             if os.path.isdir(path.srpms_dir + '/' + id):
                 c = c + "echo skip:%s;\n" % (id)
