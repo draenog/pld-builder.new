@@ -33,7 +33,8 @@ def run_command(batch):
         command = c
 
     if "no-chroot" in batch.command_flags:
-        c = "%s >> %s 2>&1" % (command, batch.logfile)
+        # TODO: the append here by shell hack should be solved in python
+        c = "(%s) >> %s 2>&1" % (command, batch.logfile)
         f = os.popen(c)
         for l in f.xreadlines():
             pass
