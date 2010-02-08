@@ -155,7 +155,7 @@ class Batch:
                 self.spec = text(c).split('/')[-1]
             elif c.nodeName == "command":
                 self.spec = "COMMAND"
-                self.command = text(c)
+                self.command = text(c).strip()
                 self.command_flags = string.split(attr(c, "flags", ""))
             elif c.nodeName == "info":
                 self.info = text(c)
