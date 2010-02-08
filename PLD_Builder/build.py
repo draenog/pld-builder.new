@@ -16,9 +16,24 @@ import status
 from config import config, init_conf
 
 
+
 def run_command(batch):
+    # we want to keep "skip" in queue.html
+    command = batch.command
+
+    # rewrite special "skip:BUILD_ID into touch
+    if command[:5] == "skip:":
+        c = "set -x; echo SKIPME; echo SKIPME >&2;"
+        for id in command[5:].split(','):
+            if os.path.isdir(path.srpms_dir + '/' + id):
+                c = c + "echo skip:%s;\n" % (id)
+                c = c + "touch %s/%s;\n" % (path.srpms_dir, id)
+            else:
+                c = c + "echo %s is not valid build-id;\n" % (id)
+        command = c
+
     if "no-chroot" in batch.command_flags:
-        c = "%s >> %s 2>&1" % (batch.command, batch.logfile)
+        c = "%s >> %s 2>&1" % (command, batch.logfile)
         f = os.popen(c)
         for l in f.xreadlines():
             pass
@@ -31,7 +46,7 @@ def run_command(batch):
         user = "root"
         if "as-builder" in batch.command_flags:
             user = "builder"
-        return chroot.run(batch.command, logfile = batch.logfile, user = user)
+        return chroot.run(command, logfile = batch.logfile, user = user)
 
 def build_all(r, build_fnc):
     status.email = r.requester_email

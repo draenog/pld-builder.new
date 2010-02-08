@@ -56,6 +56,7 @@ def handle_group(r, user):
         return
 
     for batch in r.batches:
+
         if not user.can_do("src", config.builder, batch.branch):
             fail_mail("user %s is not allowed to src:%s:%s" \
                         % (user.get_login(), config.builder, batch.branch))
@@ -74,30 +75,10 @@ def handle_group(r, user):
             return
 
         # src builder handles only special commands
-        if batch.is_command() and (batch.command in ["cvs up"] or config.builder in batch.builders):
+        if batch.is_command() and (batch.command in ["cvs up"] or batch.command[:5] == "skip:"  or config.builder in batch.builders):
             batch.expand_builders(config.binary_builders + [config.src_builder])
         else:
             batch.expand_builders(config.binary_builders)
-
-        if batch.skip:
-            msg = ""
-            for id in batch.skip:
-                if os.path.isdir(path.srpms_dir + '/' + id):
-                    fd = open(path.srpms_dir + '/' + id + '/skipme', 'w')
-                    fd.write("skip request %s" % (user.get_login()))
-                    fd.close()
-                    log.notice("skip request %s by %s" % (id, user.get_login()))
-                    msg = msg + "skip %s\n" % id
-                else:
-                    msg = msg + "no srpm dir for %s\n" % id
-
-            m = user.message_to()
-            m.set_headers(subject = "skip request")
-            m.write_line(msg)
-            m.send()
-
-            lockf.close()
-            return
 
         if not batch.is_command() and config.builder in batch.builders:
             batch.builders.remove(config.builder)

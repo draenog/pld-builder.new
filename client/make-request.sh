@@ -182,10 +182,7 @@ while [ $# -gt 0 ] ; do
 			;;
 
 		-s|--skip)
-			f_upgrade=no
-			build_mode=test
-			priority=-1
-			skip=$2
+			skip="$2"
 			shift
 			;;
 
@@ -329,6 +326,16 @@ aidath)
 	;;
 esac
 
+# need to do this after distro selection
+if [ "$skip" ]; then
+	f_upgrade=no
+	build_mode=test
+	priority=-1
+	command="skip:$skip"
+	command_flags="no-chroot"
+	builders="$distro-src"
+fi
+
 branch=${branch:-$default_branch}
 
 specs=`for s in $specs; do
@@ -379,7 +386,7 @@ for s in $specs; do
 done
 
 if [ "$ok" = "" ] ; then
-	if [ -z "$command" -a -z "$skip" ]; then
+	if [ -z "$command" ]; then
 		die "no specs passed"
 	fi
 else
@@ -410,16 +417,6 @@ gen_req() {
 		for b in $builders; do
 			echo >&2 "* Builder: $b"
 			echo "		 <builder>$b</builder>"
-		done
-		echo "	</batch>"
-
-	elif [ "$skip" ]; then
-		bid=$(uuidgen)
-		echo "	<batch id='$bid' depends-on=''>"
-		for s in {$skip,}; do
-			[ "$s" ] || continue
-		 	echo >&2 "* Skip: $s"
-			echo "<skip>$s</skip>"
 		done
 		echo "	</batch>"
 	else
