@@ -120,10 +120,11 @@ def build_srpm(r, b):
                         (b.branch, pref, b.spec), logfile = b.logfile)
     if res == 0:
         transfer_file(r, b)
-    packagedir = "/home/users/builder/rpm/packages/%s" % b.spec[:-5]
-    chroot.run("cd %s; rpmbuild --nodeps --nobuild --define '_specdir %s' --define '_sourcedir %s' " \
-            "--clean --rmspec --rmsource %s" % \
-            (packagedir, packagedir, packagedir, b.spec), logfile = b.logfile)
+    packagedir = "rpm/packages/%s" % b.spec[:-5]
+    packagename = b.spec[:-5]
+    chroot.run("rpmbuild --nodeps --nobuild --define '_specdir %%{_topdir}/%%{name}' --define '_sourcedir %%{_specdir}' " \
+            "--clean --rmspec --rmsource %s/%s" % \
+            (packagedir, b.spec), logfile = b.logfile)
     chroot.run("rm -rf %s" % packagedir, logfile = b.logfile)
     status.pop()
     if res:
