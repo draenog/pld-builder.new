@@ -291,6 +291,7 @@ ac)
 	default_builders="ac-*"
 	default_branch="AC-branch"
 	url="http://ep09.pld-linux.org:1289/"
+	control_url="http://ep09.pld-linux.org/~buildsrc"
 	;;
 ac-java) # fake "distro" for java available ac architectures
 	builder_email="builder-ac@pld-linux.org"
@@ -328,6 +329,55 @@ esac
 
 # need to do this after distro selection
 if [ "$skip" ]; then
+	skip=$(skip="$skip" control_url="$control_url" python -c '
+import urllib2
+import sys
+import StringIO
+import gzip
+import re
+import os
+import string
+from xml.dom import minidom
+
+skip = os.environ.get("skip").split(",");
+control_url = os.environ.get("control_url")
+
+print >> sys.stderr, "* Check queue_id-s against %s" % control_url
+
+try:
+	headers = { "Cache-Control": "no-cache", "Pragma": "no-cache" }
+	req = urllib2.Request(url=control_url + "/queue.gz", headers=headers)
+	f = urllib2.urlopen(req)
+except Exception, e:
+	print >> sys.stderr, "Fetch error %s: %s" % (control_url + "/queue.gz", e)
+	sys.exit(1)
+
+sio = StringIO.StringIO()
+sio.write(f.read())
+f.close()
+sio.seek(0)
+f = gzip.GzipFile(fileobj = sio)
+
+xml = re.compile("(<queue>.*?</queue>)", re.DOTALL).match(f.read()).group(1)
+d = minidom.parseString(xml)
+
+q = []
+for c in d.documentElement.childNodes:
+	if c.nodeName != "group":
+		continue
+	q.append(c.attributes["id"].value)
+
+err = 0
+for s in skip:
+	if s not in q:
+		print >> sys.stderr, "- Check %s: ERROR: Not valid queue-id" % s
+		err = 1
+	else:
+		print >> sys.stderr, "- Check %s: OK" % s
+if err == 1:
+	sys.exit(1)
+print string.join(skip, ",")
+') || exit $?
 	f_upgrade=no
 	build_mode=test
 	priority=-1
