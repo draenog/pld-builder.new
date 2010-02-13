@@ -122,7 +122,7 @@ def build_srpm(r, b):
         transfer_file(r, b)
     packagedir = "rpm/packages/%s" % b.spec[:-5]
     packagename = b.spec[:-5]
-    chroot.run("rpmbuild --nodeps --nobuild --define '_specdir %%{_topdir}/%%{name}' --define '_sourcedir %%{_specdir}' " \
+    chroot.run("rpmbuild --nodeps --nobuild --define '_topdir %(echo $HOME/rpm)' --define '_specdir %%{_topdir}/%%{name}' --define '_sourcedir %%{_specdir}' " \
             "--clean --rmspec --rmsource %s/%s" % \
             (packagedir, b.spec), logfile = b.logfile)
     chroot.run("rm -rf %s" % packagedir, logfile = b.logfile)
