@@ -66,6 +66,8 @@ def verify_sig(buf):
         m = rx.match(l)
         if m:
             emails.append(m.group(2))
+    if not emails:
+        log.error("gnupg signature check failed: %s" % d_stderr)
     return (emails, d_stdout)
 
 def sign(buf):
