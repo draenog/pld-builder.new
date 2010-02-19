@@ -27,7 +27,7 @@ def run_command(batch):
         for id in command[5:].split(','):
             if os.path.isdir(path.srpms_dir + '/' + id):
                 c = c + "echo skip:%s;\n" % (id)
-                c = c + "touch %s/%s;\n" % (path.srpms_dir, id)
+                c = c + "touch %s/%s/skipme;\n" % (path.srpms_dir, id)
             else:
                 c = c + "echo %s is not valid build-id;\n" % (id)
         command = c
