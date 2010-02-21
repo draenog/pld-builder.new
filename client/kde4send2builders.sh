@@ -57,7 +57,8 @@ kde4-kdeedu.spec \
 kde4-kdeplasma-addons.spec \
 kde4-kdesdk.spec \
 kde4-kdebindings.spec \
-kde4-kdeadmin.spec"
+kde4-kdeadmin.spec \
+kde4-kdetoys.spec"
 KOFFICE="kde4-koffice.spec"
 L10N="kde4-l10n.spec"
 
