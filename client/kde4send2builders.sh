@@ -41,7 +41,7 @@ PRIO=2
 #SPECDIR=$(rpm -E %_specdir)
 SPECDIR=~/rpm
 
-LIBS="kde4-kdelibs.spec kde4-kdepimlibs.spec kde4-kdelibs-experimental.spec"
+LIBS="kde4-kdelibs.spec kde4-kdepimlibs.spec"
 BASE="kde4-oxygen-icons.spec kde4-kdebase-runtime.spec kde4-kdebase-workspace.spec kde4-kdebase.spec"
 OTHER="kde4-kdemultimedia.spec kde4-kdegraphics.spec \
 kde4-kwebkitpart.spec \
