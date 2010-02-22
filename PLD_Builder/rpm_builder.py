@@ -123,7 +123,7 @@ def fetch_src(r, b):
 
 def prepare_env():
     chroot.run("""
-        test ! -f /proc/uptime && mount /proc
+        test ! -f /proc/uptime && mount /proc 2>/dev/null
         test ! -c /dev/full && rm -f /dev/full && mknod -m 666 /dev/full c 1 7
         test ! -c /dev/null && rm -f /dev/null && mknod -m 666 /dev/null c 1 3
         test ! -c /dev/random && rm -f /dev/random && mknod -m 644 /dev/random c 1 8
