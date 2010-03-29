@@ -14,11 +14,13 @@ from config import config
 def quote(cmd):
     return re.sub("([\"\\\\$`])", r"\\\1", cmd)
     
-def command(cmd, user = None):
+def command(cmd, user = None, nostdin=""):
     if user == None:
         user = config.builder_user
-    return "%s sudo chroot %s su - %s -c \"export LC_ALL=C; %s < /dev/null\"" \
-            % (config.sudo_chroot_wrapper, config.chroot, user, quote(cmd))
+    if nostdin:
+        nostdin = "< /dev/null"
+    return "%s sudo chroot %s su - %s -c \"export LC_ALL=C; %s %s\"" \
+            % (config.sudo_chroot_wrapper, config.chroot, user, quote(cmd), nostdin)
     
 def command_sh(cmd):
     return "%s sudo chroot %s /bin/sh -c \"export LC_ALL=C; %s < /dev/null\"" \
@@ -29,7 +31,7 @@ def popen(cmd, user = "builder", mode = "r"):
     return f
     
 def run(cmd, user = "builder", logfile = None, logstdout = None):
-    c = command(cmd, user)
+    c = command(cmd, user, nostdin=True)
     if logfile != None:
         if logstdout != None:
             c = "%s 2>&1 | /usr/bin/tee -a %s" % (c, logfile)
