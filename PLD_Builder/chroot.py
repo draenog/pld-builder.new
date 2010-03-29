@@ -32,9 +32,11 @@ def run(cmd, user = "builder", logfile = None, logstdout = None):
     c = command(cmd, user)
     if logfile != None:
         if logstdout != None:
-            c = "%s 2>&1 | /usr/bin/tee -a %s" % (c, logfile)
+            c = "%s < /dev/null 2>&1 | /usr/bin/tee -a %s" % (c, logfile)
         else:
-            c = "%s >> %s 2>&1" % (c, logfile)
+            c = "%s < /dev/null >> %s 2>&1" % (c, logfile)
+    else:
+        c = "%s < /dev/null" % (c)
     f = os.popen(c)
     if logstdout != None:
         for l in f:
