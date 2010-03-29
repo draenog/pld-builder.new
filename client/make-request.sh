@@ -312,6 +312,7 @@ th)
 	builder_email="builderth@ep09.pld-linux.org"
 	default_builders="th-*"
 	url="http://ep09.pld-linux.org:1234/"
+	control_url="http://ep09.pld-linux.org/~builderth"
 	;;
 th-java) # fake "distro" for java available th architectures
 	builder_email="builderth@ep09.pld-linux.org"
