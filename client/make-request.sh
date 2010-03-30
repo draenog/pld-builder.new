@@ -307,6 +307,8 @@ ac-xen) # fake "distro" for xen-enabled architectures
 ti)
 	builder_email="builderti@ep09.pld-linux.org"
 	default_builders="ti-*"
+	url="http://ep09.pld-linux.org:1231/"
+	control_url="http://ep09.pld-linux.org/~builderti"
 	;;
 th)
 	builder_email="builderth@ep09.pld-linux.org"
