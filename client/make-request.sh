@@ -453,10 +453,15 @@ id=$(uuidgen)
 gen_req() {
 	echo "<group id='$id' no='0' flags='$flags'>"
 	echo "	<time>$(date +%s)</time>"
+	echo >&2 "* Using priority $priority"
 	echo "	<priority>$priority</priority>"
 	if [ -n "$jobs" ]; then
+		echo >&2 "* Using jobs $jobs"
 		echo "	<maxjobs>$jobs</maxjobs>"
 	fi
+	echo >&2 "* Build mode: $build_mode"
+	echo >&2 "* Using email $builder_email"
+	echo >&2 "* Queue-ID: $id"
 	echo
 
 	if [ "$command" != "" ] ; then
@@ -474,50 +479,43 @@ gen_req() {
 		echo "	</batch>"
 	else
 
-	echo >&2 "* Using priority $priority"
-	if [ -n "$jobs" ]; then
-		echo >&2 "* Using jobs $jobs"
-	fi
-	echo >&2 "* Using email $builder_email"
-	echo >&2 "* Build mode: $build_mode"
-	if [ "$f_upgrade" = "yes" ] ; then
-		echo >&2 "* Upgrade mode: $f_upgrade"
-	fi
-	echo >&2 "* Queue-ID: $id"
+		if [ "$f_upgrade" = "yes" ] ; then
+			echo >&2 "* Upgrade mode: $f_upgrade"
+		fi
 
-	# first id:
-	fid=
-	i=1
+		# first id:
+		fid=
+		i=1
 
-	for b in $builders; do
-		echo >&2 "* Builder: $b"
-	done
-	for s in $specs; do
-		bid=$(uuidgen)
-		echo "	<batch id='$bid' depends-on='$fid'>"
-		[ "$fid" = "" ] && fid="$bid"
-		name=$(echo "$s" | sed -e 's|:.*||')
-		branch=$(echo "$s" | sed -e 's|.*:||')
-		echo >&2 "* Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}${target:+ target=$target}"
-		echo "		 <spec>$name</spec>"
-		echo "		 <branch>$branch</branch>"
-		echo "		 ${kernel:+<kernel>$kernel</kernel>}"
-		echo "		 ${target:+<target>$target</target>}"
-		echo "		 <info></info>"
-		echo
-		for b in $with; do
-			echo "		 <with>$b</with>"
-		done
-		for b in $without; do
-			echo "		 <without>$b</without>"
-		done
-		echo
 		for b in $builders; do
-			echo "		 <builder>$b</builder>"
+			echo >&2 "* Builder: $b"
 		done
-		echo "	</batch>"
-		i=$((i+1))
-	done
+		for s in $specs; do
+			bid=$(uuidgen)
+			echo "	<batch id='$bid' depends-on='$fid'>"
+			[ "$fid" = "" ] && fid="$bid"
+			name=$(echo "$s" | sed -e 's|:.*||')
+			branch=$(echo "$s" | sed -e 's|.*:||')
+			echo >&2 "* Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}${target:+ target=$target}"
+			echo "		 <spec>$name</spec>"
+			echo "		 <branch>$branch</branch>"
+			echo "		 ${kernel:+<kernel>$kernel</kernel>}"
+			echo "		 ${target:+<target>$target</target>}"
+			echo "		 <info></info>"
+			echo
+			for b in $with; do
+				echo "		 <with>$b</with>"
+			done
+			for b in $without; do
+				echo "		 <without>$b</without>"
+			done
+			echo
+			for b in $builders; do
+				echo "		 <builder>$b</builder>"
+			done
+			echo "	</batch>"
+			i=$((i+1))
+		done
 
 	fi
 
