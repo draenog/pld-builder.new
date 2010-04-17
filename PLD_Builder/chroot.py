@@ -18,12 +18,12 @@ def command(cmd, user = None, nostdin=""):
     if user == None:
         user = config.builder_user
     if nostdin:
-        nostdin = "< /dev/null"
+        nostdin = "exec < /dev/null; "
     return "%s sudo chroot %s su - %s -c \"export LC_ALL=C; %s %s\"" \
-            % (config.sudo_chroot_wrapper, config.chroot, user, quote(cmd), nostdin)
+            % (config.sudo_chroot_wrapper, config.chroot, user, nostdin, quote(cmd))
     
 def command_sh(cmd):
-    return "%s sudo chroot %s /bin/sh -c \"export LC_ALL=C; %s < /dev/null\"" \
+    return "%s sudo chroot %s /bin/sh -c \"export LC_ALL=C; exec < /dev/null; %s\"" \
             % (config.sudo_chroot_wrapper, config.chroot, quote(cmd))
 
 def popen(cmd, user = "builder", mode = "r"):
