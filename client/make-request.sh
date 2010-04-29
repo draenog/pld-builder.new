@@ -4,7 +4,6 @@
 cd /usr/share/empty
 
 builders=
-specs=
 with=
 without=
 flags=
@@ -46,10 +45,18 @@ if [ -f "$USER_CFG" ]; then
 	. $USER_CFG
 fi
 
+# internal options, not to be overriden
+specs=
+df_fetch=no
+
+die() {
+	echo >&2 "$0: $*"
+	exit 1
+}
+
 send_request() {
 	# switch to mail mode, if no url set
 	[ -z "$url" ] && send_mode="mail"
-
 
 	case "$send_mode" in
 	"mail")
@@ -76,9 +83,47 @@ print >> sys.stdout, "Request queued via HTTP."
 	esac
 }
 
-die() {
-	echo >&2 "$0: $*"
-	exit 1
+# simple df_fetcher, based on packages/fetchsrc_request
+# TODO: tcp (smtp) mode
+# TODO: adjust for ~/.requestrc config
+df_fetch() {
+	local specs="$@"
+
+	# Sending by
+	local MAILER='/usr/sbin/sendmail'
+	# MAILER='/usr/bin/msmtp'
+	# Sending via
+	local VIA="SENDMAIL"
+	#VIA="localhost"
+	local VIA_ARGS=""
+	#VIA_ARGS="some additional flags"
+	# e.g. for msmtp:
+	# VIA_ARGS='-a gmail'
+	#
+	# DISTFILES EMAIL
+	local DMAIL="distfiles@pld-linux.org"
+
+	local HOST=$(hostname -f)
+	local LOGIN=${requester%@*}
+
+	for spec in $specs; do
+		local SPEC=$(echo "$spec" | sed -e 's|:.*||')
+		local BRANCH=$(echo "$spec" | sed -e 's|.*:||')
+		echo >&2 "Distfiles Request: $SPEC:$BRANCH via $MAILER ${VIA_ARGS:+ ($VIA_ARGS)}"
+		cat <<-EOF | "$MAILER" -t -i $VIA_ARGS
+			To: $DMAIL
+			From: $LOGIN <$LOGIN@$HOST>
+			Subject: fetchsrc_request notify
+			X-CVS-Module: SPECS
+			X-distfiles-request: yes
+			X-Login: $LOGIN
+			X-Spec: $SPEC
+			X-Branch: $BRANCH
+			X-Flags: force-reply
+
+			.
+			EOF
+	done
 }
 
 usage() {
@@ -115,6 +160,8 @@ usage() {
 	echo "  -f   --flag"
 	echo "  -d   --distro"
 	echo "       Specify value for \$distro"
+	echo "  -df  --distfiles-fetch[-request] PACKAGE"
+	echo "       Send distfiles request to fetch sources for PACKAGE"
 	echo "  -cf  --command-flag"
 	echo "       Not yet documented"
 	echo "  -c   --command"
@@ -265,6 +312,10 @@ while [ $# -gt 0 ] ; do
 			f_upgrade=no
 			;;
 
+		-df | --distfiles-fetch | --distfiles-fetch-request)
+			df_fetch=yes
+			;;
+
 		--gpg-opts | -g )
 			gpg_opts="$2"
 			shift
@@ -407,6 +458,11 @@ specs=`for s in $specs; do
 		;;
 	esac
 done`
+
+if [ "$df_fetch" = "yes" ]; then
+	df_fetch $specs
+	exit 0
+fi
 
 if [[ "$requester" != *@* ]] ; then
 	requester="$requester@pld-linux.org"
