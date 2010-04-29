@@ -132,58 +132,59 @@ Usage: make-request.sh [OPTION] ... [SPECFILE] ....
 
 Mandatory arguments to long options are mandatory for short options too.
 
-      -C  --config-file /path/to/config/file
-           Source additional config file (after $USER_CFG), useful when
-           when sending build requests to Ac/Th from the same account
-      -b 'BUILDER BUILDER ...'  --builder='BUILDER BUILDER ...'
+      -C, --config-file /path/to/config/file
+            Source additional config file (after $USER_CFG), useful when
+            when sending build requests to Ac/Th from the same account
+      -b 'BUILDER BUILDER ...',  --builder='BUILDER BUILDER ...'
            Sends request to given builders (in 'version-arch' format)
-      --with VALUE --without VALUE
-           Build package with(out) a given bcond
+      --with VALUE, --without VALUE
+            Build package with(out) a given bcond
       --kernel VALUE
-           set alt_kernel to VALUE
+            set alt_kernel to VALUE
       --target VALUE
-           set --target to VALUE
+            set --target to VALUE
       -s BUILD_ID, --skip BUILD_ID[,BUILD_ID][,BUILD_ID]
-           mark build ids on src builder to be skipped
+            mark build ids on src builder to be skipped
       --branch VALUE
-           specify default branch for specs in request
-      -t   --test-build
-           Performs a 'test-build'. Package will be uploaded to test/ tree
-           and won't be upgraded on builders
-      -r   --ready-build
-           Build and upgrade package and upload it to ready/ tree
-      -u   --upgrade
-           Forces package upgrade (for use with -c or -q, not -t)
-      -n   --no-upgrade
-           Disables package upgrade (for use with -r)
-      -ni  -no-install-br
-           Do not install missing BuildRequires (--nodeps)
-      -j   Number of parallel jobs for single build
-      -f   --flag
-      -d   --distro DISTRO
-           Specify value for \$distro
-      -df  --distfiles-fetch[-request] PACKAGE
-           Send distfiles request to fetch sources for PACKAGE
-      -cf  --command-flag
-           Not yet documented
-      -c   --command
-           Executes a given command on builders
-           --test-remove-pkg
-           shortcut for --command poldek -evt ARGS
-           --remove-pkg
-           shortcut for --command poldek -ev --noask ARGS
-           --upgrade-pkg
-           shortcut for --command poldek --up -Uv ARGS
-           --cvsup
-           Updates builders infrastructure (outside chroot)
+            specify default branch for specs in request
+      -t, --test-build
+            Performs a 'test-build'. Package will be uploaded to test/ tree
+            and won't be upgraded on builders
+      -r, --ready-build
+            Build and upgrade package and upload it to ready/ tree
+      -u, --upgrade
+            Forces package upgrade (for use with -c or -q, not -t)
+      -n, --no-upgrade
+            Disables package upgrade (for use with -r)
+      -ni, -no-install-br
+            Do not install missing BuildRequires (--nodeps)
+      -j, --jobs
+            Number of parallel jobs for single build
+      -f, --flag
+      -d, --distro DISTRO
+            Specify value for \$distro
+      -df,  --distfiles-fetch[-request] PACKAGE
+            Send distfiles request to fetch sources for PACKAGE
+      -cf, --command-flag
+            Not yet documented
+      -c, --command
+            Executes a given command on builders
+      --test-remove-pkg
+            shortcut for --command poldek -evt ARGS
+      --remove-pkg
+            shortcut for --command poldek -ev --noask ARGS
+      --upgrade-pkg
+            shortcut for --command poldek --up -Uv ARGS
+      --cvsup
+            Updates builders infrastructure (outside chroot)
       -q
-           shortcut for --command rpm -q ARGS
-      -g   --gpg-opts "opts"
-           Pass additional options to gpg binary
-      -p   --priority VALUE
-           sets request priority (default 2)
-      -h   --help
-           Displays this help message
+            shortcut for --command rpm -q ARGS
+      -g, --gpg-opts "opts"
+            Pass additional options to gpg binary
+      -p, --priority VALUE
+            sets request priority (default 2)
+      -h, --help
+            Displays this help message
 EOF
 	exit 0
 }
@@ -191,37 +192,37 @@ EOF
 
 while [ $# -gt 0 ] ; do
 	case "$1" in
-		--distro | -d )
+		--distro | -d)
 			distro=$2
 			shift
 			;;
 
-		--config-file | -C )
+		--config-file | -C)
 			[ -f $2 ] && . $2 || die "Config file not found"
 			shift
 			;;
 
-		--builder | -b )
+		--builder | -b)
 			builders="$builders $2"
 			shift
 			;;
 
-		--with )
+		--with)
 			with="$with $2"
 			shift
 			;;
 
-		--without )
+		--without)
 			without="$without $2"
 			shift
 			;;
 
-		--test-build | -t )
+		--test-build | -t)
 			build_mode=test
 			f_upgrade=no
 			;;
 
-		--kernel )
+		--kernel)
 			kernel=$2
 			shift
 			;;
@@ -241,43 +242,43 @@ while [ $# -gt 0 ] ; do
 			shift
 			;;
 
-		--priority | -p )
+		--priority | -p)
 			priority=$2
 			shift
 			;;
 
-		--ready-build | -r )
+		--ready-build | -r)
 			build_mode=ready
 			;;
 
-		--upgrade | -u )
+		--upgrade | -u)
 			f_upgrade=yes
 			;;
 
-		--no-upgrade | -n )
+		--no-upgrade | -n)
 			f_upgrade=no
 			;;
 
-		--no-install-br | -ni )
+		--no-install-br | -ni)
 			flags="$flags no-install-br"
 			;;
 
-		-j )
+		-j | --jobs)
 			jobs="$2"
 			shift
 			;;
 
-		--flag | -f )
+		--flag | -f)
 			flags="$flags $2"
 			shift
 			;;
 
-		--command-flags | -cf )
+		--command-flags | -cf)
 			command_flags="$2"
 			shift
 			;;
 
-		--command | -c )
+		--command | -c)
 			command="$2"
 			if [ "$command" = - ]; then
 				echo >&2 "Reading command from STDIN"
@@ -309,7 +310,7 @@ while [ $# -gt 0 ] ; do
 			shift
 			;;
 
-		--cvsup )
+		--cvsup)
 			command_flags="no-chroot"
 			command="cvs up"
 			f_upgrade=no
@@ -319,20 +320,20 @@ while [ $# -gt 0 ] ; do
 			df_fetch=yes
 			;;
 
-		--gpg-opts | -g )
+		--gpg-opts | -g)
 			gpg_opts="$2"
 			shift
 			;;
 
-		--help | -h )
+		--help | -h)
 			usage
 			;;
 
-		-* )
+		-*)
 			die "unknown knob: $1"
 			;;
 
-		*:* | * )
+		*:* | *)
 			specs="$specs $1"
 			;;
 	esac
