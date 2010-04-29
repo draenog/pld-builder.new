@@ -127,62 +127,65 @@ df_fetch() {
 }
 
 usage() {
-	echo "Usage: make-request.sh [OPTION] ... [SPECFILE] ...."
-	echo ""
-	echo "Mandatory arguments to long options are mandatory for short options too."
-	echo "  -C  --config-file /path/to/config/file"
-	echo "       Source additional config file (after $USER_CFG), useful when"
-	echo "       when sending build requests to Ac/Th from the same account"
-	echo "  -b 'BUILDER BUILDER ...'  --builder='BUILDER BUILDER ...'"
-	echo "       Sends request to given builders (in 'version-arch' format)"
-	echo "  --with VALUE --without VALUE"
-	echo "       Build package with(out) a given bcond"
-	echo "  --kernel VALUE"
-	echo "       set alt_kernel to VALUE"
-	echo "  --target VALUE"
-	echo "       set --target to VALUE"
-	echo "  -s BUILD_ID, --skip BUILD_ID[,BUILD_ID][,BUILD_ID]"
-	echo "       mark build ids on src builder to be skipped"
-	echo "  --branch VALUE"
-	echo "       specify default branch for specs in request"
-	echo "  -t   --test-build"
-	echo "       Performs a 'test-build'. Package will be uploaded to test/ tree"
-	echo "       and won't be upgraded on builders"
-	echo "  -r   --ready-build"
-	echo "       Build and upgrade package and upload it to ready/ tree"
-	echo "  -u   --upgrade"
-	echo "       Forces package upgrade (for use with -c or -q, not -t)"
-	echo "  -n   --no-upgrade"
-	echo "       Disables package upgrade (for use with -r)"
-	echo "  -ni  -no-install-br"
-	echo "       Do not install missing BuildRequires (--nodeps)"
-	echo "  -j   Number of parallel jobs for single build"
-	echo "  -f   --flag"
-	echo "  -d   --distro"
-	echo "       Specify value for \$distro"
-	echo "  -df  --distfiles-fetch[-request] PACKAGE"
-	echo "       Send distfiles request to fetch sources for PACKAGE"
-	echo "  -cf  --command-flag"
-	echo "       Not yet documented"
-	echo "  -c   --command"
-	echo "       Executes a given command on builders"
-	echo "       --test-remove-pkg"
-	echo "       shortcut for --command poldek -evt ARGS"
-	echo "       --remove-pkg"
-	echo "       shortcut for --command poldek -ev --noask ARGS"
-	echo "       --upgrade-pkg"
-	echo "       shortcut for --command poldek --up -Uv ARGS"
-	echo "       --cvsup"
-	echo "       Updates builders infrastructure (outside chroot)"
-	echo "  -q   "
-	echo "       shortcut for --command rpm -q ARGS"
-	echo "  -g   --gpg-opts \"opts\""
-	echo "       Pass additional options to gpg binary"
-	echo "  -p   --priority VALUE"
-	echo "       sets request priority (default 2)"
-	echo "  -h   --help"
-	echo "       Displays this help message"
-	exit 0;
+	cat <<EOF
+Usage: make-request.sh [OPTION] ... [SPECFILE] ....
+
+Mandatory arguments to long options are mandatory for short options too.
+
+      -C  --config-file /path/to/config/file
+           Source additional config file (after $USER_CFG), useful when
+           when sending build requests to Ac/Th from the same account
+      -b 'BUILDER BUILDER ...'  --builder='BUILDER BUILDER ...'
+           Sends request to given builders (in 'version-arch' format)
+      --with VALUE --without VALUE
+           Build package with(out) a given bcond
+      --kernel VALUE
+           set alt_kernel to VALUE
+      --target VALUE
+           set --target to VALUE
+      -s BUILD_ID, --skip BUILD_ID[,BUILD_ID][,BUILD_ID]
+           mark build ids on src builder to be skipped
+      --branch VALUE
+           specify default branch for specs in request
+      -t   --test-build
+           Performs a 'test-build'. Package will be uploaded to test/ tree
+           and won't be upgraded on builders
+      -r   --ready-build
+           Build and upgrade package and upload it to ready/ tree
+      -u   --upgrade
+           Forces package upgrade (for use with -c or -q, not -t)
+      -n   --no-upgrade
+           Disables package upgrade (for use with -r)
+      -ni  -no-install-br
+           Do not install missing BuildRequires (--nodeps)
+      -j   Number of parallel jobs for single build
+      -f   --flag
+      -d   --distro DISTRO
+           Specify value for \$distro
+      -df  --distfiles-fetch[-request] PACKAGE
+           Send distfiles request to fetch sources for PACKAGE
+      -cf  --command-flag
+           Not yet documented
+      -c   --command
+           Executes a given command on builders
+           --test-remove-pkg
+           shortcut for --command poldek -evt ARGS
+           --remove-pkg
+           shortcut for --command poldek -ev --noask ARGS
+           --upgrade-pkg
+           shortcut for --command poldek --up -Uv ARGS
+           --cvsup
+           Updates builders infrastructure (outside chroot)
+      -q
+           shortcut for --command rpm -q ARGS
+      -g   --gpg-opts "opts"
+           Pass additional options to gpg binary
+      -p   --priority VALUE
+           sets request priority (default 2)
+      -h   --help
+           Displays this help message
+EOF
+	exit 0
 }
 
 
