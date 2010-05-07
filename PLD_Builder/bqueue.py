@@ -27,7 +27,13 @@ class B_Queue:
         self.requests.reverse()
     
     def dump_html(self, f):
-        f.write("<html><head><title>PLD builder queue</title></head><body>\n")
+        f.write("""
+        <html>
+            <head>
+            <link rel="Shortcut Icon" href="http://www.pld-linux.org/favicon.ico"/>
+            <title>PLD builder queue</title>
+            </head>
+        <body>\n""")
         self.requests.reverse()
         for r in self.requests:
             r.dump_html(f)
