@@ -7,12 +7,13 @@ import time
 import log
 import sys
 import traceback
+import os
 from config import config, init_conf
 
-from os import curdir, sep
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 import request_handler
+import path
 
 class MyHandler(BaseHTTPRequestHandler):
 
@@ -51,7 +52,59 @@ class MyHandler(BaseHTTPRequestHandler):
 			raise
 			pass
 
+def write_css():
+	css_file = path.www_dir + "/style.css"
+	if os.path.exists(css_file):
+		return
+
+	# css from www.pld-linux.org wiki theme, using css usage firebug plugin to cleanup
+	css = """
+html {
+	background-color: white;
+	color: #5e5e5e;
+	font-family: Tahoma, Arial, Lucida Grande, sans-serif;
+	font-size: 0.75em;
+	line-height: 1.25em;
+}
+
+a {
+	text-decoration: underline;
+	color: #00f;
+}
+
+a:hover {
+	color: #00c;
+}
+
+@media screen, projection {
+	html {
+		background-color: #f3efe3;
+	}
+
+	body {
+		position: relative;
+	}
+}
+@media print {
+	a {
+		background-color: inherit;
+		color: inherit;
+	}
+}
+
+@media projection {
+	html { line-height: 1.8em; }
+	body, b, a, p { font-size: 22pt; }
+}
+"""
+	old_umask = os.umask(0022)
+	f = open(css_file, "w")
+	f.write(css)
+	f.close()
+	os.umask(old_umask)
+
 def main():
+	write_css();
 	socket.setdefaulttimeout(30)
 	try:
 		init_conf()
