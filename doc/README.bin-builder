@@ -33,7 +33,6 @@ gpg --gen-key on target host
 3. import that public key to src builder keyring
 bin-builder$ gpg --export KEYID --armor > ac-ppc.asc
 src-builder$ gpg --import < ac-ppc.asc
-buildersrc# sudo -H -u buildsrc gpg --import < ~/ac-ppc.asc
  
 ssh keys
 ~~~~~~~~
