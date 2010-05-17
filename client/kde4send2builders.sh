@@ -59,7 +59,7 @@ kde4-kdeplasma-addons.spec \
 kde4-kdesdk.spec \
 kde4-kdeadmin.spec \
 kde4-kdetoys.spec"
-KOFFICE="kde4-koffice.spec"
+KOFFICE="kde4-koffice.spec kde4-koffice-l10n.spec"
 L10N="kde4-l10n.spec"
 
 while [ $# -gt 0 ]; do
