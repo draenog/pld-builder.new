@@ -4,6 +4,7 @@ import ConfigParser
 import string
 import fnmatch
 import os
+import stat
 
 import path
 import log
@@ -90,7 +91,7 @@ class ACL_Conf():
         self.reload()
 
     def try_reload(self):
-        mtime = os.stat(path.acl_conf)[ST_MTIME]
+        mtime = os.stat(path.acl_conf)[stat.ST_MTIME]
         if mtime != self.acl_conf_mtime:
             log.notice("acl.conf has changed, reloading...")
             self.reload()
