@@ -54,7 +54,8 @@ class MyHandler(BaseHTTPRequestHandler):
 
 def write_css():
 	css_file = path.www_dir + "/style.css"
-	if os.path.exists(css_file):
+	# skip if file exists and code is not newer
+	if os.path.exists(css_file) and os.stat(__file__).st_mtime < os.stat(css_file).st_mtime:
 		return
 
 	# css from www.pld-linux.org wiki theme, using css usage firebug plugin to cleanup
@@ -83,6 +84,23 @@ a:hover {
 
 	body {
 		position: relative;
+	}
+
+	div {
+		background-color: white;
+		margin: 10px 0px;
+		padding: 10px;
+	}
+	div > a {
+		font-weight: bold;
+		color: #5e5e5e;
+	}
+	div > a:hover {
+		color: #5e5e5e;
+	}
+	div:target {
+		background-color: #ffffcc;
+		color: black;
 	}
 }
 @media print {

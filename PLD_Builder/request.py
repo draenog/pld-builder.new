@@ -14,7 +14,7 @@ from acl import acl
 from config import config
 
 __all__ = ['parse_request', 'parse_requests']
-    
+
 def text(e):
     res = ""
     for n in e.childNodes:
@@ -36,7 +36,7 @@ def escape(s):
 
 def is_blank(e):
     return e.nodeType == Element.TEXT_NODE and string.strip(e.nodeValue) == ""
-    
+
 class Group:
     def __init__(self, e):
         self.batches = []
@@ -92,16 +92,23 @@ class Group:
         f.write("\n")
 
     def dump_html(self, f):
-        f.write("<p><b>%d</b>. %s from %s <small>%s, prio=%d, jobs=%d, %s</small><br/>\n" % \
-                (self.no,
-                 escape(time.strftime("%Y.%m.%d %H:%M:%S", time.localtime(self.time))),
-                 escape(self.requester),
-                 self.id, self.priority, self.max_jobs, string.join(self.flags)))
+        f.write(
+            "<div id=\"%(id)d\">"
+            "<a href=\"#%(id)d\")>%(id)d</a>. %(time)s from %(requester)s "
+            "<small>%(id)s, prio=%(priority)d, jobs=%(max_jobs)d, %(flags)s</small>\n"
+        % {
+            'id': self.no,
+            'time': escape(time.strftime("%Y.%m.%d %H:%M:%S", time.localtime(self.time))),
+            'requester': escape(self.requester),
+            'priority': self.priority,
+            'max_jobs': self.max_jobs,
+            'flags': string.join(self.flags)
+        })
         f.write("<ul>\n")
         for b in self.batches:
             b.dump_html(f, self.id)
         f.write("</ul>\n")
-        f.write("</p>\n")
+        f.write("</div>\n")
 
     def write_to(self, f):
         f.write("""
@@ -110,7 +117,7 @@ class Group:
          <time>%d</time>
          <priority>%d</priority>
          <maxjobs>%d</maxjobs>\n""" % (self.id, self.no, string.join(self.flags),
-                    escape(self.requester_email), escape(self.requester), 
+                    escape(self.requester_email), escape(self.requester),
                     self.time, self.priority, self.max_jobs))
         for b in self.batches:
             b.write_to(f)
@@ -177,7 +184,7 @@ class Batch:
                 self.bconds_without.append(text(c))
             else:
                 log.panic("xml: evil batch child (%s)" % c.nodeName)
- 
+
     def is_done(self):
         ok = 1
         for b in self.builders:
@@ -185,7 +192,7 @@ class Batch:
             if not s.startswith("OK") and not s.startswith("SKIP") and not s.startswith("UNSUPP") and not s.startswith("FAIL"):
                 ok = 0
         return ok
-            
+
     def dump(self, f):
         f.write("  batch: %s/%s\n" % (self.src_rpm, self.spec))
         f.write("    info: %s\n" % self.info)
@@ -264,7 +271,7 @@ class Batch:
         for b in self.bconds_without:
             r = r + " --without " + b
         return r
-        
+
     def write_to(self, f):
         f.write("""
          <batch id='%s' depends-on='%s'>
@@ -272,9 +279,9 @@ class Batch:
            <command flags="%s">%s</command>
            <spec>%s</spec>
            <branch>%s</branch>
-           <info>%s</info>\n""" % (self.b_id, 
+           <info>%s</info>\n""" % (self.b_id,
                  string.join(map(lambda (b): b.b_id, self.depends_on)),
-                 escape(self.src_rpm), 
+                 escape(self.src_rpm),
                  escape(' '.join(self.command_flags)), escape(self.command),
                  escape(self.spec), escape(self.branch), escape(self.info)))
         if self.kernel != "":
@@ -289,7 +296,7 @@ class Batch:
             f.write("           <builder status='%s' time='%s'>%s</builder>\n" % \
                     (escape(self.builders_status[b]), self.builders_status_time[b], escape(b)))
         f.write("         </batch>\n")
-        
+
     def log_line(self, l):
         log.notice(l)
         if self.logfile != None:
@@ -352,7 +359,7 @@ def build_request(e):
 def parse_request(f):
     d = parseString(f)
     return build_request(d.documentElement)
-    
+
 def parse_requests(f):
     d = parseString(f)
     res = []
