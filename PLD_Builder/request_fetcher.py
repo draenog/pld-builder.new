@@ -109,6 +109,7 @@ def main():
     if lck == None:
         sys.exit(1)
     init_conf()
+    acl.try_reload()
     
     status.push("fetching requests")
     if has_new(config.control_url):

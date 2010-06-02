@@ -3,6 +3,7 @@
 import ConfigParser
 import string
 import fnmatch
+import os
 
 import path
 import log
@@ -83,8 +84,21 @@ class User:
     def get_login(self):
         return self.login
 
-class ACL_Conf:
+class ACL_Conf():
     def __init__(self):
+        self.acl_conf_mtime = 0
+        self.reload()
+
+    def try_reload(self):
+        mtime = os.stat(path.acl_conf)[ST_MTIME]
+        if mtime != self.acl_conf_mtime:
+            log.notice("acl.conf has changed, reloading...")
+            self.reload()
+            self.acl_conf_mtime = mtime
+            return True
+        return False
+
+    def reload(self):
         self.current_user = None
         status.push("reading acl.conf")
         p = ConfigParser.ConfigParser()

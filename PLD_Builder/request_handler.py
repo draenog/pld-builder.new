@@ -192,6 +192,7 @@ def handle_request(req, filename = None):
     return True
 
 def handle_request_main(req, filename = None):
+    acl.try_reload()
     init_conf("src")
     status.push("handling email request")
     ret = handle_request(req, filename = filename)
