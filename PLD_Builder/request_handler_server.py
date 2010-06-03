@@ -89,7 +89,7 @@ a:hover {
 	div {
 		background-color: white;
 		margin: 10px 0px;
-		padding: 10px;
+		padding: 2px;
 	}
 	div > a {
 		font-weight: bold;
