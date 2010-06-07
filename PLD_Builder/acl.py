@@ -85,7 +85,7 @@ class User:
     def get_login(self):
         return self.login
 
-class ACL_Conf():
+class ACL_Conf:
     def __init__(self):
         self.acl_conf_mtime = 0
         self.reload()
