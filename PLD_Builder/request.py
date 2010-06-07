@@ -98,7 +98,7 @@ class Group:
             "<small>%(id)s, prio=%(priority)d, jobs=%(max_jobs)d, %(flags)s</small>\n"
         % {
             'no': self.no,
-            'id': self.id,
+            'id': '<a href="srpms/%(id)s">%(id)s</a>' % {'id': self.id},
             'time': escape(time.strftime("%Y.%m.%d %H:%M:%S", time.localtime(self.time))),
             'requester': escape(self.requester),
             'priority': self.priority,
