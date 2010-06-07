@@ -70,11 +70,11 @@ html {
 
 a {
 	text-decoration: underline;
-	color: #00f;
+	color: #006;
 }
 
 a:hover {
-	color: #00c;
+	color: #006;
 }
 
 @media screen, projection {
