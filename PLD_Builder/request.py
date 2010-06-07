@@ -214,8 +214,18 @@ class Batch:
         if self.is_command():
             desc = "SH: %s [%s]" % (self.command, ' '.join(self.command_flags))
         else:
-            desc = "%s (%s -r %s %s %s %s)" \
-                % (self.src_rpm, self.spec, self.branch, self.bconds_string(), self.kernel_string(), self.target_string())
+            package_url = "http://cvs.pld-linux.org/cgi-bin/cvsweb.cgi/packages/%(package)s/%(spec)s?only_with_tag=%(branch)s" % {
+                'spec': self.spec,
+                'branch': self.branch,
+                'package': self.spec[:-5],
+            }
+            desc = "%(src_rpm)s (<a href=\"%(package_url)s\">%(spec)s -r %(branch)s</a>%(bconds)s)" % {
+                'src_rpm': self.src_rpm,
+                'spec': self.spec,
+                'branch': self.branch,
+                'bconds': self.bconds_string() + self.kernel_string() + self.target_string(),
+                'package_url': package_url,
+            }
         f.write("%s <small>[" % desc)
         builders = []
         for b in self.builders:
