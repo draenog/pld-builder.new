@@ -42,9 +42,8 @@ PRIO=2
 SPECDIR=~/rpm
 
 LIBS="kde4-kdelibs.spec kde4-kdepimlibs.spec"
-BASE="kde4-oxygen-icons.spec kde4-kdebase-runtime.spec kde4-kdebase-workspace.spec kde4-kdebase.spec"
+BASE="kde4-oxygen-icons.spec kde4-kdebase-runtime.spec kde4-kdebase-workspace.spec kde4-kwebkitpart.spec kde4-kdebase.spec"
 OTHER="kde4-kdemultimedia.spec kde4-kdegraphics.spec \
-kde4-kwebkitpart.spec \
 kde4-kdenetwork.spec \
 kde4-kdepim.spec \
 kde4-kdepim-runtime.spec \
