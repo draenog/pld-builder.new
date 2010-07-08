@@ -5,7 +5,8 @@
 # chkconfig:	345 99 01
 #
 # description:	perform adminstrator's tasks for PLD Linux Builder
-
+#
+# $Id$
 
 # Source function library
 . /etc/rc.d/init.d/functions
@@ -77,13 +78,14 @@ stop() {
 }
 
 condrestart() {
-	if [ -f /var/lock/subsys/pld-builder ]; then
-		stop
-		start
-	else
+	if [ ! -f /var/lock/subsys/pld-builder ]; then
 		msg_not_running "PLD Linux Builder"
 		RETVAL=$1
+		return
 	fi
+
+	stop
+	start
 }
 
 # See how we were called.
