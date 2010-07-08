@@ -72,8 +72,8 @@ stop() {
 	msg_stopping "PLD Linux Builder"
 	busy; echo
 	umount_chroots
+	rm -f /var/lock/subsys/pld-builder >/dev/null 2>&1
 	RETVAL=0
-	rm -f /var/lock/subsys/pld-builder
 }
 
 condrestart() {
