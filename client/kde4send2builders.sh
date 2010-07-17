@@ -28,6 +28,7 @@ usage() {
 	echo "other - all other kde4-* except libs and base"
 	echo "koffice - kde4-koffice"
 	echo "l10n - kde4-l10n"
+	echo "kdevelop - kde4-devplatform, kde4-kdevelop-*"
 	echo "almost-all - all but koffice and l10n"
 	echo ""
 	exit 0
@@ -60,6 +61,9 @@ kde4-kdeadmin.spec \
 kde4-kdetoys.spec"
 KOFFICE="kde4-koffice.spec kde4-koffice-l10n.spec"
 L10N="kde4-l10n.spec"
+KDEVELOP="kde4-kdevplatform.spec \
+kde4-kdevelop.spec
+kde4-kdevelop-plugin-php.spec"
 
 while [ $# -gt 0 ]; do
 	case "$1" in
@@ -116,6 +120,9 @@ specs=`for s in $specs; do
 			;;
 	l10n) # kde4-l10n
 			echo $L10N
+			;;
+	kdevelop) # kde4-kdevplatform and kde4-kdevelop-*
+			echo $KDEVELOP
 			;;
 	almost-all) # all but koffice and l10n
 			echo $LIBS $BASE $OTHER
