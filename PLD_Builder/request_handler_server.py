@@ -77,6 +77,15 @@ a:hover {
 	color: #006;
 }
 
+pre {
+	background: #FFF8EB;
+	border: 1pt solid #FFE2AB;
+	font-family: courier, monospace;
+	padding: 0.5em;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
 @media screen, projection {
 	html {
 		background-color: #f3efe3;

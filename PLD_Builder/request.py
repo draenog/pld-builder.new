@@ -212,7 +212,7 @@ class Batch:
     def dump_html(self, f, rid):
         f.write("<li>\n")
         if self.is_command():
-            desc = "SH: %s [%s]" % (self.command, ' '.join(self.command_flags))
+            desc = "SH: <pre>%s</pre> flags: [%s]" % (self.command, ' '.join(self.command_flags))
         else:
             package_url = "http://cvs.pld-linux.org/cgi-bin/cvsweb.cgi/packages/%(package)s/%(spec)s?only_with_tag=%(branch)s" % {
                 'spec': self.spec,
