@@ -66,13 +66,14 @@ send_request() {
 	*)
 		echo >&2 "* Sending using http mode to $url"
 		cat - | python -c '
-import sys, urllib2
+import sys, socket, urllib2
 
 try:
         data = sys.stdin.read()
         url = sys.argv[1]
+        socket.setdefaulttimeout(10)
         req = urllib2.Request(url, data)
-        f = urllib2.urlopen(req, timeout = 10)
+        f = urllib2.urlopen(req)
         f.close()
 except Exception, e:
         print >> sys.stderr, "Problem while sending request via HTTP: %s: %s" % (url, e)
