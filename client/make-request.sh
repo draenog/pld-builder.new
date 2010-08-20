@@ -149,10 +149,11 @@ Mandatory arguments to long options are mandatory for short options too.
       --branch VALUE
             specify default branch for specs in request
       -t, --test-build
-            Performs a 'test-build'. Package will be uploaded to test/ tree
-            and won't be upgraded on builders
+            Performs a 'test-build'. Package will be uploaded to hidden .test-builds/
+            ftp tree and won't be upgraded on builders.
       -r, --ready-build
-            Build and upgrade package and upload it to ready/ tree
+            Preforms a 'ready' build. Package will be built and uploaded to test/ ftp tree
+            (and later moved by release manager staff to ready/ and main ftp tree)
       -u, --upgrade
             Forces package upgrade (for use with -c or -q, not -t)
       -n, --no-upgrade
