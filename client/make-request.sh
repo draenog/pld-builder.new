@@ -367,6 +367,12 @@ ti)
 	url="http://ep09.pld-linux.org:1231/"
 	control_url="http://ep09.pld-linux.org/~builderti"
 	;;
+ti-dev)
+	builder_email="buildertidev@ep09.pld-linux.org"
+	default_builders="ti-dev-*"
+	url="http://ep09.pld-linux.org:1232/"
+	control_url="http://ep09.pld-linux.org/~buildertidev"
+	;;
 th)
 	builder_email="builderth@ep09.pld-linux.org"
 	default_builders="th-*"
