@@ -48,6 +48,7 @@ fi
 # internal options, not to be overriden
 specs=
 df_fetch=no
+upgrade_macros=no
 
 die() {
 	echo >&2 "$0: $*"
@@ -179,6 +180,8 @@ Mandatory arguments to long options are mandatory for short options too.
             shortcut for --command poldek --up -Uv ARGS
       --cvsup
             Updates builders infrastructure (outside chroot)
+      --update-macros
+            Updates rpm-build-macros on src builder
       -q
             shortcut for --command rpm -q ARGS
       -g, --gpg-opts "opts"
@@ -316,6 +319,10 @@ while [ $# -gt 0 ] ; do
 			command_flags="no-chroot"
 			command="cvs up"
 			f_upgrade=no
+			;;
+
+		--update-macros)
+			upgrade_macros="yes"
 			;;
 
 		-df | --distfiles-fetch | --distfiles-fetch-request)
@@ -474,6 +481,13 @@ done`
 if [ "$df_fetch" = "yes" ]; then
 	df_fetch $specs
 	exit 0
+fi
+
+if [ "$upgrade_macros" = "yes" ]; then
+	command="poldek --up -Uv rpm-build-macros"
+	builders="$distro-src"
+	f_upgrade=no
+	build_mode=test
 fi
 
 if [[ "$requester" != *@* ]] ; then
