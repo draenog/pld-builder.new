@@ -111,6 +111,9 @@ pre {
 		background-color: #ffffcc;
 		color: black;
 	}
+	div.upgrade {
+		background-color: #cff1d0;
+	}
 }
 @media print {
 	a {

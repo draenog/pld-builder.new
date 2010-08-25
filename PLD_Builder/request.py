@@ -93,7 +93,7 @@ class Group:
 
     def dump_html(self, f):
         f.write(
-            "<div id=\"%(no)d\">"
+            "<div id=\"%(no)d\" class=\"%(flags)s\">\n"
             "<a href=\"#%(no)d\")>%(no)d</a>. %(time)s from <b>%(requester)s</b> "
             "<small>%(id)s, prio=%(priority)d, jobs=%(max_jobs)d, %(flags)s</small>\n"
         % {
