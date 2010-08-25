@@ -108,7 +108,7 @@ pre {
 		color: #5e5e5e;
 	}
 	div.upgrade {
-		background-color: #cff1d0;
+		background-color: #e4f1cf;
 	}
 	div:target {
 		background-color: #ffffcc;
