@@ -107,12 +107,12 @@ pre {
 	div > a:hover {
 		color: #5e5e5e;
 	}
+	div.upgrade {
+		background-color: #cff1d0;
+	}
 	div:target {
 		background-color: #ffffcc;
 		color: black;
-	}
-	div.upgrade {
-		background-color: #cff1d0;
 	}
 }
 @media print {
