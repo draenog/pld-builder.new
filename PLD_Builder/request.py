@@ -52,19 +52,21 @@ class Group:
         self.flags = string.split(attr(e, "flags", ""))
         for c in e.childNodes:
             if is_blank(c): continue
+
+            key = text(c)
             if c.nodeType != Element.ELEMENT_NODE:
                 log.panic("xml: evil group child %d" % c.nodeType)
             if c.nodeName == "batch":
                 self.batches.append(Batch(c))
             elif c.nodeName == "requester":
-                self.requester = text(c)
+                self.requester = key
                 self.requester_email = attr(c, "email", "")
             elif c.nodeName == "priority":
-                self.priority = int(text(c))
+                self.priority = int(key)
             elif c.nodeName == "time":
-                self.time = int(text(c))
+                self.time = int(key)
             elif c.nodeName == "maxjobs":
-                self.max_jobs = int(text(c))
+                self.max_jobs = int(key)
             else:
                 log.panic("xml: evil group child (%s)" % c.nodeName)
         # note that we also check that group is sorted WRT deps
@@ -154,36 +156,37 @@ class Batch:
         self.upgraded = True
         for c in e.childNodes:
             if is_blank(c): continue
+            key = text(c)
             if c.nodeType != Element.ELEMENT_NODE:
                 log.panic("xml: evil batch child %d" % c.nodeType)
             if c.nodeName == "src-rpm":
-                self.src_rpm = text(c)
+                self.src_rpm = key
             elif c.nodeName == "spec":
                 # normalize specname, specname is used as buildlog and we don't
                 # want to be exposed to directory traversal attacks
-                self.spec = text(c).split('/')[-1]
+                self.spec = key.split('/')[-1]
             elif c.nodeName == "command":
                 self.spec = "COMMAND"
-                self.command = text(c).strip()
+                self.command = key.strip()
                 self.command_flags = string.split(attr(c, "flags", ""))
             elif c.nodeName == "info":
-                self.info = text(c)
+                self.info = key
             elif c.nodeName == "kernel":
-                self.kernel = text(c)
+                self.kernel = key
             elif c.nodeName == "target":
-                self.target.append(text(c))
+                self.target.append(key)
             elif c.nodeName == "skip":
-                self.skip.append(text(c))
+                self.skip.append(key)
             elif c.nodeName == "branch":
-                self.branch = text(c)
+                self.branch = key
             elif c.nodeName == "builder":
-                self.builders.append(text(c))
-                self.builders_status[text(c)] = attr(c, "status", "?")
-                self.builders_status_time[text(c)] = attr(c, "time", "0")
+                self.builders.append(key)
+                self.builders_status[key] = attr(c, "status", "?")
+                self.builders_status_time[key] = attr(c, "time", "0")
             elif c.nodeName == "with":
-                self.bconds_with.append(text(c))
+                self.bconds_with.append(key)
             elif c.nodeName == "without":
-                self.bconds_without.append(text(c))
+                self.bconds_without.append(key)
             else:
                 log.panic("xml: evil batch child (%s)" % c.nodeName)
 
