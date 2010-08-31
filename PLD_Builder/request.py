@@ -7,6 +7,7 @@ import xml.sax.saxutils
 import fnmatch
 import os
 import urllib
+import cgi
 
 import util
 import log
@@ -256,8 +257,18 @@ class Batch:
                 link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s&action=tail\">" \
                      % (urllib.quote(bld[0]), urllib.quote(bld[1]), is_ok, urllib.quote(bl_name), urllib.quote(rid))
                 link_post = "</a>"
-            builders.append(link_pre + ("<font color='%s'><b>%s:%s</b></font>" %
-                                        (c, b, s)) + link_post)
+            tooltip = "time: %(time)s\nbuild time: %(buildtime)s---" % {
+                'last update' : time.asctime(time.localtime(float(self.builders_status_time[b]))),
+                'build time': 'n/a',
+            }
+            builders.append(link_pre +
+                "<font color='%(color)s'><b title=\"%(tooltip)s\">%(builder)s:%(status)s</b></font>" % {
+                    'color' : c,
+                    'builder' : b,
+                    'status' : s,
+                    'tooltip' : cgi.escape(tooltip, True),
+            }
+            + link_post)
         f.write("%s]</small></li>\n" % string.join(builders))
 
     def kernel_string(self):
