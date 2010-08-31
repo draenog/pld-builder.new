@@ -53,20 +53,19 @@ class Group:
         for c in e.childNodes:
             if is_blank(c): continue
 
-            key = text(c)
             if c.nodeType != Element.ELEMENT_NODE:
                 log.panic("xml: evil group child %d" % c.nodeType)
             if c.nodeName == "batch":
                 self.batches.append(Batch(c))
             elif c.nodeName == "requester":
-                self.requester = key
+                self.requester = text(c)
                 self.requester_email = attr(c, "email", "")
             elif c.nodeName == "priority":
-                self.priority = int(key)
+                self.priority = int(text(c))
             elif c.nodeName == "time":
-                self.time = int(key)
+                self.time = int(text(c))
             elif c.nodeName == "maxjobs":
-                self.max_jobs = int(key)
+                self.max_jobs = int(text(c))
             else:
                 log.panic("xml: evil group child (%s)" % c.nodeName)
         # note that we also check that group is sorted WRT deps
@@ -141,6 +140,7 @@ class Batch:
         self.builders = []
         self.builders_status = {}
         self.builders_status_time = {}
+        self.builders_status_buildtime = {}
         self.kernel = ""
         self.target = []
         self.branch = ""
@@ -156,37 +156,39 @@ class Batch:
         self.upgraded = True
         for c in e.childNodes:
             if is_blank(c): continue
-            key = text(c)
+
             if c.nodeType != Element.ELEMENT_NODE:
                 log.panic("xml: evil batch child %d" % c.nodeType)
             if c.nodeName == "src-rpm":
-                self.src_rpm = key
+                self.src_rpm = text(c)
             elif c.nodeName == "spec":
                 # normalize specname, specname is used as buildlog and we don't
                 # want to be exposed to directory traversal attacks
-                self.spec = key.split('/')[-1]
+                self.spec = text(c).split('/')[-1]
             elif c.nodeName == "command":
                 self.spec = "COMMAND"
-                self.command = key.strip()
+                self.command = text(c).strip()
                 self.command_flags = string.split(attr(c, "flags", ""))
             elif c.nodeName == "info":
-                self.info = key
+                self.info = text(c)
             elif c.nodeName == "kernel":
-                self.kernel = key
+                self.kernel = text(c)
             elif c.nodeName == "target":
-                self.target.append(key)
+                self.target.append(text(c))
             elif c.nodeName == "skip":
-                self.skip.append(key)
+                self.skip.append(text(c))
             elif c.nodeName == "branch":
-                self.branch = key
+                self.branch = text(c)
             elif c.nodeName == "builder":
+                key = text(c)
                 self.builders.append(key)
                 self.builders_status[key] = attr(c, "status", "?")
                 self.builders_status_time[key] = attr(c, "time", "0")
+                self.builders_status_buildtime[key] = "0" #attr(c, "buildtime", "0")
             elif c.nodeName == "with":
-                self.bconds_with.append(key)
+                self.bconds_with.append(text(c))
             elif c.nodeName == "without":
-                self.bconds_without.append(key)
+                self.bconds_without.append(text(c))
             else:
                 log.panic("xml: evil batch child (%s)" % c.nodeName)
 
@@ -260,9 +262,17 @@ class Batch:
                 link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s&action=tail\">" \
                      % (urllib.quote(bld[0]), urllib.quote(bld[1]), is_ok, urllib.quote(bl_name), urllib.quote(rid))
                 link_post = "</a>"
-            tooltip = "last update: %(time)s\nbuild time: %(buildtime)s\n" % {
-                'time' : time.asctime(time.localtime(float(self.builders_status_time[b]))),
-                'buildtime': 'n/a',
+
+            def ftime(s):
+                t = float(s)
+                if t > 0:
+                    return time.asctime(time.localtime(t))
+                else:
+                    return 'N/A'
+
+            tooltip = "last update: %(time)s\nbuild time: %(buildtime)s" % {
+                'time' : ftime(self.builders_status_time[b]),
+                'buildtime' : ftime(self.builders_status_buildtime[b]),
             }
             builders.append(link_pre +
                 "<font color='%(color)s'><b title=\"%(tooltip)s\">%(builder)s:%(status)s</b></font>" % {
@@ -318,8 +328,12 @@ class Batch:
         for b in self.bconds_without:
             f.write("           <without>%s</without>\n" % escape(b))
         for b in self.builders:
-            f.write("           <builder status='%s' time='%s'>%s</builder>\n" % \
-                    (escape(self.builders_status[b]), self.builders_status_time[b], escape(b)))
+            if self.builders_status_buildtime.has_key(b):
+                t = self.builders_status_buildtime[b]
+            else:
+                t = "0"
+            f.write("           <builder status='%s' time='%s' buildtime='%s'>%s</builder>\n" % \
+                    (escape(self.builders_status[b]), self.builders_status_time[b], t, escape(b)))
         f.write("         </batch>\n")
 
     def log_line(self, l):
@@ -347,6 +361,7 @@ class Notification:
         self.group_id = attr(e, "group-id")
         self.builder = attr(e, "builder")
         self.batches = {}
+        self.batches_buildtime = {}
         for c in e.childNodes:
             if is_blank(c): continue
             if c.nodeType != Element.ELEMENT_NODE:
@@ -354,9 +369,11 @@ class Notification:
             if c.nodeName == "batch":
                 id = attr(c, "id")
                 status = attr(c, "status")
+                buildtime = attr(c, "buildtime", "0")
                 if not status.startswith("OK") and not status.startswith("SKIP") and not status.startswith("UNSUPP") and not status.startswith("FAIL"):
                     log.panic("xml notification: bad status: %s" % status)
                 self.batches[id] = status
+                self.batches_buildtime[id] = buildtime
             else:
                 log.panic("xml: evil notification child (%s)" % c.nodeName)
 
@@ -367,6 +384,7 @@ class Notification:
                     if self.batches.has_key(b.b_id):
                         b.builders_status[self.builder] = self.batches[b.b_id]
                         b.builders_status_time[self.builder] = time.time()
+                        b.builders_status_buildtime[self.builder] = "0" #self.batches_buildtime[b.b_id]
 
 def build_request(e):
     if e.nodeType != Element.ELEMENT_NODE:
