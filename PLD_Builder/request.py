@@ -257,7 +257,7 @@ class Batch:
                 link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s&action=tail\">" \
                      % (urllib.quote(bld[0]), urllib.quote(bld[1]), is_ok, urllib.quote(bl_name), urllib.quote(rid))
                 link_post = "</a>"
-            tooltip = "last update: %(time)s\nbuild time: %(buildtime)s\n% {
+            tooltip = "last update: %(time)s\nbuild time: %(buildtime)s\n" % {
                 'time' : time.asctime(time.localtime(float(self.builders_status_time[b]))),
                 'buildtime': 'n/a',
             }
