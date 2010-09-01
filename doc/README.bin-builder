@@ -4,33 +4,38 @@ packages and chroot
 ~~~~~~~~~~~~~~~~~~~
 1. install pld-builder from ac-ready on target host
 
-2. create chroot /srv/chroot (symlink to real dest for the sake of copy-paste from here)
-# mkdir -p /srv/chroot
+2. create chroot /srv/chroot
+(you can symlink to real dest for the sake of copy-paste from here)
+mkdir -p /srv/chroot
 
-- instal distro gpg key as default ac config packages are signed and sign verify enabled in config:
-# rpm -r /srv/chroot --import /etc/pki/rpm-gpg/PLD-*.asc
+- if you're using rpm < 4.5-29, make system rpmdb linked to target rpmdb, as
+  rpm gets it all very messy. see LP#395177.
+mv /var/lib/rpm{,-host}
+ln -s /srv/chroot/var/lib/rpm /var/lib/rpm
 
-- install pld-builder-chroot from ac-ready
-  as vserver-packages is usually hidden, so you must install it manually with --noignore
-# poldek -r /srv/chroot -u vserver-packages -Q --noignore
+- install distro gpg key as default ac config packages are signed and sign verify enabled in config:
+rpm -r /srv/chroot --import /etc/pki/rpm-gpg/PLD-*.asc
 
 - setup minimal /dev
-# install -d /srv/chroot/dev
-# cp -a /dev/{full,null,random,urandom,zero} /srv/chroot/dev
+install -d /srv/chroot/dev
+cp -a /dev/{full,null,random,urandom,zero} /srv/chroot/dev
 
-# poldek -r /srv/chroot -u pld-builder-chroot db4.5-utils -Q --sn ac --sn ac-ready
+- install vserver-packages, but as it is usually hidden, so you must unhide it
+  with --noignore:
+poldek -r /srv/chroot -u vserver-packages -Q --noignore
 
-- dump rpmdb, so it can be loaded inside
-# cd /srv/chroot/var/lib/rpm
-# db_dump Packages > .Packages
-# chroot /srv/chroot bash -l
-# cd /var/lib/rpm
-# rm -f *
-# db_load Packages < .Packages
-# rpm --rebuilddb
+- install pld-builder-chroot from ac-ready
+poldek -r /srv/chroot -u pld-builder-chroot -Q --sn ac --sn ac-ready
+
+- make rpmdb readable for builder user
+chmod -R a+rX /srv/chroot/var/lib/rpm
 
 - setup /srv/chroot/etc/resolv.conf so if you enter manually you can work with poldek
-# cat /etc/resolv.conf > /srv/chroot/etc/resolv.conf
+cat /etc/resolv.conf > /srv/chroot/etc/resolv.conf
+
+- restore rpmdb hack
+rm /var/lib/rpm
+mv /var/lib/rpm{-host,}
 
 gpg keys
 ~~~~~~~~
