@@ -4,20 +4,27 @@ packages and chroot
 ~~~~~~~~~~~~~~~~~~~
 1. install pld-builder from ac-ready on target host
 
-2. create chroot /srv/chroot
+2. create chroot /srv/chroot (symlink to real dest for the sake of copy-paste from here)
 # mkdir -p /srv/chroot
 
 - instal distro gpg key as default ac config packages are signed and sign verify enabled in config:
-# rpm -r /srv/chroot --import /etc/pki/rpm-gpg/PLD-2.0-Ac-GPG-key.asc
+# rpm -r /srv/chroot --import /etc/pki/rpm-gpg/PLD-*.asc
 
 - install pld-builder-chroot from ac-ready
   as vserver-packages is usually hidden, so you must install it manually with --noignore
-# poldek -r /srv/chroot -u vserver-packages --noignore
-# poldek -r /srv/chroot -u pld-builder-chroot --sn ac --sn ac-ready
+# poldek -r /srv/chroot -u vserver-packages -Q --noignore
+
+- setup minimal /dev
+# install -d /srv/chroot/dev
+# cp -a /dev/{full,null,random,urandom,zero} /srv/chroot/dev
+
+# poldek -r /srv/chroot -u pld-builder-chroot db4.5-utils -Q --sn ac --sn ac-ready
+
+- make rpmdb readable for regular users (builder)
+# chmod -R a+rX /srv/chroot/var/lib/rpm
 
 - setup /srv/chroot/etc/resolv.conf so if you enter manually you can work with poldek
 # cat /etc/resolv.conf > /srv/chroot/etc/resolv.conf
-
 
 gpg keys
 ~~~~~~~~
@@ -55,5 +62,5 @@ builder ALL=(ALL) NOPASSWD: /usr/sbin/chroot /home/users/builder/chroot-ac *
 testing
 ~~~~~~~
 
-keep /var/lib/pld-builder/spool/log running with tail -f
+keep /var/lib/pld-builder/spool/log running with tailf
 run the cronjobs under builder account.
