@@ -19,3 +19,4 @@ dist:
 	cvs -d $(CVSROOT) export -d $(PACKAGE)-$(VERSION).$(SNAP) -r $(CVSTAG) $(CVSMODULE)
 	tar -cjf $(PACKAGE)-$(VERSION).$(SNAP).tar.bz2 $(PACKAGE)-$(VERSION).$(SNAP)
 	rm -rf $(PACKAGE)-$(VERSION).$(SNAP)
+	test -x ./dropin && ./dropin $(PACKAGE)-$(VERSION).$(SNAP).tar.bz2
