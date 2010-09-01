@@ -20,8 +20,14 @@ packages and chroot
 
 # poldek -r /srv/chroot -u pld-builder-chroot db4.5-utils -Q --sn ac --sn ac-ready
 
-- make rpmdb readable for regular users (builder)
-# chmod -R a+rX /srv/chroot/var/lib/rpm
+- dump rpmdb, so it can be loaded inside
+# cd /srv/chroot/var/lib/rpm
+# db_dump Packages > .Packages
+# chroot /srv/chroot bash -l
+# cd /var/lib/rpm
+# rm -f *
+# db_load Packages < .Packages
+# rpm --rebuilddb
 
 - setup /srv/chroot/etc/resolv.conf so if you enter manually you can work with poldek
 # cat /etc/resolv.conf > /srv/chroot/etc/resolv.conf
