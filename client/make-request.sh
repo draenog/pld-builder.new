@@ -484,7 +484,7 @@ if [ "$df_fetch" = "yes" ]; then
 fi
 
 if [ "$upgrade_macros" = "yes" ]; then
-	command="poldek --up -Uv rpm-build-macros"
+	command="poldek --up; poldek -Uv rpm-build-macros"
 	builders="$distro-src"
 	f_upgrade=no
 	build_mode=test
@@ -542,7 +542,11 @@ gen_req() {
 		echo "	<maxjobs>$jobs</maxjobs>"
 	fi
 	echo >&2 "* Build mode: $build_mode"
-	echo >&2 "* Using email $builder_email"
+	if [ -z "$url" ]; then
+		echo >&2 "* Using email $builder_email"
+	else
+		echo >&2 "* Using URL $url"
+	fi
 	echo >&2 "* Queue-ID: $id"
 	echo
 
