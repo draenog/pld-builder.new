@@ -35,6 +35,16 @@ def attr(e, a, default = None):
 def escape(s):
     return xml.sax.saxutils.escape(s)
 
+# return timestamp with timezone information
+# so we could parse it in javascript
+def tzdate(t):
+    # as strftime %z is unofficial, and does not work, need to make it numeric ourselves
+#    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
+    date = time.strftime("%a, %b %d %Y %H:%M:%S", time.localtime(t))
+    # NOTE: the altzone is showing CURRENT timezone, not what the "t" reflects
+    tz = '{:=+05d}'.format(-time.altzone / 3600 * 100)
+    return date + ' ' + tz
+
 def is_blank(e):
     return e.nodeType == Element.TEXT_NODE and string.strip(e.nodeValue) == ""
 
@@ -96,12 +106,12 @@ class Group:
     def dump_html(self, f):
         f.write(
             "<div id=\"%(no)d\" class=\"%(flags)s\">\n"
-            "<a href=\"#%(no)d\")>%(no)d</a>. %(time)s from <b>%(requester)s</b> "
+            "<a href=\"#%(no)d\")>%(no)d</a>. <span id=\"tz\">%(time)s</span> from <b>%(requester)s</b> "
             "<small>%(id)s, prio=%(priority)d, jobs=%(max_jobs)d, %(flags)s</small>\n"
         % {
             'no': self.no,
             'id': '<a href="srpms/%(id)s">%(id)s</a>' % {'id': self.id},
-            'time': escape(time.strftime("%Y.%m.%d %H:%M:%S", time.localtime(self.time))),
+            'time': escape(tzdate(self.time)),
             'requester': escape(self.requester),
             'priority': self.priority,
             'max_jobs': self.max_jobs,

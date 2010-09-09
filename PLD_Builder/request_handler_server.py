@@ -133,8 +133,39 @@ pre {
 	f.close()
 	os.umask(old_umask)
 
+def write_js():
+	js_file = path.www_dir + "/script.js"
+	# skip if file exists and code is not newer
+	if os.path.exists(js_file) and os.stat(__file__).st_mtime < os.stat(js_file).st_mtime:
+		return
+
+	js = """
+// update date stamps to reflect viewers timezone
+function update_tz(t) {
+	var el, off, dt,
+		collection = document.getElementsByTagName('span');
+	for (off in collection) {
+		el = collection[off];
+		if (el.id == 'tz') {
+			dt = new Date(el.innerHTML).toString();
+			// strip timezone name, it is usually wrong when not initialized
+			// from TZ env, but reverse calculated from os data
+			dt = dt.replace(/\s+\(.+\)/, "");
+			el.innerHTML = dt;
+		}
+	}
+}
+window.onload = update_tz;
+"""
+	old_umask = os.umask(0022)
+	f = open(js_file, "w")
+	f.write(js)
+	f.close()
+	os.umask(old_umask)
+
 def main():
 	write_css();
+	write_js();
 	socket.setdefaulttimeout(30)
 	try:
 		init_conf()

@@ -25,7 +25,7 @@ class B_Queue:
         for r in self.requests:
             r.dump(f)
         self.requests.reverse()
-    
+
     def dump_html(self, f):
         f.write("""
 <html>
@@ -33,6 +33,7 @@ class B_Queue:
     <link rel="Shortcut Icon" href="http://www.pld-linux.org/favicon.ico"/>
         <title>PLD builder queue</title>
         <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="style.css">
+        <script type="text/javascript" src="script.js"></script>
     </head>
 <body>\n"""
         )
@@ -41,7 +42,7 @@ class B_Queue:
             r.dump_html(f)
         self.requests.reverse()
         f.write("</body></html>\n")
-    
+
     # read possibly compressed, signed queue
     def read_signed(self):
         if re.search(r"\.gz$", self.name):
