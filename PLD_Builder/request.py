@@ -40,7 +40,7 @@ def escape(s):
 def tzdate(t):
     # as strftime %z is unofficial, and does not work, need to make it numeric ourselves
 #    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
-    date = time.strftime("%a, %b %d %Y %H:%M:%S", time.localtime(t))
+    date = time.strftime("%a %b %d %Y %H:%M:%S", time.localtime(t))
     # NOTE: the altzone is showing CURRENT timezone, not what the "t" reflects
     tz = '{:=+05d}'.format(-time.altzone / 3600 * 100)
     return date + ' ' + tz
