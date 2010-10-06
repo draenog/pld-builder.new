@@ -133,11 +133,16 @@ specs=`for s in $specs; do
 	esac
 done`
 
+if [ "$DIST" == "ti-dev" ]; then
+       disttag="ti"
+else
+       disttag=$DIST
+fi
 
 if [ "$ATAG" == "yes" ]; then
 	for spec in $specs; do
 		PKG=$(echo $spec |sed -e 's/.spec//g')
-		LAST_AUTOTAG=$(cd $SPECDIR/packages && ./builder -g -ns $PKG/$spec >/dev/null 2>&1 && cvs status -v $PKG/$spec | awk -vdist=$DIST '!/Sticky/ && $1 ~ "^auto-" dist "-"{if (!a++) print $1}')
+		LAST_AUTOTAG=$(cd $SPECDIR/packages && ./builder -g -ns $PKG/$spec >/dev/null 2>&1 && cvs status -v $PKG/$spec | awk -vdist=$disttag '!/Sticky/ && $1 ~ "^auto-" dist "-"{if (!a++) print $1}')
 		sleep 1
 		SENDPRIO="$SENDPRIO $spec:$LAST_AUTOTAG "
 	done
