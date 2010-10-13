@@ -269,12 +269,10 @@ class Batch:
                 if s.startswith("OK"):
                     is_ok = 1
                 bld = lin_ar.split('-')
-                if (len(bld) > 2):
-                    link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s-%s&arch=%s&ok=%d&name=%s&id=%s&action=tail\">" \
-                     % (urllib.quote(bld[0]), urllib.quote(bld[1]), urllib.quote(bld[2]), is_ok, urllib.quote(bl_name), urllib.quote(rid))
-                else:
-                    link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s&action=tail\">" \
-                     % (urllib.quote(bld[0]), urllib.quote(bld[1]), is_ok, urllib.quote(bl_name), urllib.quote(rid))
+                tree_name = '-'.join(bld[:-1])
+                tree_arch = bld[-1:]
+                link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s&action=tail\">" \
+                        % (urllib.quote(tree_name), urllib.quote(tree_arch), is_ok, urllib.quote(bl_name), urllib.quote(rid))
                 link_post = "</a>"
 
             def ftime(s):
