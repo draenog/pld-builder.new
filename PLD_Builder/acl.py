@@ -87,7 +87,6 @@ class User:
 
 class ACL_Conf:
     def __init__(self):
-        self.acl_conf_mtime = 0
         self.reload()
 
     def try_reload(self):
@@ -95,11 +94,11 @@ class ACL_Conf:
         if mtime != self.acl_conf_mtime:
             log.notice("acl.conf has changed, reloading...")
             self.reload()
-            self.acl_conf_mtime = mtime
             return True
         return False
 
     def reload(self):
+        self.acl_conf_mtime = os.stat(path.acl_conf)[stat.ST_MTIME]
         self.current_user = None
         status.push("reading acl.conf")
         p = ConfigParser.ConfigParser()
