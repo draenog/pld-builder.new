@@ -270,7 +270,7 @@ class Batch:
                     is_ok = 1
                 bld = lin_ar.split('-')
                 tree_name = '-'.join(bld[:-1])
-                tree_arch = bld[-1:]
+                tree_arch = '-'.join(bld[-1:])
                 link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s&action=tail\">" \
                         % (urllib.quote(tree_name), urllib.quote(tree_arch), is_ok, urllib.quote(bl_name), urllib.quote(rid))
                 link_post = "</a>"
