@@ -42,7 +42,8 @@ def tzdate(t):
 #    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
     date = time.strftime("%a %b %d %Y %H:%M:%S", time.localtime(t))
     # NOTE: the altzone is showing CURRENT timezone, not what the "t" reflects
-    tz = '{:=+05d}'.format(-time.altzone / 3600 * 100)
+    # NOTE: when DST is off timezone gets it right, altzone not
+    tz = '{:=+05d}'.format(-time.timezone / 3600 * 100)
     return date + ' ' + tz
 
 def is_blank(e):
