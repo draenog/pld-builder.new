@@ -153,7 +153,10 @@ def build_rpm(r, b):
     b.log_line("started at: %s" % time.asctime())
     fetch_src(r, b)
     b.log_line("installing srpm: %s" % b.src_rpm)
-    res = chroot.run("rpm -U %s" % b.src_rpm, logfile = b.logfile)
+    res = chroot.run("""
+        install -d rpm/SPECS rpm/SOURCES
+        rpm -Uhv %s
+    """ % b.src_rpm, logfile = b.logfile)
     chroot.run("rm -f %s" % b.src_rpm, logfile = b.logfile)
     b.files = []
     tmpdir = "/tmp/B." + b.b_id[0:6]
