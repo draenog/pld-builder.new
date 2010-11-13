@@ -64,7 +64,8 @@ def store_binary_request(r):
     q.write_signed(path.req_queue_signed_file)
     q.unlock()
 
-    (cnt_f, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(path.max_req_no_file))
+    (fdno, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(path.max_req_no_file))
+    cnt_f = os.fdopen(fdno)
     cnt_f.seek(0)
     cnt_f.write("%d\n" % num)
     cnt_f.flush()

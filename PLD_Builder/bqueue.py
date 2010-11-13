@@ -22,7 +22,8 @@ class B_Queue:
         self.fd = None
 
     def dump(self, fname):
-        (f, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(fname))
+        (fdno, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(fname))
+        f = os.fdopen(fdno)
         self.requests.reverse()
         for r in self.requests:
             r.dump(f)
@@ -34,7 +35,8 @@ class B_Queue:
         os.rename(tmpfname, fname)
 
     def dump_html(self, fname):
-        (f, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(fname))
+        (fdno, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(fname))
+        f = os.fdopen(fdno)
         f.write("""
 <html>
     <head>
@@ -120,7 +122,8 @@ class B_Queue:
         sio.seek(0)
         sio.write(gpg.sign(sio.read()))
         sio.seek(0)
-        (f, tmpname) = tempfile.mkstemp(dir=os.path.dirname(name))
+        (fdno, tmpname) = tempfile.mkstemp(dir=os.path.dirname(name))
+        f = os.fdopen(fdno)
         if re.search(r"\.gz$", name):
             fgz = gzip.GzipFile(filename=name, mode="w", compresslevel=6, fileobj=f)
             util.sendfile(sio, fgz)
