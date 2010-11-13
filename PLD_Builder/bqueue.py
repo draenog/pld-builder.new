@@ -24,8 +24,8 @@ class B_Queue:
     def dump(self, fname):
         (f, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(fname))
         self.requests.reverse()
-            for r in self.requests:
-                r.dump(f)
+        for r in self.requests:
+            r.dump(f)
         self.requests.reverse()
         f.flush()
         os.fsync(f.fileno())
