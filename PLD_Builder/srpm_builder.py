@@ -65,7 +65,7 @@ def store_binary_request(r):
     q.unlock()
 
     (fdno, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(path.max_req_no_file))
-    cnt_f = os.fdopen(fdno)
+    cnt_f = os.fdopen(fdno, "w")
     cnt_f.seek(0)
     cnt_f.write("%d\n" % num)
     cnt_f.flush()
