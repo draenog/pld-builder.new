@@ -47,7 +47,7 @@ zdefiniowany w konfigach buildera, wiêc sugerowa³bym wybieranie aliasa
 kogo¶ z bezpo¶rednim dostêpem do odpowiedniego buildera). Je¶li chcesz byæ
 informowany o wszystkich zleceniach, to musisz siê zapisaæ na listê
 pld-logs-builder@pld-linux.org i/lub ¶ledziæ co siê dzieje na
-http://ep09.pld-linux.org/~buildsrc/queue.html
+http://src.th.pld-linux.org/queue.html
 
 Poniewa¿ póki co domy¶lnie pakiety l±duj± w katalogu ready na ftpie i po
 zbudowaniu nowe wersje s± automatycznie upgrejdowane na builderze, wiêc

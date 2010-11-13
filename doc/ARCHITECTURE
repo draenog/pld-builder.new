@@ -95,7 +95,7 @@ cvs repository (see http://www.pld-linux.org/Repositories for details)).
 After finishing the build procedure the src.builder reports (via email) to the 
 requester on the status of the build (OK/FAIL), updates the 'queue.html' file 
 with that information (urls for PLD2.0 and 3.0 queues: 
-http://ep09.pld-linux.org/~buildsrc/queue.html and
+http://src.th.pld-linux.org/queue.html and
 http://ep09.pld-linux.org/~builderth/queue.html) and, if configured to do so, 
 uploads the complete log of the whole procedure (called the buildlog) 
 somewhere, most likely to our PLD buildlogs system 
