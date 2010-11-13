@@ -7,6 +7,7 @@ import StringIO
 import os
 import fcntl
 import string
+import tempfile
 
 # PLD_Builder:
 import gpg
@@ -20,13 +21,31 @@ class B_Queue:
         self.requests = []
         self.fd = None
 
-    def dump(self, f):
+    def dump(self, fname):
+        (f, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(fname))
+        self.dump_fobj(f)
+        f.flush()
+        os.fsync(f.fileno())
+        f.close()
+        os.chmod(tmpfname, 0644)
+        os.rename(tmpfname, fname)
+
+    def dump_fobj(self, f):
         self.requests.reverse()
         for r in self.requests:
-            r.dump(f)
+            r.dump_fobj(f)
         self.requests.reverse()
 
-    def dump_html(self, f):
+    def dump_html(self, fname):
+        (f, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(fname))
+        self.dump_html_fobj(f)
+        f.flush()
+        os.fsync(f.fileno())
+        f.close()
+        os.chmod(tmpfname, 0644)
+        os.rename(tmpfname, fname)
+
+    def dump_html_fobj(self, f):
         f.write("""
 <html>
     <head>
@@ -39,7 +58,7 @@ class B_Queue:
         )
         self.requests.reverse()
         for r in self.requests:
-            r.dump_html(f)
+            r.dump_html_fobj(f)
         self.requests.reverse()
         f.write("</body></html>\n")
 
@@ -106,14 +125,19 @@ class B_Queue:
         self._write_to(sio)
         sio.seek(0)
         sio.write(gpg.sign(sio.read()))
-        if os.access(name, os.F_OK): os.unlink(name)
-        if re.search(r"\.gz$", name):
-            f = gzip.open(name, "w", 6)
-        else:
-            f = open(name, "w")
         sio.seek(0)
-        util.sendfile(sio, f)
+        (f, tmpname) = tempfile.mkstemp(dir=os.path.dirname(name))
+        if re.search(r"\.gz$", name):
+            fgz = gzip.GzipFile(filename=name, mode="w", compresslevel=6, fileobj=f)
+            util.sendfile(sio, fgz)
+            fgz.close()
+        else:
+            util.sendfile(sio, f)
+        f.flush()
+        os.fsync(f.fileno())
         f.close()
+        os.chmod(tmpname, 0644)
+        os.rename(tmpfname, name)
 
     def add(self, req):
         self.requests.append(req)
