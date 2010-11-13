@@ -134,7 +134,7 @@ class B_Queue:
         os.fsync(f.fileno())
         f.close()
         os.chmod(tmpname, 0644)
-        os.rename(tmpfname, name)
+        os.rename(tmpname, name)
 
     def add(self, req):
         self.requests.append(req)
