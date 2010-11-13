@@ -9,6 +9,7 @@ import sys
 import re
 import shutil
 import atexit
+import tempfile
 
 import gpg
 import request
@@ -50,8 +51,8 @@ def store_binary_request(r):
         return
     r.batches = new_b
     # store new queue and max_req_no for binary builders
-    cnt_f = open(path.max_req_no_file, "r+")
-    num = int(string.strip(cnt_f.read())) + 1
+    num = int(string.strip(open(path.max_req_no_file, "r").read())) + 1
+
     r.no = num
     q = B_Queue(path.req_queue_file)
     q.lock(0)
@@ -62,10 +63,15 @@ def store_binary_request(r):
     q.dump_html(path.queue_html_stats_file)
     q.write_signed(path.req_queue_signed_file)
     q.unlock()
+
+    (cnt_f, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(path.max_req_no_file))
     cnt_f.seek(0)
     cnt_f.write("%d\n" % num)
+    cnt_f.flush()
+    os.fsync(cnt_f.fileno())
     cnt_f.close()
-    os.chmod(path.max_req_no_file, 0644)
+    os.chmod(tmpfname, 0644)
+    os.rename(tmpfname, path.max_req_no_file)
 
 def transfer_file(r, b):
     local = path.srpms_dir + '/' + r.id + "/" + b.src_rpm
