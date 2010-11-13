@@ -381,13 +381,13 @@ ti-dev)
 	control_url="http://ep09.pld-linux.org/~buildertidev"
 	;;
 th)
-	builder_email="builderth@ep09.pld-linux.org"
+	builder_email="builderth@pld-linux.org"
 	default_builders="th-*"
 	url="http://ep09.pld-linux.org:1234/"
-	control_url="http://ep09.pld-linux.org/~builderth"
+	control_url="http://src.th.pld-linux.org"
 	;;
 th-java) # fake "distro" for java available th architectures
-	builder_email="builderth@ep09.pld-linux.org"
+	builder_email="builderth@pld-linux.org"
 	default_builders="th-x86_64 th-athlon th-i686"
 	url="http://ep09.pld-linux.org:1234/"
 	;;
