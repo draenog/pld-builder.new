@@ -23,29 +23,18 @@ class B_Queue:
 
     def dump(self, fname):
         (f, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(fname))
-        self.dump_fobj(f)
+        self.requests.reverse()
+            for r in self.requests:
+                r.dump(f)
+        self.requests.reverse()
         f.flush()
         os.fsync(f.fileno())
         f.close()
         os.chmod(tmpfname, 0644)
         os.rename(tmpfname, fname)
-
-    def dump_fobj(self, f):
-        self.requests.reverse()
-        for r in self.requests:
-            r.dump_fobj(f)
-        self.requests.reverse()
 
     def dump_html(self, fname):
         (f, tmpfname) = tempfile.mkstemp(dir=os.path.dirname(fname))
-        self.dump_html_fobj(f)
-        f.flush()
-        os.fsync(f.fileno())
-        f.close()
-        os.chmod(tmpfname, 0644)
-        os.rename(tmpfname, fname)
-
-    def dump_html_fobj(self, f):
         f.write("""
 <html>
     <head>
@@ -58,9 +47,14 @@ class B_Queue:
         )
         self.requests.reverse()
         for r in self.requests:
-            r.dump_html_fobj(f)
+            r.dump_html(f)
         self.requests.reverse()
         f.write("</body></html>\n")
+        f.flush()
+        os.fsync(f.fileno())
+        f.close()
+        os.chmod(tmpfname, 0644)
+        os.rename(tmpfname, fname)
 
     # read possibly compressed, signed queue
     def read_signed(self):
