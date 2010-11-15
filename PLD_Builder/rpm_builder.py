@@ -70,8 +70,8 @@ def check_skip_build(r, b):
                 continue
             else:
                 return False
-        return True
         f.close()
+        return True
     return False
 
 def fetch_src(r, b):
