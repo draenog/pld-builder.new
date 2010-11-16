@@ -355,7 +355,7 @@ ac)
 	default_builders="ac-*"
 	default_branch="AC-branch"
 	url="http://ep09.pld-linux.org:1289/"
-	control_url="http://src.th.pld-linux.org"
+	control_url="http://ep09.pld-linux.org/~buildsrc"
 	;;
 ac-java) # fake "distro" for java available ac architectures
 	builder_email="builder-ac@pld-linux.org"
