@@ -49,11 +49,10 @@ cd ~/pld-builder.new
 poldek.conf:
 
 source = local,pri=1 /spools/ready/
-source = main-test,noauto,pri=2 ftp://ftp.pld-linux.org/dists/ac/test/athlon/
-source = main-ready,pri=3 ftp://ftp.pld-linux.org/dists/ac/ready/athlon/
-source = main-ug,pri=4 ftp://ftp.pld-linux.org/dists/ac/updates/general/athlon/
-source = main-us,pri=5 ftp://ftp.pld-linux.org/dists/ac/updates/security/athlon/
-source = main,pri=6 ftp://ftp.pld-linux.org/dists/ac/PLD/athlon/RPMS/
+source = main-test,noauto,pri=2 ftp://ftp.pld-linux.org/dists/th/test/i686/RPMS/
+source = main-ready,pri=3 ftp://ftp.pld-linux.org/dists/th/ready/i686/RPMS/
+source = main-ug,pri=4 ftp://ftp.pld-linux.org/dists/th/updates/i686/RPMS/
+source = main,pri=5 ftp://ftp.pld-linux.org/dists/th/PLD/i686/RPMS/
 particle_install = no
 greedy = yes
 rpmdef = _excludedocs 1

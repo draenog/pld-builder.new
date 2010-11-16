@@ -123,7 +123,6 @@ def send_cia_report(r, is_src = False):
 
     # write in iteration list and status of all processed files
     for b in r.batches:
-        # Instead of hardcoded Ac information use some config variable
         m.write('<package name="%s" arch="%s">\n' % (b.spec, b.branch))
         if b.build_failed:
             m.write('<failed/>\n')
