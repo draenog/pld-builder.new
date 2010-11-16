@@ -1,6 +1,6 @@
-W katalogu client jest skrypt nazywaj±cy siê make-request.sh. Odpalamy go
-bez argumentów po czym zagl±damy do pliku ~/.requestrc. Najlepszy bêdzie
-przyk³ad wiêc poni¿ej ustawienia, które trzeba zmieniæ:
+W katalogu client jest skrypt nazywajÄ…cy siÄ™ make-request.sh. Odpalamy go
+bez argumentÃ³w po czym zaglÄ…damy do pliku ~/.requestrc. Najlepszy bÄ™dzie
+przykÅ‚ad wiÄ™c poniÅ¼ej ustawienia, ktÃ³re trzeba zmieniÄ‡:
 
   requester=mmazur
   default_key=mmazur@kernel.pl
@@ -10,60 +10,60 @@ Przy czym:
   [mmazur@home mmazur]$ gpg --list-secret-keys|grep '@'
   sec  1024D/A1490DA4 2003-08-14 Mariusz Mazur <mmazur@kernel.pl>
 
-Mam nadziejê, ¿e teraz jest jasne sk±d siê ten email bierze.
+Mam nadziejÄ™, Å¼e teraz jest jasne skÄ…d siÄ™ ten email bierze.
 
-Na razie obowi±zuj±cymi ustawieniami s±:
+Na razie obowiÄ…zujÄ…cymi ustawieniami sÄ…:
 
   build_mode=ready
   f_upgrade=yes
 
-Po wyrównaniu ilo¶ci pakietów na ftpie z tym co jest w Ra przechodzimy na
+Po wyrÃ³wnaniu iloÅ›ci pakietÃ³w na ftpie z tym co jest w Ra przechodzimy na
 ustawienia:
 
   build_mode=test
   f_upgrade=no
 
-Ale tym na razie nie trzeba siê martwiæ, bo gdy przyjdzie czas, to bêdê
-o tym tr±bi³.
+Ale tym na razie nie trzeba siÄ™ martwiÄ‡, bo gdy przyjdzie czas, to bÄ™dÄ™
+o tym trÄ…biÅ‚.
 
-Teraz æwiczenia praktyczne:
+Teraz Ä‡wiczenia praktyczne:
 
   make-request.sh kernel.spec:LINUX_2_6
   make-request.sh qt.spec kadu.spec
   make-request.sh -b 'th-i* th-x86_64' nasm.spec
 
-Pierwszy przyk³ad to puszczenie zlecenia na pakiet kernel z brancha LINUX_2_6.
-Drugi to puszczenie w jednym zleceniu qt i kadu, przy czym je¶li budowanie
-qt siê wywróci, to automatyka nawet nie bêdzie próbowa³a budowaæ kadu.
-Ostatni przyk³ad to puszczenie nasma tylko i wy³±cznie na buildery x86
-(th-i* rozwija siê na to samo, co th-i?86). Zwracam uwagê, ¿e przy
-listowaniu tych buidlerów trzeba je wycytowaæ, ¿eby sz³y jako jeden
+Pierwszy przykÅ‚ad to puszczenie zlecenia na pakiet kernel z brancha LINUX_2_6.
+Drugi to puszczenie w jednym zleceniu qt i kadu, przy czym jeÅ›li budowanie
+qt siÄ™ wywrÃ³ci, to automatyka nawet nie bÄ™dzie prÃ³bowaÅ‚a budowaÄ‡ kadu.
+Ostatni przykÅ‚ad to puszczenie nasma tylko i wyÅ‚Ä…cznie na buildery x86
+(th-i* rozwija siÄ™ na to samo, co th-i?86). Zwracam uwagÄ™, Å¼e przy
+listowaniu tych buidlerÃ³w trzeba je wycytowaÄ‡, Å¼eby szÅ‚y jako jeden
 argument.
 
-Ka¿dy dostaje mailem informacje o zleceniach które wysy³a (przy czym maile
-z tymi informacjami przychodz± nie na adres w ~/.requestrc, ale na adres
-zdefiniowany w konfigach buildera, wiêc sugerowa³bym wybieranie aliasa
-@pld-linux.org, ¿eby móc to samemu zmieniaæ, bez konieczno¶ci interwencji
-kogo¶ z bezpo¶rednim dostêpem do odpowiedniego buildera). Je¶li chcesz byæ
-informowany o wszystkich zleceniach, to musisz siê zapisaæ na listê
-pld-logs-builder@pld-linux.org i/lub ¶ledziæ co siê dzieje na
+KaÅ¼dy dostaje mailem informacje o zleceniach ktÃ³re wysyÅ‚a (przy czym maile
+z tymi informacjami przychodzÄ… nie na adres w ~/.requestrc, ale na adres
+zdefiniowany w konfigach buildera, wiÄ™c sugerowaÅ‚bym wybieranie aliasa
+@pld-linux.org, Å¼eby mÃ³c to samemu zmieniaÄ‡, bez koniecznoÅ›ci interwencji
+kogoÅ› z bezpoÅ›rednim dostÄ™pem do odpowiedniego buildera). JeÅ›li chcesz byÄ‡
+informowany o wszystkich zleceniach, to musisz siÄ™ zapisaÄ‡ na listÄ™
+pld-logs-builder@pld-linux.org i/lub Å›ledziÄ‡ co siÄ™ dzieje na
 http://src.th.pld-linux.org/queue.html
 
-Poniewa¿ póki co domy¶lnie pakiety l±duj± w katalogu ready na ftpie i po
-zbudowaniu nowe wersje s± automatycznie upgrejdowane na builderze, wiêc
-przez pewien czas pewnie przydatne bêdzie poni¿sze wywo³anie:
+PoniewaÅ¼ pÃ³ki co domyÅ›lnie pakiety lÄ…dujÄ… w katalogu ready na ftpie i po
+zbudowaniu nowe wersje sÄ… automatycznie upgrejdowane na builderze, wiÄ™c
+przez pewien czas pewnie przydatne bÄ™dzie poniÅ¼sze wywoÅ‚anie:
 
   make-request.sh -t nasm.spec
 
-Skutek bêdzie taki, ¿e pakiet siê zbuduje, ale nie zostanie automatycznie
-zupgrejdowany na builderach, a zamiast w ready wyl±duje w test (póki co
-cieciwa u¿ywa tego do budowania sobie w spokoju jajek 2.6).
+Skutek bÄ™dzie taki, Å¼e pakiet siÄ™ zbuduje, ale nie zostanie automatycznie
+zupgrejdowany na builderach, a zamiast w ready wylÄ…duje w test (pÃ³ki co
+cieciwa uÅ¼ywa tego do budowania sobie w spokoju jajek 2.6).
 
 Zasady puszczania do Th:
 
-- Puszczamy zawsze z HEAD i bez bcondów. Odstêpstwa od tej zasady s±
-  akceptowalne tylko i wy³±cznie w dobrze uzasadnionych przypadkach. HEAD ma
-  na celu ³atwiejsz± orientacjê w zawarto¶ci ftpa. Natomiast brak bcondów jest
-  wedle zasady "src.rpm ma siê budowaæ w ¶rodowisku, jakie jest dostêpne na
-  ftpie (wyj±tek to oczywi¶cie java) i nie oczekujmy wiedzy tajemnej (jakiego
-  bconda u¿yæ) od wszystkich, którzy chc± dany pakiet zbudowaæ".
+- Puszczamy zawsze z HEAD i bez bcondÃ³w. OdstÄ™pstwa od tej zasady sÄ…
+  akceptowalne tylko i wyÅ‚Ä…cznie w dobrze uzasadnionych przypadkach. HEAD ma
+  na celu Å‚atwiejszÄ… orientacjÄ™ w zawartoÅ›ci ftpa. Natomiast brak bcondÃ³w jest
+  wedle zasady "src.rpm ma siÄ™ budowaÄ‡ w Å›rodowisku, jakie jest dostÄ™pne na
+  ftpie (wyjÄ…tek to oczywiÅ›cie java) i nie oczekujmy wiedzy tajemnej (jakiego
+  bconda uÅ¼yÄ‡) od wszystkich, ktÃ³rzy chcÄ… dany pakiet zbudowaÄ‡".
