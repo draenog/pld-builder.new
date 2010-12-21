@@ -4,6 +4,7 @@ import sys
 import os
 import atexit
 import time
+import datetime
 import string
 import urllib2
 
@@ -192,7 +193,7 @@ def build_rpm(r, b):
                 begin_time = time.time()
                 res = chroot.run(cmd, logfile = b.logfile)
                 end_time = time.time()
-                b.log_line("ended at: %s, done in %s" % (time.asctime(), time.strftime("%ddays %Hh %Mm %Ss", time.gmtime(end_time - begin_time))))
+                b.log_line("ended at: %s, done in %s" % (time.asctime(), datetime.timedelta(0, end_time - begin_time)))
                 if res:
                     res = "FAIL"
                 files = util.collect_files(b.logfile)
