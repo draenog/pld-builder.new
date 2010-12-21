@@ -183,7 +183,7 @@ def build_rpm(r, b):
             if ("no-install-br" not in r.flags) and not install.install_br(r, b):
                 res = "FAIL_DEPS_INSTALL"
             if not res:
-                max_jobs = max(min(int(os.sysconf('SC_NPROCESSORS_ONLN') * 1.5), config.max_jobs), 1)
+                max_jobs = max(min(int(os.sysconf('SC_NPROCESSORS_ONLN') + 1), config.max_jobs), 1)
                 if r.max_jobs > 0:
                     max_jobs = max(min(config.max_jobs, r.max_jobs), 1)
                 cmd = "echo build-id: %s; cd rpm/SPECS; TMPDIR=%s exec nice -n %s rpmbuild -bb --define '_smp_mflags -j%d' %s %s" % \
