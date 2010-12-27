@@ -63,7 +63,7 @@ ftp_url = scp://fpldth@ep09.pld-linux.org:ftp/.tree/.incoming/i686/
 
 buildlogs
 ~~~~~~~~~
-buildlogs are copied with rsync. ask buidlogs.pld-linux.org admin to allow your ip
+buildlogs are copied with rsync. ask buildlogs.pld-linux.org admin to allow your ip
 
 sudo access
 ~~~~~~~~~~~
