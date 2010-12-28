@@ -1,0 +1,13 @@
+# rpm macros for pld builder chroot
+
+# A colon separated list of desired locales to be installed;
+# "all" means install all locale specific files.
+%_install_langs en_US
+
+# If non-zero, all erasures will be automagically repackaged.
+%_repackage_all_erasures    0
+
+# Boolean (i.e. 1 == "yes", 0 == "no") that controls whether files
+# marked as %doc should be installed.
+# FIXME: excludedocs breaks kde build
+#%_excludedocs   1

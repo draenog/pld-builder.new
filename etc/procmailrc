@@ -1,0 +1,15 @@
+LOGFILE=procmail.log
+
+#:0 c
+#mail.copy
+
+:0
+* ^X-New-PLD-Builder:
+| /usr/share/pld-builder/bin/request-handler.sh
+
+:0
+* ^FROM_MAILER
+/dev/null
+
+#:0
+#!root@example.org
