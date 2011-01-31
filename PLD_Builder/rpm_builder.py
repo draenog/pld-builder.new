@@ -88,7 +88,7 @@ def fetch_src(r, b):
             good = True
         except urllib2.HTTPError, error:
             # fail in a way where cron job will retry
-            msg = "unable to fetch file, http code: %d" % error.code
+            msg = "unable to fetch url %s, http code: %d" % (src_url, error.code)
             b.log_line(msg)
             queue_time = time.time() - r.time
             # 6 hours
@@ -101,7 +101,7 @@ def fetch_src(r, b):
         except urllib2.URLError, error:
             # see errno.h
             if error.errno in [-3, 60, 61, 110, 111]:
-                b.log_line("unable to connect... trying again")
+                b.log_line("unable to connect to %s... trying again" % (src_url))
                 continue
             else:
                 raise
