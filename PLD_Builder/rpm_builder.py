@@ -6,6 +6,7 @@ import atexit
 import time
 import datetime
 import string
+import urllib
 import urllib2
 
 from config import config, init_conf
@@ -76,7 +77,7 @@ def check_skip_build(r, b):
     return False
 
 def fetch_src(r, b):
-    src_url = config.control_url + "/srpms/" + r.id + "/" + b.src_rpm
+    src_url = config.control_url + "/srpms/" + r.id + "/" + urllib.quote(b.src_rpm)
     b.log_line("fetching %s" % src_url)
     start = time.time()
     good = False
