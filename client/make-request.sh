@@ -13,6 +13,7 @@ gpg_opts=
 default_branch='HEAD'
 distro=
 url=
+no_depend=no
 
 [ -x /usr/bin/python ] && send_mode="python" || send_mode="mail"
 
@@ -159,8 +160,10 @@ Mandatory arguments to long options are mandatory for short options too.
             Forces package upgrade (for use with -c or -q, not -t)
       -n, --no-upgrade
             Disables package upgrade (for use with -r)
-      -ni, -no-install-br
+      -ni, --no-install-br
             Do not install missing BuildRequires (--nodeps)
+      -nd, --no-depend
+            Do not add dependency of build jobs, each job in batch runs itself
       -j, --jobs
             Number of parallel jobs for single build
       -f, --flag
@@ -264,6 +267,10 @@ while [ $# -gt 0 ] ; do
 			f_upgrade=no
 			;;
 
+		--no-depend | -nd)
+			no_depend=yes
+			;;
+
 		--no-install-br | -ni)
 			flags="$flags no-install-br"
 			;;
@@ -305,7 +312,7 @@ while [ $# -gt 0 ] ; do
 			shift
 			;;
 		--upgrade-pkg|-Uhv)
-			command="poldek --up -Uv $2"
+			command="poldek --up; poldek -uv $2"
 			f_upgrade=no
 			shift
 			;;
@@ -463,6 +470,10 @@ branch=${branch:-$default_branch}
 
 specs=`for s in $specs; do
 	case "$s" in
+	^)
+		# skip marker
+		echo $s
+		;;
 	*.spec:*) # spec with branch
 		basename $s
 		;;
@@ -484,7 +495,7 @@ if [ "$df_fetch" = "yes" ]; then
 fi
 
 if [ "$upgrade_macros" = "yes" ]; then
-	command="poldek --up; poldek -Uv rpm-build-macros"
+	command="poldek --up; poldek -uv rpm-build-macros"
 	builders="$distro-src"
 	f_upgrade=no
 	build_mode=test
@@ -558,6 +569,7 @@ gen_req() {
 		echo -E "$command" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g'
 		echo "</command>"
 		echo "		 <info></info>"
+		local b
 		for b in $builders; do
 			echo >&2 "* Builder: $b"
 			echo "		 <builder>$b</builder>"
@@ -569,20 +581,26 @@ gen_req() {
 			echo >&2 "* Upgrade mode: $f_upgrade"
 		fi
 
-		# first id:
-		fid=
-		i=1
-
+		# job to depend on
+		local depend=
+		local b i=1
+		local name branch
 		for b in $builders; do
 			echo >&2 "* Builder: $b"
 		done
+
 		for s in $specs; do
+			# skip marker
+			if [ "$s" = "^" ] || [ "$no_depend" = yes ]; then
+				depend=
+				continue
+			fi
 			bid=$(uuidgen)
-			echo "	<batch id='$bid' depends-on='$fid'>"
-			[ "$fid" = "" ] && fid="$bid"
+			echo "	<batch id='$bid' depends-on='$depend'>"
+
 			name=$(echo "$s" | sed -e 's|:.*||')
 			branch=$(echo "$s" | sed -e 's|.*:||')
-			echo >&2 "* Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}${target:+ target=$target}"
+			echo >&2 "* Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}${target:+ target=$target}${depend:+ depends on $depend}"
 			echo "		 <spec>$name</spec>"
 			echo "		 <branch>$branch</branch>"
 			echo "		 ${kernel:+<kernel>$kernel</kernel>}"
@@ -601,8 +619,10 @@ gen_req() {
 			done
 			echo "	</batch>"
 			i=$((i+1))
-		done
 
+			# let next job depend on previous
+			depend=$bid
+		done
 	fi
 
 	echo "</group>"
