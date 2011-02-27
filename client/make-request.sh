@@ -531,14 +531,8 @@ for s in $specs; do
 	ok=1
 done
 
-if [ "$ok" = "" ] ; then
-	if [ -z "$command" ]; then
-		die "no specs passed"
-	fi
-else
-	if [ "$command" != "" ] ; then
-		die "cannot pass specs and --command"
-	fi
+if [ -z "$specs" -a -z "$command" ]; then
+	die "no packages to build or command to invoke specified"
 fi
 
 id=$(uuidgen)
@@ -561,7 +555,17 @@ gen_req() {
 	echo >&2 "* Queue-ID: $id"
 	echo
 
-	if [ "$command" != "" ] ; then
+	# job to depend on
+	local depend=
+	local b i=1
+	local name branch builders_xml
+
+	for b in $builders; do
+		echo >&2 "* Builder: $b"
+		builders_xml="$builders_xml <builder>$b</builder>"
+	done
+
+	if [ "$command" ]; then
 		bid=$(uuidgen)
 		echo -E >&2 "* Command: $command"
 		echo "	<batch id='$bid' depends-on=''>"
@@ -569,31 +573,23 @@ gen_req() {
 		echo -E "$command" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g'
 		echo "</command>"
 		echo "		 <info></info>"
-		local b
-		for b in $builders; do
-			echo >&2 "* Builder: $b"
-			echo "		 <builder>$b</builder>"
-		done
+		echo "$builders_xml"
 		echo "	</batch>"
-	else
+		depend=$bid
+	fi
 
 		if [ "$f_upgrade" = "yes" ] ; then
 			echo >&2 "* Upgrade mode: $f_upgrade"
 		fi
 
-		# job to depend on
-		local depend=
-		local b i=1
-		local name branch
-		for b in $builders; do
-			echo >&2 "* Builder: $b"
-		done
-
 		for s in $specs; do
 			# skip marker
-			if [ "$s" = "^" ] || [ "$no_depend" = yes ]; then
+			if [ "$s" = "^" ]; then
 				depend=
 				continue
+			fi
+			if [ "$no_depend" = yes ]; then
+				depend=
 			fi
 			bid=$(uuidgen)
 			echo "	<batch id='$bid' depends-on='$depend'>"
@@ -614,16 +610,13 @@ gen_req() {
 				echo "		 <without>$b</without>"
 			done
 			echo
-			for b in $builders; do
-				echo "		 <builder>$b</builder>"
-			done
+			echo "$builders_xml"
 			echo "	</batch>"
 			i=$((i+1))
 
 			# let next job depend on previous
 			depend=$bid
 		done
-	fi
 
 	echo "</group>"
 }
