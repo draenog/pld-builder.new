@@ -51,6 +51,13 @@ specs=
 df_fetch=no
 upgrade_macros=no
 
+# Set colors
+c_star=$(tput setaf 2)
+c_norm=$(tput op)
+msg() {
+	echo >&2 "${c_star}*${c_norm} $*"
+}
+
 die() {
 	echo >&2 "$0: $*"
 	exit 1
@@ -62,11 +69,11 @@ send_request() {
 
 	case "$send_mode" in
 	"mail")
-		echo >&2 "* Sending using mail mode"
+		msg "Sending using mail mode"
 		cat - | $mailer
 		;;
 	*)
-		echo >&2 "* Sending using http mode to $url"
+		msg "Sending using http mode to $url"
 		cat - | python -c '
 import sys, socket, urllib2
 
@@ -540,19 +547,19 @@ id=$(uuidgen)
 gen_req() {
 	echo "<group id='$id' no='0' flags='$flags'>"
 	echo "	<time>$(date +%s)</time>"
-	echo >&2 "* Using priority $priority"
+	msg "Using priority $priority"
 	echo "	<priority>$priority</priority>"
 	if [ -n "$jobs" ]; then
-		echo >&2 "* Using jobs $jobs"
+		msg "Using jobs $jobs"
 		echo "	<maxjobs>$jobs</maxjobs>"
 	fi
-	echo >&2 "* Build mode: $build_mode"
+	msg "Build mode: $build_mode"
 	if [ -z "$url" ]; then
-		echo >&2 "* Using email $builder_email"
+		msg "Using email $builder_email"
 	else
-		echo >&2 "* Using URL $url"
+		msg "Using URL $url"
 	fi
-	echo >&2 "* Queue-ID: $id"
+	msg "Queue-ID: $id"
 	echo
 
 	# job to depend on
@@ -561,7 +568,7 @@ gen_req() {
 	local name branch builders_xml
 
 	for b in $builders; do
-		echo >&2 "* Builder: $b"
+		msg "Builder: $b"
 		builders_xml="$builders_xml <builder>$b</builder>"
 	done
 
@@ -579,7 +586,7 @@ gen_req() {
 	fi
 
 		if [ "$f_upgrade" = "yes" ] ; then
-			echo >&2 "* Upgrade mode: $f_upgrade"
+			msg "Upgrade mode: $f_upgrade"
 		fi
 
 		for s in $specs; do
@@ -596,7 +603,7 @@ gen_req() {
 
 			name=$(echo "$s" | sed -e 's|:.*||')
 			branch=$(echo "$s" | sed -e 's|.*:||')
-			echo >&2 "* Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}${target:+ target=$target}${depend:+ depends on $depend}"
+			msg "Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}${target:+ target=$target}${depend:+ depends on $depend}"
 			echo "		 <spec>$name</spec>"
 			echo "		 <branch>$branch</branch>"
 			echo "		 ${kernel:+<kernel>$kernel</kernel>}"
