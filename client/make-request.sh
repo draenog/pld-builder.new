@@ -53,9 +53,13 @@ upgrade_macros=no
 
 # Set colors
 c_star=$(tput setaf 2)
+c_red=$(tput setaf 1)
 c_norm=$(tput op)
 msg() {
 	echo >&2 "${c_star}*${c_norm} $*"
+}
+red() {
+	echo "${c_red}$*${c_norm}"
 }
 
 die() {
@@ -568,7 +572,7 @@ gen_req() {
 	local name branch builders_xml
 
 	for b in $builders; do
-		msg "Builder: $b"
+		msg "Builder: $(red $b)"
 		builders_xml="$builders_xml <builder>$b</builder>"
 	done
 
