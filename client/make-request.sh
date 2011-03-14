@@ -14,6 +14,7 @@ default_branch='HEAD'
 distro=
 url=
 no_depend=no
+verbose=no
 
 [ -x /usr/bin/python ] && send_mode="python" || send_mode="mail"
 
@@ -289,6 +290,10 @@ while [ $# -gt 0 ] ; do
 		-j | --jobs)
 			jobs="$2"
 			shift
+			;;
+
+		-v)
+			verbose=yes
 			;;
 
 		--flag | -f)
@@ -636,6 +641,9 @@ gen_email () {
 	# make request first, so the STDERR/STDOUT streams won't be mixed
 	local req=$(gen_req)
 
+	if [ "$verbose" = "yes" ]; then
+		echo >&2 -E "$req"
+	fi
 cat <<EOF
 From: $requester
 To: $builder_email
