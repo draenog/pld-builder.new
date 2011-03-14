@@ -228,12 +228,12 @@ while [ $# -gt 0 ] ; do
 			;;
 
 		--with)
-			with="$with $2"
+			without="$with $(echo "$2" | tr ',' ' ')"
 			shift
 			;;
 
 		--without)
-			without="$without $2"
+			without="$without $(echo "$2" | tr ',' ' ')"
 			shift
 			;;
 
