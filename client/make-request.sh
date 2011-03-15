@@ -147,7 +147,7 @@ Usage: make-request.sh [OPTION] ... [SPECFILE] ....
 
 Mandatory arguments to long options are mandatory for short options too.
 
-      -C, --config-file /path/to/config/file
+      --config-file /path/to/config/file
             Source additional config file (after $USER_CFG), useful when
             when sending build requests to Ac/Th from the same account
       -b 'BUILDER BUILDER ...',  --builder='BUILDER BUILDER ...'
@@ -186,7 +186,9 @@ Mandatory arguments to long options are mandatory for short options too.
       -cf, --command-flag
             Not yet documented
       -c, --command
-            Executes a given command on builders
+            Executes a given command on builders (prepended to build jobs if build jobs included)
+      -C, --post-command
+            Executes a given command on builders (appended to build jobs if build jobs included)
       --test-remove-pkg
             shortcut for --command poldek -evt ARGS
       --remove-pkg
@@ -217,8 +219,8 @@ while [ $# -gt 0 ] ; do
 			shift
 			;;
 
-		--config-file | -C)
-			[ -f $2 ] && . $2 || die "Config file not found"
+		--config-file)
+			[ -f "$2" ] && . $2 || die "Config file not found"
 			shift
 			;;
 
@@ -314,7 +316,16 @@ while [ $# -gt 0 ] ; do
 				command=$(cat)
 				echo >&2 "---"
 			fi
-			f_upgrade=no
+			shift
+			;;
+		--post-command | -C)
+			post_command="$2"
+			if [ "$post_command" = - ]; then
+				echo >&2 "Reading post_command from STDIN"
+				echo >&2 "---"
+				post_command=$(cat)
+				echo >&2 "---"
+			fi
 			shift
 			;;
 		--test-remove-pkg)
@@ -633,6 +644,19 @@ gen_req() {
 			# let next job depend on previous
 			depend=$bid
 		done
+
+	if [ "$post_command" ]; then
+		bid=$(uuidgen)
+		echo -E >&2 "* Post-Command: $post_command"
+		echo "	<batch id='$bid' depends-on='$depend'>"
+		echo "		 <command flags='$command_flags'>"
+		echo -E "$post_command" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g'
+		echo "</command>"
+		echo "		 <info></info>"
+		echo "$builders_xml"
+		echo "	</batch>"
+		depend=$bid
+	fi
 
 	echo "</group>"
 }
