@@ -647,6 +647,9 @@ gen_req() {
 
 	if [ "$post_command" ]; then
 		bid=$(uuidgen)
+		if [ "$no_depend" = yes ]; then
+			depend=
+		fi
 		echo -E >&2 "* Post-Command: $post_command"
 		echo "	<batch id='$bid' depends-on='$depend'>"
 		echo "		 <command flags='$command_flags'>"
