@@ -21,7 +21,7 @@ EOF
 }
 
 default_config () {
-  builder_pkgs="rpm-build poldek shadow net-tools which rpm-perlprov rpm-php-pearprov rpm-pythonprov bash vim"
+  builder_pkgs="rpm-build poldek pwdutils net-tools which rpm-perlprov rpm-php-pearprov rpm-pythonprov bash vim"
   builder_uid=`id -u`
   dist_url="ftp://ftp.$DIST.pld-linux.org"
 
