@@ -27,7 +27,7 @@ default_config () {
 
   case "$chroot_type" in
   src )
-    builder_arch_pkgs="cvs wget"
+    builder_arch_pkgs="cvs wget git-core"
     ;;
   bin )
     builder_arch_pkgs="mount"
