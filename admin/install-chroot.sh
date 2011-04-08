@@ -143,7 +143,8 @@ set -x
 cd $PWD
 rm -rf $chroot_dir
 mkdir -p $chroot_dir/spools/poldek
-poldek --mkdir --install-dist $chroot_dir \
+rpm --root $chroot_dir --initdb
+poldek --root $chroot_dir -i\
 	$builder_pkgs $builder_arch_pkgs
 EOF
 chmod 755 install-$chroot_name.sh
