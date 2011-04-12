@@ -95,6 +95,8 @@ chb() {
 }
 
 install_SPECS_builder () {
+  chr "mknod /dev/random -m 644 c 1 8"
+  chr "mknod /dev/urandom -m 644 c 1 9"
   cat >install-specs <<EOF
 set -x
 rm -rf rpm
