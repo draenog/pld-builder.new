@@ -12,8 +12,7 @@ Variables:
   chroot_type=src or chroot_type=bin 	 (required)
   chroot_dir=/path/to/chroot 		 (required)
   arch=i386 				 (required)
-  cvs_root=:pserver:<user>:<password>@<host>:<cvsroot>
-  					 (required in src builder)
+  git_server=git://<host>/<project>      (required in src builder)
   builder_uid=2000 			 (optional, uid of builder user 
   					  in chroot; defaults to current uid)
 EOF
@@ -27,7 +26,7 @@ default_config () {
 
   case "$chroot_type" in
   src )
-    builder_arch_pkgs="cvs wget git-core"
+    builder_arch_pkgs="wget git-core"
     ;;
   bin )
     builder_arch_pkgs="mount"
@@ -42,7 +41,7 @@ check_conf () {
   
   case "$chroot_type" in
   src )
-    test "$cvs_root" || die "no cvs_root"
+    test "$git_server" || die "no git_server"
     ;;
   bin )
     ;;
@@ -99,14 +98,10 @@ install_SPECS_builder () {
   cat >install-specs <<EOF
 set -x
 rm -rf rpm
-mkdir rpm
-cvs -d $cvs_root login
+mkdir -p rpm/packages
 cd rpm
-cvs -d $cvs_root co SPECS/builder
-cvs -d $cvs_root co SOURCES/.cvsignore
-mkdir SRPMS RPMS BUILD
-cd SPECS
-cvs up additional-md5sums mirrors
+git clone $git_server/rpm-build-tools rpm/packages/rpm-build-tools
+rpm/packages/rpm-build-tools/builder --init-rpm-dir
 echo "%packager       PLD bug tracking system ( http://bugs.pld-linux.org/ )">~/.rpmmacros
 echo "%vendor         PLD">>~/.rpmmacros
 echo "%distribution   $DISTTAG">>~/.rpmmacros
