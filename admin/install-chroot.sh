@@ -26,7 +26,7 @@ default_config () {
 
   case "$chroot_type" in
   src )
-    builder_arch_pkgs="wget git-core"
+    builder_arch_pkgs="wget gawk git-core"
     ;;
   bin )
     builder_arch_pkgs="mount"
