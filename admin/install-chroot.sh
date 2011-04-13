@@ -158,7 +158,7 @@ mkdir -p $chroot_dir/spools/poldek
 mkdir $chroot_dir/dev
 mknod $chroot_dir/dev/null -m 666 c 1 3
 rpm --root $chroot_dir --initdb
-poldek --root $chroot_dir -i\
+poldek --conf poldek.conf --root $chroot_dir -i\
 	$builder_pkgs $builder_arch_pkgs
 EOF
 chmod 755 install-$chroot_name.sh
