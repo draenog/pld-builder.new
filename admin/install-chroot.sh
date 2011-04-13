@@ -113,6 +113,7 @@ echo "GIT_LOGINNAME=$git_user" >> ~/.builderrc
 EOF
   chb "sh" < install-specs
   rm install-specs
+  echo "WARNING: Do not forget to install ssh keys to access git repo"
 }
 
 install_build_tree () {
