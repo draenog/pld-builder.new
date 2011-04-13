@@ -54,21 +54,33 @@ check_conf () {
 
 poldek_src () {
   if test "$1" ; then
-    echo "source = local,pri=1 /spools/ready/"
+      cat <<EOF
+[source]
+name=local
+type=pndir
+path=/spools/ready
+pri=1
+EOF
   fi
   cat <<EOF
-source = main-test,noauto,pri=2 $dist_url/dists/$DIST/test/$arch/RPMS/
-source = main-test,noauto,pri=2 $dist_url/dists/$DIST/test/noarch/RPMS/
-#source = main-ready,pri=3 $dist_url/dists/$DIST/ready/$arch/RPMS/
-#source = main-ug,pri=4 $dist_url/dists/$DIST/updates-general/$arch/RPMS/
-#source = main-us,pri=5 $dist_url/dists/$DIST/updates-security/$arch/RPMS/
-source = main,pri=6 $dist_url/dists/$DIST/PLD/$arch/RPMS/
-source = main,pri=6 $dist_url/dists/$DIST/PLD/noarch/RPMS/
+[source]
+name=main
+type=pndir
+path=$dist_url/dists/$DIST/PLD/$arch/RPMS/
+pri=6
+
+[source]
+name=main
+type=pndir
+path=$dist_url/dists/$DIST/PLD/noarch/RPMS/
+pri=6
+
 EOF
 }
 
 common_poldek_opt () {
   cat <<EOF
+[global]
 particle_install = no
 greedy = yes
 rpmdef = _excludedocs 1
