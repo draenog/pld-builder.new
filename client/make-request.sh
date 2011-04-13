@@ -200,7 +200,7 @@ Mandatory arguments to long options are mandatory for short options too.
             shortcut for --command poldek -ev --noask ARGS
       --upgrade-pkg
             shortcut for --command poldek --up -Uv ARGS
-      --cvsup
+      --pull
             Updates builders infrastructure (outside chroot)
       --update-macros
             Updates rpm-build-macros on src builder
@@ -360,9 +360,9 @@ while [ $# -gt 0 ] ; do
 			shift
 			;;
 
-		--cvsup)
+		--pull)
 			command_flags="no-chroot"
-			command="cvs up"
+			command="git pull"
 			f_upgrade=no
 			;;
 
