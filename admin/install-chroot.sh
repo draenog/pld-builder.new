@@ -13,6 +13,7 @@ Variables:
   chroot_dir=/path/to/chroot 		 (required)
   arch=i386 				 (required)
   git_server=git://<host>/<project>      (required in src builder)
+  git_user=<name>                        (required in src builder)
   builder_uid=2000 			 (optional, uid of builder user 
   					  in chroot; defaults to current uid)
 EOF
@@ -42,6 +43,7 @@ check_conf () {
   case "$chroot_type" in
   src )
     test "$git_server" || die "no git_server"
+    test "$git_user" || die "no git_user"
     ;;
   bin )
     ;;
@@ -107,6 +109,7 @@ rpm/packages/rpm-build-tools/builder --init-rpm-dir
 echo "%packager       PLD bug tracking system ( http://bugs.pld-linux.org/ )">~/.rpmmacros
 echo "%vendor         PLD">>~/.rpmmacros
 echo "%distribution   $DISTTAG">>~/.rpmmacros
+echo "GIT_LOGINNAME=$git_user" >> ~/.builderrc
 EOF
   chb "sh" < install-specs
   rm install-specs
