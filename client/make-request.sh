@@ -230,7 +230,7 @@ while [ $# -gt 0 ] ; do
 			;;
 
 		--with)
-			without="$with $(echo "$2" | tr ',' ' ')"
+			with="$with $(echo "$2" | tr ',' ' ')"
 			shift
 			;;
 
