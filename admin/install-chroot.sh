@@ -102,10 +102,10 @@ install_SPECS_builder () {
   cat >install-specs <<EOF
 set -x
 rm -rf rpm
-mkdir -p rpm/packages
+mkdir rpm
 cd rpm
-git clone $git_server/rpm-build-tools rpm/packages/rpm-build-tools
-rpm/packages/rpm-build-tools/builder --init-rpm-dir
+git clone $git_server/rpm-build-tools rpm-build-tools
+./rpm-build-tools/builder --init-rpm-dir
 echo "%packager       PLD bug tracking system ( http://bugs.pld-linux.org/ )">~/.rpmmacros
 echo "%vendor         PLD">>~/.rpmmacros
 echo "%distribution   $DISTTAG">>~/.rpmmacros
