@@ -16,7 +16,12 @@ url=
 no_depend=no
 verbose=no
 
-[ -x /usr/bin/python ] && send_mode="python" || send_mode="mail"
+if [ -x /usr/bin/python ]; then
+	send_mode="python"
+else
+	echo "No python present, using mail mode"
+	send_mode="mail"
+fi
 
 if [ -n "$HOME_ETC" ]; then
 	USER_CFG=$HOME_ETC/.requestrc
