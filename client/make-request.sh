@@ -230,7 +230,9 @@ while [ $# -gt 0 ] ; do
 			;;
 
 		--builder | -b)
-			builders="$builders $2"
+			for b in $2; do
+				builders="$builders ${b%:*}"
+			done
 			shift
 			;;
 
