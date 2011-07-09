@@ -296,6 +296,10 @@ while [ $# -gt 0 ] ; do
 			flags="$flags no-install-br"
 			;;
 
+		-j*)
+			jobs="${1#-j}"
+			;;
+
 		-j | --jobs)
 			jobs="$2"
 			shift
