@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # prevent "*" from being expanded in builders var
-cd /usr/share/empty
+set -f
 
 builders=
 with=
