@@ -142,7 +142,7 @@ def maybe_flush_queue(dir):
         os.unlink(dir + "/retry-at")
     except:
         pass
-        
+
     status.push("flushing %s" % dir)
 
     if flush_queue(dir):
@@ -170,7 +170,7 @@ def flush_queue(dir):
         else:
             return rc
     q.sort(mycmp)
-    
+
     error = None
     # copy of q
     remaining = q[:]
@@ -186,7 +186,7 @@ def flush_queue(dir):
         os.unlink(d['_file'])
         os.unlink(d['_desc'])
         remaining.remove(d)
-        
+
     if error != None:
         emails = {}
         emails[config.admin_email] = 1
@@ -198,7 +198,7 @@ def flush_queue(dir):
                 emails[d['Requester']] = 1
         e = emails.keys()
         m = mailer.Message()
-        m.set_headers(to = string.join(e, ", "), 
+        m.set_headers(to = string.join(e, ", "),
                       subject = "[%s] builder queue problem" % config.builder)
         m.write("there were problems sending files from queue %s:\n" % dir)
         m.write("problems:\n")

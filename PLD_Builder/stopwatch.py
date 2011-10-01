@@ -21,9 +21,9 @@ class Time:
 
     def format(self):
         return "user:%.2fs sys:%.2fs real:%.2fs (faults io:%d non-io:%d)" % \
-                (self.user_time, self.sys_time, self.time, self.io_faults, 
+                (self.user_time, self.sys_time, self.time, self.io_faults,
                  self.non_io_faults)
-        
+
 class Timer:
     def __init__(self):
         self.starts = []

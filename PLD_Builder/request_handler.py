@@ -22,7 +22,7 @@ from config import config, init_conf
 
 def check_double_id(id):
     id_nl = id + "\n"
-    
+
     ids = open(path.processed_ids_file)
     for i in ids.xreadlines():
         if i == id_nl:
@@ -30,7 +30,7 @@ def check_double_id(id):
             log.alert("request %s already processed" % id)
             return 1
     ids.close()
-    
+
     ids = open(path.processed_ids_file, "a")
     ids.write(id_nl)
     ids.close()
@@ -49,7 +49,7 @@ def handle_group(r, user):
         m.set_headers(subject = "building %s failed" % spec)
         m.write_line(msg)
         m.send()
-    
+
     lockf = lock("request")
     if check_double_id(r.id):
         lockf.close()
@@ -112,7 +112,7 @@ def handle_group(r, user):
                                 % (user.get_login(), pkg, bld, batch.branch))
                     lockf.close()
                     return
-    
+
     r.priority = user.check_priority(r.priority,config.builder)
     r.requester = user.get_login()
     r.requester_email = user.mail_to()

@@ -26,22 +26,22 @@ def log(p, s):
     f = open(path.log_file, "a")
     f.write("%s [%s]: %s [%s]\n" % (time.asctime(), builder, s, os.path.basename(sys.argv[0])))
     f.close()
-    
+
 def panic(s):
     log(syslog.LOG_ALERT, "PANIC: %s" % s)
     raise Exception, "PANIC: %s" % str(s)
 
 def alert(s):
-    log(syslog.LOG_ALERT, "alert: %s" % s) 
- 
+    log(syslog.LOG_ALERT, "alert: %s" % s)
+
 def error(s):
-    log(syslog.LOG_ERR, "error: %s" % s) 
- 
+    log(syslog.LOG_ERR, "error: %s" % s)
+
 def warn(s):
-    log(syslog.LOG_WARNING, "warning: %s" % s) 
- 
+    log(syslog.LOG_WARNING, "warning: %s" % s)
+
 def notice(s):
-    log(syslog.LOG_NOTICE, "notice: %s" % s) 
+    log(syslog.LOG_NOTICE, "notice: %s" % s)
 
 def open_syslog(name, f):
     global do_syslog

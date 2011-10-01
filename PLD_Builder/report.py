@@ -52,7 +52,7 @@ def info_from_log(b, target):
                 copy_mode = 0
             else:
                 target.write(l)
-    
+
 def send_report(r, is_src = False):
     s_failed = ' '.join([b.spec for b in r.batches if b.build_failed])
     s_ok = ' '.join([b.spec for b in r.batches if not b.build_failed])
@@ -70,7 +70,7 @@ def send_report(r, is_src = False):
         subject = 'upgrade failed '
 
     subject += ' '.join((s_failed, s_ok)).strip()
-    
+
     m = mailer.Message()
     m.set_headers(to = r.requester_email,
                   cc = config.builder_list,
@@ -84,9 +84,9 @@ def send_report(r, is_src = False):
     for b in r.batches:
         if b.build_failed and b.logfile == None:
             info = b.skip_reason
-        elif b.build_failed: 
+        elif b.build_failed:
             info = "FAILED"
-        else: 
+        else:
             info = "OK"
         m.write("%s (%s): %s\n" % (b.spec, b.branch, info))
 
@@ -99,13 +99,13 @@ def send_report(r, is_src = False):
             m.write("\n\n*** buildlog for %s\n" % b.spec)
             m.append_log(b.logfile)
             m.write("\n\n")
-            
+
     m.send()
 
 def send_cia_report(r, is_src = False):
 
     subject = 'DeliverXML'
-    
+
     m = mailer.Message()
     if (len(config.bot_email) == 0):
         return
@@ -134,6 +134,6 @@ def send_cia_report(r, is_src = False):
     f = open(path.root_dir + '/PLD_Builder/cia-foot.xml')
     m.write(f.read())
     f.close()
-                        
+
     # send the e-mail
     m.send()

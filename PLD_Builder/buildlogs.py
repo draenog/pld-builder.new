@@ -46,7 +46,7 @@ Type: buildlog
 Requester: %s
 END
 """ % (config.buildlogs_url, l['name'], config.builder, time.time(), self.requester_email)
-        
+
         q = self.queue[:]
         for l in q:
             f = open(path.buildlogs_queue_dir + '/' + l['id'] + ".desc.tmp", "w")

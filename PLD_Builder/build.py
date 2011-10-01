@@ -67,7 +67,7 @@ def build_all(r, build_fnc):
             if dep.build_failed:
                 can_build = 0
                 failed_dep = dep.spec
-        
+
         if batch.is_command() and can_build:
             batch.logfile = tmp + "command"
             if config.builder in batch.builders:
@@ -115,6 +115,6 @@ def build_all(r, build_fnc):
             batch.build_time = ""
             log.notice("building %s %s" % (batch.spec, batch.skip_reason))
             notify.add_batch(batch, "SKIP")
-            
+
     buildlogs.flush()
     chroot.run("rm -f %s" % string.join(r.chroot_files))

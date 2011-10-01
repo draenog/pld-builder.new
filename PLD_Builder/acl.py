@@ -18,18 +18,18 @@ class User:
         self.privs = []
         self.gpg_emails = []
         self.mailto = ""
-        
+
         if p.has_option(login, "gpg_emails"):
             self.gpg_emails = string.split(p.get(login, "gpg_emails"))
         else:
             log.panic("acl: [%s] has no gpg_emails" % login)
-            
+
         if p.has_option(login, "mailto"):
             self.mailto = p.get(login, "mailto")
         else:
             if len(self.gpg_emails) > 0:
                 self.mailto = self.gpg_emails[0]
-            
+
         if p.has_option(login, "privs"):
             for p in string.split(p.get(login, "privs")):
                 l = string.split(p, ":")
@@ -117,7 +117,7 @@ class ACL_Conf:
                     self.users[e] = user
             self.users[login] = user
         status.pop()
-    
+
     def user_by_email(self, ems):
         for e in ems:
             if self.users.has_key(e):

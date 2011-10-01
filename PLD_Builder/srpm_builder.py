@@ -42,7 +42,7 @@ def pick_request(q):
     ret = q.requests[0]
     q.requests = q.requests[1:]
     return ret
-    
+
 def store_binary_request(r):
     new_b = []
     for b in r.batches:
@@ -98,7 +98,7 @@ def build_srpm(r, b):
     else:
                     tag_test=" -Tp %s -tt" % (config.tag_prefixes[0],)
     cmd = ("cd rpm/packages; nice -n %s ./builder %s -bs %s -r %s %s %s %s 2>&1" %
-             (config.nice, builder_opts, b.bconds_string(), b.branch, 
+             (config.nice, builder_opts, b.bconds_string(), b.branch,
               tag_test, b.kernel_string(), b.spec))
     util.append_to(b.logfile, "request from: %s" % r.requester)
     util.append_to(b.logfile, "started at: %s" % time.asctime())

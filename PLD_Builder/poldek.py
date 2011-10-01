@@ -19,10 +19,10 @@ def get_poldek_requires():
     # and intersection method on set object
     def intersect(a, b):
         r = []
-        for x in a: 
+        for x in a:
             if x in b: r.append(x)
         return r
-    
+
     # add given req-list to cur_pkg_reqs
     def add_req(reqs):
         if len(reqs) == 1:
@@ -49,11 +49,11 @@ def get_poldek_requires():
                         return
             if not did:
                 cur_pkg_reqs.append(reqs)
-        
+
     pkg_reqs = {}
     cur_pkg_reqs = None
     cur_pkg = None
-    
+
     f = chr_popen("poldek -v -v --verify --unique-pkg-names")
     for l in xreadlines.xreadlines(f):
         m = name_rx.match(l)
@@ -78,7 +78,7 @@ def get_poldek_requires():
                 else:
                     msg("poldek_reqs: bad pkg name: %s\n" % x)
             if len(reqs) != 0: add_req(reqs)
-    
+
     f.close()
 
     if cur_pkg:
