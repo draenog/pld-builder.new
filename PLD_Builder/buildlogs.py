@@ -31,11 +31,11 @@ class Buildlogs_Queue:
 
         if failed: s = "FAIL"
         else: s = "OK"
-        f = open(path.buildlogs_queue_dir + '/' + id + '.' + blogfile + ".info", "w")
+        f = open(path.buildlogs_queue_dir + '/' + config.builder + '.' + id + '.' + blogfile + ".info", "w")
         f.write("Status: %s\nEND\n" % s)
         f.close()
 
-        self.queue.append({'name': name, 'id': id + '.' + blogfile, 'failed': failed})
+        self.queue.append({'name': name, config.builder + '.' + id + '.' + blogfile, 'failed': failed})
 
     def flush(self):
         def desc(l):
