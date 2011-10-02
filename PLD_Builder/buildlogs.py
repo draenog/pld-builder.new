@@ -25,7 +25,7 @@ class Buildlogs_Queue:
         blogfile = os.path.basename(logfile)
         name = re.sub(r"\.spec\.log", "", blogfile) + "," + id + ".bz2"
         ret = os.system("bzip2 --best --force < %s > %s" \
-                    % (logfile, path.buildlogs_queue_dir + '/' + id + '.' + blogfile))
+                    % (logfile, path.buildlogs_queue_dir + '/' + config.builder + '.' + id + '.' + blogfile))
         if ret:
             log.error("bzip2 compression of %s failed; does bzip2 binary exist?" % (logfile))
 
