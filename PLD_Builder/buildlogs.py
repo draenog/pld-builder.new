@@ -35,7 +35,7 @@ class Buildlogs_Queue:
         f.write("Status: %s\nEND\n" % s)
         f.close()
 
-        self.queue.append({'name': name, config.builder + '.' + id + '.' + blogfile, 'failed': failed})
+        self.queue.append({'name': name, 'id': config.builder + '.' + id + '.' + blogfile, 'failed': failed})
 
     def flush(self):
         def desc(l):
