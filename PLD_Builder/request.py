@@ -47,7 +47,7 @@ def tzdate(t):
         tzoffset = time.altzone
     else:
         tzoffset = time.timezone
-    tz = '{:=+05d}'.format(-tzoffset / 3600 * 100)
+    tz = '%+05d' % (-tzoffset / 3600 * 100)
     return date + ' ' + tz
 
 def is_blank(e):
