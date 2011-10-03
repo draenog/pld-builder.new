@@ -46,7 +46,7 @@ def tzdate(t):
     if time.daylight:
         tzoffset = time.altzone
     else:
-        time.timezone
+        tzoffset = time.timezone
     tz = '{:=+05d}'.format(-tzoffset / 3600 * 100)
     return date + ' ' + tz
 
