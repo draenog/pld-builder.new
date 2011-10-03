@@ -43,7 +43,10 @@ def tzdate(t):
     date = time.strftime("%a %b %d %Y %H:%M:%S", time.localtime(t))
     # NOTE: the altzone is showing CURRENT timezone, not what the "t" reflects
     # NOTE: when DST is off timezone gets it right, altzone not
-    tzoffset = time.altzone if time.daylight else time.timezone
+    if time.daylight:
+        tzoffset = time.altzone
+    else:
+        time.timezone
     tz = '{:=+05d}'.format(-tzoffset / 3600 * 100)
     return date + ' ' + tz
 
