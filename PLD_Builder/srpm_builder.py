@@ -124,13 +124,20 @@ def build_srpm(r, b):
                         (b.branch, pref, b.spec), logfile = b.logfile)
     if res == 0:
         transfer_file(r, b)
-    packagedir = "rpm/packages/%s" % b.spec[:-5]
+
     packagename = b.spec[:-5]
-    chroot.run("rpmbuild --nodeps --nobuild --define '_topdir %%(echo $HOME/rpm)' --define '_specdir %%{_topdir}/%%{name}' --define '_sourcedir %%{_specdir}' " \
-            "--clean --rmspec --rmsource %s/%s" % \
-            (packagedir, b.spec), logfile = b.logfile)
-    chroot.run("rm -rf %s" % packagedir, logfile = b.logfile)
-    status.pop()
+    if len(packagename) == 0:
+        util.append_to(b.logfile, "error: No package name specified")
+        res = "FAIL_MISSING_PACKAGE"
+
+    if res == 0:
+        packagedir = "rpm/packages/%s" % packagename
+        chroot.run("rpmbuild --nodeps --nobuild --define '_topdir %%(echo $HOME/rpm)' --define '_specdir %%{_topdir}/%%{name}' --define '_sourcedir %%{_specdir}' " \
+                "--clean --rmspec --rmsource %s/%s" % \
+                (packagedir, b.spec), logfile = b.logfile)
+        chroot.run("rm -rf %s" % packagedir, logfile = b.logfile)
+        status.pop()
+
     if res:
         res = "FAIL"
     return res
