@@ -90,7 +90,13 @@ def transfer_file(r, b):
         ftp.add(fname, "uploadinfo")
 
 def build_srpm(r, b):
+    if len(b.spec) == 0:
+        # should not really get here
+        util.append_to(b.logfile, "error: No .spec given but build src.rpm wanted")
+        return "FAIL"
+
     status.push("building %s" % b.spec)
+
     b.src_rpm = ""
     builder_opts = "-nu -nm --nodeps --http"
     if ("test-build" in r.flags) or b.branch and b.branch.startswith(config.tag_prefixes[0]):
@@ -126,17 +132,12 @@ def build_srpm(r, b):
         transfer_file(r, b)
 
     packagename = b.spec[:-5]
-    if len(packagename) == 0:
-        util.append_to(b.logfile, "error: No package name specified")
-        res = "FAIL_MISSING_PACKAGE"
-
-    if res == 0:
-        packagedir = "rpm/packages/%s" % packagename
-        chroot.run("rpmbuild --nodeps --nobuild --define '_topdir %%(echo $HOME/rpm)' --define '_specdir %%{_topdir}/%%{name}' --define '_sourcedir %%{_specdir}' " \
-                "--clean --rmspec --rmsource %s/%s" % \
-                (packagedir, b.spec), logfile = b.logfile)
-        chroot.run("rm -rf %s" % packagedir, logfile = b.logfile)
-        status.pop()
+    packagedir = "rpm/packages/%s" % packagename
+    chroot.run("rpmbuild --nodeps --nobuild --define '_topdir %%(echo $HOME/rpm)' --define '_specdir %%{_topdir}/%%{name}' --define '_sourcedir %%{_specdir}' " \
+            "--clean --rmspec --rmsource %s/%s" % \
+            (packagedir, b.spec), logfile = b.logfile)
+    chroot.run("rm -rf %s" % packagedir, logfile = b.logfile)
+    status.pop()
 
     if res:
         res = "FAIL"
