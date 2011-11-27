@@ -12,6 +12,11 @@ mkdir -p /srv/chroot
   rpm gets it all very messy. see LP#395177.
 mv /var/lib/rpm{,-host}
 ln -s /srv/chroot/var/lib/rpm /var/lib/rpm
+install -d /srv/chroot/var/lib/rpm
+rpm -r /srv/chroot --initdb
+
+therwise it's just:
+rpm -r /srv/chroot --initdb
 
 - install distro gpg key as default th config packages are signed and sign verify enabled in config:
 rpm -r /srv/chroot --import /etc/pki/rpm-gpg/PLD-*.asc
@@ -34,21 +39,21 @@ chmod -R a+rX /srv/chroot/var/lib/rpm
 cat /etc/resolv.conf > /srv/chroot/etc/resolv.conf
 
 - restore rpmdb hack
-rm /var/lib/rpm
+rm -f /var/lib/rpm
 mv /var/lib/rpm{-host,}
 
 gpg keys
 ~~~~~~~~
 1. import src builder key to bin builder so it can download queue.gz
 
-src-builder$ gpg --export KEYID --armor > th-src.asc
+src-builder$ gpg --export builder-th-src@pld-linux.org --armor > th-src.asc
 bin-builder$ gpg --import < th-src.asc
 
 2. generate new key for bin builder and import it to src builder so it can
    accept spool/notify messages
 
-gpg --gen-key on target host
 3. import that public key to src builder keyring
+bin-builder$ gpg --gen-key
 bin-builder$ gpg --export KEYID --armor > th-i686.asc
 src-builder$ gpg --import < th-i686.asc
  
