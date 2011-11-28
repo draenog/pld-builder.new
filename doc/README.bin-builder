@@ -72,6 +72,7 @@ bin-builder$ ssh-copy-id -i .ssh/id_rsa.pub fpldth@ep09.pld-linux.org
 buildlogs
 ~~~~~~~~~
 buildlogs are copied with rsync. ask buildlogs.pld-linux.org admin to allow your ip
+also you need to setup password that is used to authenticate in rsync-passwords
 
 sudo access
 ~~~~~~~~~~~
@@ -81,5 +82,5 @@ builder ALL=(ALL) NOPASSWD: /usr/sbin/chroot /home/users/builder/chroot-th *
 testing
 ~~~~~~~
 
-keep /var/lib/pld-builder/spool/log running with tailf
+keep /var/lib/pld-builder/spool/log running with tail -f
 run the cronjobs under builder account.
