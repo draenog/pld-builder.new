@@ -57,27 +57,26 @@ def copy_file(src, target):
 
 def rsync_file(src, target, host):
     global problems
+
     p = open(path.rsync_password_file, "r")
-    password = None
+    password = ""
     for l in p.xreadlines():
         l = string.split(l)
         if len(l) >= 2 and l[0] == host:
             password = l[1]
     p.close()
+
+    # NOTE: directing STDIN to /dev/null, does not make rsync to skip asking
+    # password, it opens /dev/tty and still asks if password is needed and
+    # missing, therefore we always set RSYNC_PASSWORD env var
+    os.environ["RSYNC_PASSWORD"] = password
     rsync = "rsync --verbose --archive"
-    if password != None:
-        p = open(".rsync.pass", "w")
-        os.chmod(".rsync.pass", 0600)
-        p.write("%s\n" % password)
-        p.close()
-        rsync += " --password-file .rsync.pass"
-    f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
+    f = os.popen("%s %s %s 2>&1" % (rsync, src, target))
     p = f.read()
-    if password != None:
-        os.unlink(".rsync.pass")
     ret = f.close()
     if ret:
         problems[src] = p
+    del os.environ["RSYNC_PASSWORD"];
     return ret
 
 def rsync_ssh_file(src, target):
