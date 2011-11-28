@@ -1,0 +1,2 @@
+# allow to run all comments under builder chroot
+#builder ALL=(ALL) NOPASSWD: /usr/sbin/chroot /srv/chroot *
