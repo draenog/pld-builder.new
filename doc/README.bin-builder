@@ -66,6 +66,9 @@ i.e account where you push your uploads:
 [th-i686]
 ftp_url = scp://fpldth@ep09.pld-linux.org:ftp/.tree/.incoming/i686/
 
+bin-builder$ ssh-keygen
+bin-builder$ ssh-copy-id -i .ssh/id_rsa.pub fpldth@ep09.pld-linux.org
+
 buildlogs
 ~~~~~~~~~
 buildlogs are copied with rsync. ask buildlogs.pld-linux.org admin to allow your ip
