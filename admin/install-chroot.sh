@@ -105,7 +105,7 @@ rm -rf rpm
 mkdir rpm
 cd rpm
 git clone $git_server/rpm-build-tools rpm-build-tools
-./rpm-build-tools/builder --init-rpm-dir
+./rpm-build-tools/builder.sh --init-rpm-dir
 echo "%packager       PLD bug tracking system ( http://bugs.pld-linux.org/ )">~/.rpmmacros
 echo "%vendor         PLD">>~/.rpmmacros
 echo "%distribution   $DISTTAG">>~/.rpmmacros
