@@ -109,7 +109,8 @@ git clone $git_server/rpm-build-tools rpm-build-tools
 echo "%packager       PLD bug tracking system ( http://bugs.pld-linux.org/ )">~/.rpmmacros
 echo "%vendor         PLD">>~/.rpmmacros
 echo "%distribution   $DISTTAG">>~/.rpmmacros
-echo "GIT_LOGINNAME=$git_user" >> ~/.builderrc
+git config --global user.name $git_user
+git config --global user.email ${git_user}@pld-linux.org
 EOF
   chb "sh" < install-specs
   rm install-specs
