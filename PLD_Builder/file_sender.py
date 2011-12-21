@@ -81,7 +81,7 @@ def rsync_file(src, target, host):
 
 def rsync_ssh_file(src, target):
     global problems
-    rsync = "rsync --verbose --archive --timeout=360 --contimeout=360 -e ssh"
+    rsync = "rsync --verbose --archive --timeout=360 -e ssh"
     f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
     p = f.read()
     ret = f.close()
