@@ -216,11 +216,35 @@ EOF
 	exit 0
 }
 
+# validate distro, set $distro
+set_distro() {
+	case "$1" in
+	ac)
+		;;
+	ac-java|ac-xen)
+		;;
+	ti)
+		;;
+	ti-dev)
+		;;
+	th)
+		;;
+	th-java)
+		;;
+	aidath)
+		;;
+	*)
+		die "distro \`$1' not known"
+		;;
+	esac
+
+	distro=$1
+}
 
 while [ $# -gt 0 ] ; do
 	case "$1" in
 		--distro | -d)
-			distro=$2
+			set_distro $2
 			shift
 			;;
 
