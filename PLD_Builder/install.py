@@ -126,8 +126,8 @@ def install_br(r, b):
 
         tmpdir = "/tmp/BR." + b.b_id[0:6]
         chroot.run("install -m 700 -d %s" % tmpdir)
-        cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild --nobuild %s %s 2>&1" \
-                    % (tmpdir, b.bconds_string(), b.spec)
+        cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild --nobuild %s %s %s %s 2>&1" \
+                    % (tmpdir, b.target_string(), b.kernel_string(), b.bconds_string(), b.spec)
         f = chroot.popen(cmd)
         rx = re.compile(r"^\s*(?P<name>[^\s]+) .*is needed by")
         needed = {}
