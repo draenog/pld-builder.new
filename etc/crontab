@@ -5,4 +5,4 @@ MAILTO=root
 #* * * * * builder exec nice -n 19 /usr/share/pld-builder/bin/load-balancer.sh
 #* * * * * builder exec nice -n 19 /usr/share/pld-builder/bin/file-sender.sh
 
-#0 0 * * * chroot /srv/chroot nice -n 19 tmpwatch -m 240 /var/cache/pld-builder/ready
+#0 0 * * * root chroot /srv/chroot nice -n 19 tmpwatch -m 240 /var/cache/pld-builder/ready
