@@ -235,7 +235,7 @@ class Batch:
         if self.is_command():
             desc = "SH: <pre>%s</pre> flags: [%s]" % (self.command, ' '.join(self.command_flags))
         else:
-            package_url = "http://cvs.pld-linux.org/cgi-bin/cvsweb.cgi/packages/%(package)s/%(spec)s?only_with_tag=%(branch)s" % {
+            package_url = "http://cvs.pld-linux.org/packages/%(package)s/%(spec)s?only_with_tag=%(branch)s" % {
                 'spec': self.spec,
                 'branch': self.branch,
                 'package': self.spec[:-5],
@@ -301,6 +301,18 @@ class Batch:
             + link_post)
         f.write("%s]</small></li>\n" % string.join(builders))
 
+    def rpmbuild_opts(self):
+        """
+            return all rpmbuild options related to this build
+        """
+        bconds = self.bconds_string() + self.kernel_string() + self.target_string()
+        rpmdefs = \
+            "--define '_topdir %(echo $HOME/rpm)' " \
+            "--define '_specdir %{_topdir}/packages/%%{name}' "  \
+            "--define '_sourcedir %{_specdir}' " \
+            "--define '_builddir %{_topdir}/BUILD/%%{name}' "
+        return rpmdefs + bconds
+
     def kernel_string(self):
         r = ""
         if self.kernel != "":
@@ -313,9 +325,6 @@ class Batch:
         else:
             return ""
 
-    def default_target(self, arch):
-        self.target.append("%s-pld-linux" % arch)
-
     def bconds_string(self):
         r = ""
         for b in self.bconds_with:
@@ -323,6 +332,9 @@ class Batch:
         for b in self.bconds_without:
             r = r + " --without " + b
         return r
+
+    def default_target(self, arch):
+        self.target.append("%s-pld-linux" % arch)
 
     def write_to(self, f):
         f.write("""
