@@ -175,7 +175,11 @@ def build_rpm(r, b):
         'src_rpm' : b.src_rpm
     }, logfile = b.logfile)
     b.files = []
-    tmpdir = "/tmp/B." + b.b_id[0:6]
+
+    # it's better to have TMPDIR and BUILD dir on same partition:
+    # + /usr/bin/bzip2 -dc /home/services/builder/rpm/packages/kernel/patch-2.6.27.61.bz2
+    # patch: **** Can't rename file /tmp/B.a1b1d3/poKWwRlp to drivers/scsi/hosts.c : No such file or directory
+    tmpdir = os.environ.get('HOME') + "/rpm/BUILD/%s/tmp" % packagename
     if res:
         b.log_line("error: installing src rpm failed")
         res = "FAIL_SRPM_INSTALL"
