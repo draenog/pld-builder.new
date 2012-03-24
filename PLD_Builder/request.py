@@ -308,9 +308,9 @@ class Batch:
         bconds = self.bconds_string() + self.kernel_string() + self.target_string()
         rpmdefs = \
             "--define '_topdir %(echo $HOME/rpm)' " \
-            "--define '_specdir %{_topdir}/packages/%%{name}' "  \
+            "--define '_specdir %{_topdir}/packages/%{name}' "  \
             "--define '_sourcedir %{_specdir}' " \
-            "--define '_builddir %{_topdir}/BUILD/%%{name}' "
+            "--define '_builddir %{_topdir}/BUILD/%{name}' "
         return rpmdefs + bconds
 
     def kernel_string(self):
