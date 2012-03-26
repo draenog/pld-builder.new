@@ -1,4 +1,5 @@
 SHELL=/bin/sh
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=root
 
 #* * * * * builder exec nice -n 19 /usr/share/pld-builder/bin/request-fetcher.sh
