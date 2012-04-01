@@ -44,20 +44,27 @@ autotag() {
 
 get_last_tags() {
 	local pkg spec
-	for pkg in $*; do
+
+	echo >&2 "Fetching package tags: $*..."
+	for pkg in "$@"; do
 		echo >&2 "$pkg... "
-		if [ ! -e  $pkg/$pkg.spec ]; then
-			$rpmdir/builder -g $pkg -ns -r HEAD
+		if [ ! -e $pkg/$pkg.spec ]; then
+			$rpmdir/builder -g $pkg -ns -r HEAD 1>&2
 		fi
-		spec=$(autotag $pkg/$pkg.spec)
-		echo >&2 "... $spec"
-		echo $spec
+		if [ ! -e $pkg/$pkg.spec ]; then
+			# just print it out, to fallback to base pkg name
+			echo "$pkg"
+		else
+			spec=$(autotag $pkg/$pkg.spec)
+			echo >&2 "... $spec"
+			echo $spec
+		fi
 	done
 }
 
+cd $rpmdir
 case "$1" in
 	head)
-		cd $rpmdir
 		for pkg in $pkgs_head; do
 			$rpmdir/builder -g $pkg -ns
 			echo ./relup.sh -ui $a/$a.spec && make-request.sh -d th $a.spec
@@ -65,15 +72,30 @@ case "$1" in
 		;;
 	longterm)
 		cd $rpmdir
-		echo "Fetching package tags..."
 		specs=$(get_last_tags $pkgs_longterm)
-		set -x
 		$dir/make-request.sh -r -d $dist --kernel longterm --without userspace $specs
-#		for pkg in $pkgs_longterm_only; do
-#			echo ./relup.sh -ui $a/$a.spec && make-request.sh -d th --kernel longterm $a.spec
-#		done
+
+		specs=$pkgs_longterm_only
+		$dir/make-request.sh -r -d $dist --kernel longterm $specs
 		;;
 	*)
-		echo "UNKNOWN CRAP $1 !"
+		# try to parse all args, filling them with last autotag
+		while [ $# -gt 0 ]; do
+			case "$1" in
+			--kernel|--with|--without)
+				args="$1 $2"
+				shift
+				;;
+			-*)
+				args="$args $1"
+				;;
+			*)
+				specs="$specs $1"
+				;;
+			esac
+			shift
+		done
+		specs=$(get_last_tags $specs)
+		$dir/make-request.sh -r -d $dist $args $specs
 		;;
 esac
