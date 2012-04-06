@@ -1,8 +1,10 @@
 # vi: encoding=utf-8 ts=8 sts=4 sw=4 et
 
-import os.path
+import os
 
-root_dir = os.path.expanduser('~/pld-builder.new')
+root_dir = os.getenv('BUILDERPATH')
+if root_dir is None:
+    root_dir = os.path.expanduser('~/pld-builder.new')
 conf_dir = root_dir + "/config"
 spool_dir = root_dir + "/spool"
 lock_dir = root_dir + "/lock"
