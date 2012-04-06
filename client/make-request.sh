@@ -151,6 +151,45 @@ df_fetch() {
 	done
 }
 
+# autotag from rpm-build-macros
+# displays latest used tag for a specfile
+autotag() {
+	local out s
+	for s in "$@"; do
+		# strip branches
+		s=${s%:*}
+		# ensure package ends with .spec
+		s=${s%.spec}.spec
+		out=$(cvs status -v $s | awk "!/Sticky/&&/auto-$dist-/{if (!a++) print \$1}")
+		echo "$s:$out"
+	done
+}
+
+# get autotag for specs
+# WARNING: This may checkout some files from CVS
+get_autotag() {
+	local pkg spec rpmdir
+
+	rpmdir=$(rpm -E %_topdir)
+	cd $rpmdir
+	for pkg in "$@"; do
+		# strip branches
+		pkg=${pkg%:*}
+		# strip .spec extension
+		pkg=${pkg%.spec}
+		# checkout only if missing
+		if [ ! -e $pkg/$pkg.spec ]; then
+			$rpmdir/builder -g $pkg -ns -r HEAD 1>&2
+		fi
+		if [ ! -e $pkg/$pkg.spec ]; then
+			# just print it out, to fallback to base pkg name
+			echo "$pkg"
+		else
+			autotag $pkg/$pkg.spec
+		fi
+	done
+}
+
 usage() {
 	cat <<EOF
 Usage: make-request.sh [OPTION] ... [SPECFILE] ....
@@ -160,8 +199,11 @@ Mandatory arguments to long options are mandatory for short options too.
       --config-file /path/to/config/file
             Source additional config file (after $USER_CFG), useful when
             when sending build requests to Ac/Th from the same account
+      -a
+            Try to use latest auto-tag for the spec when building
+            WARNING: This will checkout new files to your packages dir
       -b 'BUILDER BUILDER ...',  --builder='BUILDER BUILDER ...'
-           Sends request to given builders (in 'version-arch' format)
+            Sends request to given builders (in 'version-arch' format)
       --with VALUE, --without VALUE
             Build package with(out) a given bcond
       --kernel VALUE
@@ -263,6 +305,10 @@ while [ $# -gt 0 ] ; do
 				builders="$builders ${b%:*}"
 			done
 			shift
+			;;
+
+		-a)
+			autotag=yes
 			;;
 
 		--with)
@@ -555,6 +601,11 @@ specs=`for s in $specs; do
 		;;
 	esac
 done`
+
+if [ "$autotag" = "yes" ]; then
+	msg "Auto autotag build enabled"
+	specs=$(get_autotag $specs)
+fi
 
 if [ "$df_fetch" = "yes" ]; then
 	df_fetch $specs
