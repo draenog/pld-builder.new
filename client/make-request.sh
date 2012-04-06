@@ -11,10 +11,11 @@ command=
 command_flags=
 gpg_opts=
 default_branch='HEAD'
-distro=
+dist=
 url=
 no_depend=no
 verbose=no
+autotag=no
 
 if [ -x /usr/bin/python ]; then
 	send_mode="python"
@@ -39,7 +40,7 @@ send_mode="$send_mode"
 url="$url"
 mailer="/usr/sbin/sendmail -t"
 gpg_opts=""
-distro=th
+dist=th
 url="http://src.th.pld-linux.org:1234/"
 
 # defaults:
@@ -50,6 +51,10 @@ fi
 
 if [ -f "$USER_CFG" ]; then
 	. $USER_CFG
+	# legacy fallback
+	if [ "${distro:+set}" = "set" ]; then
+		dist=$distro
+	fi
 fi
 
 # internal options, not to be overriden
@@ -184,8 +189,8 @@ Mandatory arguments to long options are mandatory for short options too.
       -j, --jobs
             Number of parallel jobs for single build
       -f, --flag
-      -d, --distro DISTRO
-            Specify value for \$distro
+      -d, --dist DISTRIBUTION_ID
+            Specify value for \$dist
       -df,  --distfiles-fetch[-request] PACKAGE
             Send distfiles request to fetch sources for PACKAGE
       -cf, --command-flag
@@ -216,8 +221,8 @@ EOF
 	exit 0
 }
 
-# validate distro, set $distro
-set_distro() {
+# validate distro, set $dist
+set_dist() {
 	case "$1" in
 	ac)
 		;;
@@ -234,17 +239,17 @@ set_distro() {
 	aidath)
 		;;
 	*)
-		die "distro \`$1' not known"
+		die "dist \`$1' not known"
 		;;
 	esac
 
-	distro=$1
+	dist=$1
 }
 
 while [ $# -gt 0 ] ; do
 	case "$1" in
-		--distro | -d)
-			set_distro $2
+		-d | --dist | --distro)
+			set_dist $2
 			shift
 			;;
 
@@ -418,7 +423,7 @@ while [ $# -gt 0 ] ; do
 	shift
 done
 
-case "$distro" in
+case "$dist" in
 ac)
 	builder_email="builder-ac@pld-linux.org"
 	default_builders="ac-*"
@@ -426,13 +431,13 @@ ac)
 	url="http://ep09.pld-linux.org:1289/"
 	control_url="http://ep09.pld-linux.org/~buildsrc"
 	;;
-ac-java) # fake "distro" for java available ac architectures
+ac-java) # fake "dist" for java available ac architectures
 	builder_email="builder-ac@pld-linux.org"
 	default_builders="ac-i586 ac-i686 ac-athlon ac-amd64"
 	default_branch="AC-branch"
 	url="http://ep09.pld-linux.org:1289/"
 	;;
-ac-xen) # fake "distro" for xen-enabled architectures
+ac-xen) # fake "dist" for xen-enabled architectures
 	builder_email="builder-ac@pld-linux.org"
 	default_builders="ac-i686 ac-athlon ac-amd64"
 	default_branch="AC-branch"
@@ -455,7 +460,7 @@ th)
 	url="http://src.th.pld-linux.org:1234/"
 	control_url="http://src.th.pld-linux.org"
 	;;
-th-java) # fake "distro" for java available th architectures
+th-java) # fake "dist" for java available th architectures
 	builder_email="builderth@pld-linux.org"
 	default_builders="th-x86_64 th-athlon th-i686"
 	url="http://src.th.pld-linux.org:1234/"
@@ -465,11 +470,11 @@ aidath)
 	default_builders="aidath-*"
 	;;
 *)
-	die "distro \`$distro' not known"
+	die "dist \`$dist' not known"
 	;;
 esac
 
-# need to do this after distro selection
+# need to do this after dist selection
 if [ "$skip" ]; then
 	skip=$(skip="$skip" control_url="$control_url" python -c '
 import urllib2
@@ -525,7 +530,7 @@ print string.join(skip, ",")
 	priority=-1
 	command="skip:$skip"
 	command_flags="no-chroot"
-	builders="$distro-src"
+	builders="$dist-src"
 fi
 
 branch=${branch:-$default_branch}
@@ -533,7 +538,7 @@ branch=${branch:-$default_branch}
 specs=`for s in $specs; do
 	case "$s" in
 	^)
-		# skip marker
+		# skip marker - pass it along
 		echo $s
 		;;
 	*.spec:*) # spec with branch
@@ -558,7 +563,7 @@ fi
 
 if [ "$upgrade_macros" = "yes" ]; then
 	command="poldek --up; poldek -uv rpm-build-macros"
-	builders="$distro-src"
+	builders="$dist-src"
 	f_upgrade=no
 	build_mode=test
 fi
