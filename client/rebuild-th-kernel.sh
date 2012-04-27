@@ -56,6 +56,7 @@ get_last_tags() {
 			echo "$pkg"
 		else
 			spec=$(autotag $pkg/$pkg.spec)
+			spec=${spec:#*/}
 			echo >&2 "... $spec"
 			echo $spec
 		fi
