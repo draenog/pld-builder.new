@@ -6,24 +6,23 @@ dist=th
 
 pkgs_head="
 	dahdi-linux
-   	ipset
-   	iscsitarget
-   	lirc
-   	madwifi-ng
-   	open-vm-tools
-   	r8168
-   	VirtualBox
-   	xorg-driver-video-nvidia
-   	xorg-driver-video-fglrx
-   	xtables-addons
+	ipset
+	lirc
+	madwifi-ng
+	open-vm-tools
+	r8168
+	VirtualBox
+	xorg-driver-video-fglrx
+	xorg-driver-video-nvidia
+	xtables-addons
 "
 
 pkgs_longterm="
-	$pkgs_head
-   	xorg-driver-video-nvidia-legacy3
-	openvswitch
 	e1000e
 	igb
+	iscsitarget
+	openvswitch
+	xorg-driver-video-nvidia-legacy3
 "
 
 # autotag from rpm-build-macros
@@ -72,7 +71,12 @@ case "$1" in
 		;;
 	longterm)
 		cd $rpmdir
-		specs=$(get_last_tags $pkgs_longterm)
+		for pkg in $pkgs_longterm; do
+			echo >&2 "Rebuilding $pkg..."
+			$rpmdir/builder -g $pkg -ns
+			$rpmdir/relup.sh -ui $pkg/$pkg.spec && $dir/make-request.sh -r -d th --without kernel $pkg.spec
+		done
+		specs=$(get_last_tags $pkgs_head $pkgs_longterm)
 		for pkg in $specs; do
 			echo >&2 "Rebuilding $pkg..."
 			$dir/make-request.sh -r -d $dist --kernel longterm --without userspace $pkg
