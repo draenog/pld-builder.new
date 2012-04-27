@@ -20,6 +20,7 @@ pkgs_head="
 
 pkgs_longterm="
 	$pkgs_head
+   	xorg-driver-video-nvidia-legacy3
 	openvswitch
 	e1000e
 	igb
