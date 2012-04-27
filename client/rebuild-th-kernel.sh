@@ -22,8 +22,6 @@ pkgs_head="
 pkgs_longterm="
 	$pkgs_head
 	openvswitch
-"
-pkgs_longterm_only="
 	e1000e
 	igb
 "
@@ -67,6 +65,7 @@ cd $rpmdir
 case "$1" in
 	head)
 		for pkg in $pkgs_head; do
+			echo >&2 "Rebuilding $pkg..."
 			$rpmdir/builder -g $pkg -ns
 			$rpmdir/relup.sh -ui $pkg/$pkg.spec && $dir/make-request.sh -r -d th $pkg.spec
 		done
@@ -74,10 +73,10 @@ case "$1" in
 	longterm)
 		cd $rpmdir
 		specs=$(get_last_tags $pkgs_longterm)
-		$dir/make-request.sh -r -d $dist --kernel longterm --without userspace $specs
-
-		specs=$pkgs_longterm_only
-		$dir/make-request.sh -r -d $dist --kernel longterm $specs
+		for pkg in $specs; do
+			echo >&2 "Rebuilding $pkg..."
+			$dir/make-request.sh -r -d $dist --kernel longterm --without userspace $pkg
+		done
 		;;
 	*)
 		# try to parse all args, filling them with last autotag
