@@ -67,7 +67,7 @@ case "$1" in
 	head)
 		for pkg in $pkgs_head; do
 			$rpmdir/builder -g $pkg -ns
-			echo ./relup.sh -ui $a/$a.spec && make-request.sh -d th $a.spec
+			$rpmdir/relup.sh -ui $pkg/$pkg.spec && make-request.sh -d th $pkg.spec
 		done
 		;;
 	longterm)
