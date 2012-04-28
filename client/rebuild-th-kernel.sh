@@ -6,7 +6,11 @@ dist=th
 
 pkgs_head="
 	dahdi-linux
+	e1000e
+	igb
 	ipset
+	ixgbe
+	linuxrdac
 	lirc
 	madwifi-ng
 	open-vm-tools
@@ -18,8 +22,6 @@ pkgs_head="
 "
 
 pkgs_longterm="
-	e1000e
-	igb
 	iscsitarget
 	openvswitch
 	xorg-driver-video-nvidia-legacy3
