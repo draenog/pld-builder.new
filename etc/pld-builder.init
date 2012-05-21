@@ -22,8 +22,14 @@ mount_chroots() {
 	local ret
 	for CHROOT in $CHROOTS; do
 		show "chroot: %s mount /proc" "$CHROOT"
-		ret=$(chroot $CHROOT mount /proc > /dev/null 2>&1; echo $?)
-		[ $ret -eq 0 ] && ok || fail
+		mount -t proc -o gid=17 none $CHROOT/proc
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			ok
+		else
+			fail
+			RETVAL=$ret
+		fi
 	done
 }
 
@@ -31,8 +37,8 @@ umount_chroots() {
 	local ret
 	for CHROOT in $CHROOTS; do
 		show "chroot: %s umount /proc" "$CHROOT"
-		ret=$(chroot $CHROOT umount /proc > /dev/null 2>&1; echo $?)
-		[ $ret -eq 0 ] && ok || fail
+		umount $CHROOT/proc
+		[ $? -eq 0 ] && ok || fail
 	done
 }
 
@@ -40,8 +46,14 @@ chroots_status() {
 	local ret
 	for CHROOT in $CHROOTS; do
 		show "chroot: %s is /proc mounted?" "$CHROOT"
-		ret=$(chroot $CHROOT mount 2> /dev/null | grep -q 'none.*/proc'; echo $?)
-		[ $ret -eq 0 ] && ok || fail
+		test -f $CHROOT/proc/mounts
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			ok
+		else
+			fail
+			RETVAL=$ret
+		fi
 	done
 }
 
