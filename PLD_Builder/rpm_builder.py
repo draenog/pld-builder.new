@@ -64,10 +64,16 @@ def check_skip_build(r, b):
             f = urllib2.urlopen(req)
             good = True
         except urllib2.HTTPError, error:
-                return False
+            return False
         except urllib2.URLError, error:
             # see errno.h
-            if error.errno in [-3, 60, 61, 110, 111]:
+            try:
+                errno = error.errno
+            except AttributeError:
+                # python 2.4
+                errno = error.reason[0]
+
+            if errno in [-3, 60, 61, 110, 111]:
                 b.log_line("unable to connect... trying again")
                 continue
             else:
@@ -101,7 +107,13 @@ def fetch_src(r, b):
                 return False
         except urllib2.URLError, error:
             # see errno.h
-            if error.errno in [-3, 60, 61, 110, 111]:
+            try:
+                errno = error.errno
+            except AttributeError:
+                # python 2.4
+                errno = error.reason[0]
+
+            if errno in [-3, 60, 61, 110, 111]:
                 b.log_line("unable to connect to %s... trying again" % (src_url))
                 continue
             else:
