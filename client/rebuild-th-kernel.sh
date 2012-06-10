@@ -30,14 +30,19 @@ pkgs_longterm="
 # autotag from rpm-build-macros
 # displays latest used tag for a specfile
 autotag() {
-	local out s
-	for s in "$@"; do
+	local out spec pkg
+	for spec in "$@"; do
+		set -x
 		# strip branches
-		s=${s%:*}
+		pkg=${spec%:*}
 		# ensure package ends with .spec
-		s=${s%.spec}.spec
-		out=$(cvs status -v $s | awk "!/Sticky/&&/auto-$dist-/{if (!a++) print \$1}")
-		echo "$s:$out"
+		spec=${pkg%.spec}.spec
+		# and pkg without subdir
+		pkg=${pkg#*/}
+		# or .ext
+		pkg=${pkg%%.spec}
+		out=$(cvs status -v $spec | awk "!/Sticky/&&/auto-$dist-$pkg-$alt_kernel/{if (!a++) print \$1}")
+		echo "$spec:$out"
 	done
 }
 
@@ -55,7 +60,7 @@ get_last_tags() {
 			echo "$pkg"
 		else
 			spec=$(autotag $pkg/$pkg.spec)
-			spec=${spec:#*/}
+			spec=${spec#*/}
 			echo >&2 "... $spec"
 			echo $spec
 		fi
@@ -65,18 +70,22 @@ get_last_tags() {
 cd $rpmdir
 case "$1" in
 	head)
+		kernel=$(get_last_tags kernel)
+		kernel=$(echo ${kernel#*auto-??-} | tr _ .)
 		for pkg in $pkgs_head; do
 			echo >&2 "Rebuilding $pkg..."
 			$rpmdir/builder -g $pkg -ns
-			$rpmdir/relup.sh -ui $pkg/$pkg.spec && $dir/make-request.sh -r -d th $pkg.spec
+			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec && $dir/make-request.sh -r -d th $pkg.spec
 		done
 		;;
 	longterm)
 		cd $rpmdir
+		kernel=$(alt_kernel=longterm get_last_tags kernel)
+		kernel=$(echo ${kernel#*auto-??-} | tr _ .)
 		for pkg in $pkgs_longterm; do
 			echo >&2 "Rebuilding $pkg..."
 			$rpmdir/builder -g $pkg -ns
-			$rpmdir/relup.sh -ui $pkg/$pkg.spec && $dir/make-request.sh -r -d th --without kernel $pkg.spec
+			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec && $dir/make-request.sh -r -d th --without kernel $pkg.spec
 		done
 		specs=$(get_last_tags $pkgs_head $pkgs_longterm)
 		for pkg in $specs; do
