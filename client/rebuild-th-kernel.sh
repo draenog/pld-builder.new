@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 dir=$(cd "$(dirname "$0")"; pwd)
 rpmdir=$(rpm -E %_topdir)
@@ -74,7 +75,8 @@ case "$1" in
 		for pkg in $pkgs_head; do
 			echo >&2 "Rebuilding $pkg..."
 			$rpmdir/builder -g $pkg -ns
-			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec && $dir/make-request.sh -r -d th $pkg.spec
+			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec
+			$dir/make-request.sh -r -d th $pkg.spec
 		done
 		;;
 	longterm)
@@ -84,7 +86,8 @@ case "$1" in
 		for pkg in $pkgs_longterm; do
 			echo >&2 "Rebuilding $pkg..."
 			$rpmdir/builder -g $pkg -ns
-			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec && $dir/make-request.sh -r -d th --without kernel $pkg.spec
+			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec
+			$dir/make-request.sh -r -d th --without kernel $pkg.spec
 		done
 		specs=$(get_last_tags $pkgs_head $pkgs_longterm)
 		for pkg in $specs; do
