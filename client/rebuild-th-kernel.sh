@@ -32,7 +32,6 @@ pkgs_longterm="
 autotag() {
 	local out spec pkg
 	for spec in "$@"; do
-		set -x
 		# strip branches
 		pkg=${spec%:*}
 		# ensure package ends with .spec
