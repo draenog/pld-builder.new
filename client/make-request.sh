@@ -757,21 +757,26 @@ gen_req() {
 
 gen_email () {
 	# make request first, so the STDERR/STDOUT streams won't be mixed
-	local req=$(gen_req)
+	local tmp req
+	tmp=$(mktemp)
+	gen_req > $tmp
 
 	if [ "$verbose" = "yes" ]; then
-		echo >&2 -E "$req"
+		cat $tmp >&2
 	fi
-cat <<EOF
-From: $requester
-To: $builder_email
-Subject: build request
-Message-Id: <$id@$(hostname)>
-X-New-PLD-Builder: request
-X-Requester-Version: \$Id$
 
-$(echo -E "$req" | gpg --clearsign --default-key $default_key $gpg_opts)
-EOF
+	cat <<-EOF
+	From: $requester
+	To: $builder_email
+	Subject: build request
+	Message-Id: <$id@$(hostname)>
+	X-New-PLD-Builder: request
+	X-Requester-Version: \$Id$
+
+	EOF
+
+	gpg --clearsign --default-key $default_key $gpg_opts --output=- $tmp
+	rm -f $tmp
 }
 
 gen_email | send_request
