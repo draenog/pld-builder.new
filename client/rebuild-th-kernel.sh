@@ -72,28 +72,29 @@ case "$1" in
 	head)
 		kernel=$(get_last_tags kernel)
 		kernel=$(echo ${kernel#*auto-??-} | tr _ .)
+		specs=""
 		for pkg in $pkgs_head; do
 			echo >&2 "Rebuilding $pkg..."
 			$rpmdir/builder -g $pkg -ns
 			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec
-			$dir/make-request.sh -r -d th $pkg.spec
+			specs="$specs $pkg.spec"
 		done
+		$dir/make-request.sh -r -d $dist $specs
 		;;
 	longterm)
-		cd $rpmdir
 		kernel=$(alt_kernel=longterm get_last_tags kernel)
 		kernel=$(echo ${kernel#*auto-??-} | tr _ .)
+		specs=""
 		for pkg in $pkgs_longterm; do
 			echo >&2 "Rebuilding $pkg..."
 			$rpmdir/builder -g $pkg -ns
 			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec
-			$dir/make-request.sh -r -d th --without kernel $pkg.spec
+			specs="$specs $pkg.spec"
 		done
+		$dir/make-request.sh -r -d $dist --without kernel $specs
+
 		specs=$(get_last_tags $pkgs_head $pkgs_longterm)
-		for pkg in $specs; do
-			echo >&2 "Rebuilding $pkg..."
-			$dir/make-request.sh -r -d $dist --kernel longterm --without userspace $pkg
-		done
+		$dir/make-request.sh -r -d $dist --kernel longterm --without userspace $specs
 		;;
 	*)
 		# try to parse all args, filling them with last autotag
