@@ -664,12 +664,18 @@ gen_req() {
 		msg "Using jobs $jobs"
 		echo "	<maxjobs>$jobs</maxjobs>"
 	fi
-	msg "Build mode: $build_mode"
 	if [ -z "$url" ]; then
 		msg "Using email $builder_email"
 	else
 		msg "Using URL $url"
 	fi
+
+	if [ "$build_mode" = "ready" ]; then
+		msg "Build mode: $(tput setaf 2)$build_mode$c_norm"
+	else
+		msg "Build mode: $(tput setaf 3)$build_mode$c_norm"
+	fi
+
 	msg "Queue-ID: $id"
 	echo
 
