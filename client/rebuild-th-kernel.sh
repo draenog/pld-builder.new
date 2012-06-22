@@ -79,7 +79,7 @@ case "$1" in
 			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec
 			specs="$specs $pkg.spec"
 		done
-		$dir/make-request.sh -r -d $dist $specs
+		$dir/make-request.sh -nd -r -d $dist $specs
 		;;
 	longterm)
 		kernel=$(alt_kernel=longterm get_last_tags kernel)
@@ -91,10 +91,11 @@ case "$1" in
 			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec
 			specs="$specs $pkg.spec"
 		done
-		$dir/make-request.sh -r -d $dist --without kernel $specs
+		# first build with main pkg (userspace), later build from tag
+		$dir/make-request.sh -nd -r -d $dist --without kernel $specs
 
 		specs=$(get_last_tags $pkgs_head $pkgs_longterm)
-		$dir/make-request.sh -r -d $dist --kernel longterm --without userspace $specs
+		$dir/make-request.sh -nd -r -d $dist --kernel longterm --without userspace $specs
 		;;
 	*)
 		# try to parse all args, filling them with last autotag
@@ -114,6 +115,6 @@ case "$1" in
 			shift
 		done
 		specs=$(get_last_tags $specs)
-		$dir/make-request.sh -r -d $dist $args $specs
+		$dir/make-request.sh -nd -r -d $dist $args $specs
 		;;
 esac
