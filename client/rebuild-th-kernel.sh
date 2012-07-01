@@ -18,6 +18,7 @@ pkgs_head="
 	r8168
 	VirtualBox
 	xorg-driver-video-fglrx
+	xorg-driver-video-fglrx-legacy-12.x
 	xorg-driver-video-nvidia
 	xtables-addons
 "
