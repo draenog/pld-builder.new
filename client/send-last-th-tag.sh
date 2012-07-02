@@ -3,4 +3,6 @@ set -e
 
 dist=th
 
-./make-request.sh -d $dist -r -a "$@"
+dir=$(dirname $0)
+
+$dir/make-request.sh -d $dist -r -a "$@"
