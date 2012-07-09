@@ -111,7 +111,7 @@ class Group:
     def dump_html(self, f):
         f.write(
             "<div id=\"%(no)d\" class=\"%(flags)s\">\n"
-            "<a href=\"#%(no)d\")>%(no)d</a>. <span id=\"tz\">%(time)s</span> from <b>%(requester)s</b> "
+            "<a href=\"#%(no)d\">%(no)d</a>. <span id=\"tz\">%(time)s</span> from <b>%(requester)s</b> "
             "<small>%(id)s, prio=%(priority)d, jobs=%(max_jobs)d, %(flags)s</small>\n"
         % {
             'no': self.no,
@@ -235,7 +235,7 @@ class Batch:
         if self.is_command():
             desc = "SH: <pre>%s</pre> flags: [%s]" % (self.command, ' '.join(self.command_flags))
         else:
-            package_url = "http://cvs.pld-linux.org/packages/%(package)s/%(spec)s?only_with_tag=%(branch)s" % {
+            package_url = "http://git.pld-linux.org/gitweb.cgi?p=packages/%(package)s.git;f=%(spec)s;h=%(branch)s;a=shortlog" % {
                 'spec': self.spec,
                 'branch': self.branch,
                 'package': self.spec[:-5],
