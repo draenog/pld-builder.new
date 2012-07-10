@@ -42,7 +42,7 @@ def pick_request(q):
     ret = q.requests[0]
     q.requests = q.requests[1:]
     return ret
-    
+
 def store_binary_request(r):
     new_b = []
     for b in r.batches:
@@ -90,7 +90,13 @@ def transfer_file(r, b):
         ftp.add(fname, "uploadinfo")
 
 def build_srpm(r, b):
+    if len(b.spec) == 0:
+        # should not really get here
+        util.append_to(b.logfile, "error: No .spec given but build src.rpm wanted")
+        return "FAIL"
+
     status.push("building %s" % b.spec)
+
     b.src_rpm = ""
     builder_opts = "-nu -nm --nodeps --http"
     if ("test-build" in r.flags) or b.branch and b.branch.startswith(config.tag_prefixes[0]):
@@ -98,7 +104,7 @@ def build_srpm(r, b):
     else:
                     tag_test=" -Tp %s -tt" % (config.tag_prefixes[0],)
     cmd = ("cd rpm/packages; nice -n %s ./builder %s -bs %s -r %s %s %s %s 2>&1" %
-             (config.nice, builder_opts, b.bconds_string(), b.branch, 
+             (config.nice, builder_opts, b.bconds_string(), b.branch,
               tag_test, b.kernel_string(), b.spec))
     util.append_to(b.logfile, "request from: %s" % r.requester)
     util.append_to(b.logfile, "started at: %s" % time.asctime())
@@ -124,12 +130,14 @@ def build_srpm(r, b):
                         (b.branch, pref, b.spec), logfile = b.logfile)
     if res == 0:
         transfer_file(r, b)
-    packagedir = "rpm/packages/%s" % b.spec[:-5]
+
     packagename = b.spec[:-5]
+    packagedir = "rpm/packages/%s" % packagename
     chroot.run("rpm/packages/builder -m %s" % \
             (b.spec,), logfile = b.logfile)
     chroot.run("rm -rf %s" % packagedir, logfile = b.logfile)
     status.pop()
+
     if res:
         res = "FAIL"
     return res
@@ -170,4 +178,4 @@ def main():
         status.pop()
 
 if __name__ == '__main__':
-    main()
+    loop.run_loop(main)

@@ -216,7 +216,7 @@ def build_rpm(r, b):
 
     def ll(l):
         util.append_to(b.logfile, l)
- 
+
     if b.files != []:
         rpm_cache_dir = config.rpm_cache_dir
         if "test-build" not in r.flags:
@@ -318,7 +318,7 @@ def main_for(builder):
         l.close()
     else:
         msg = "HIGH PRIORITY: "
-    
+
     msg += "handling request %s (%d) for %s from %s, priority %s" \
             % (req.id, req.no, config.builder, req.requester, req.priority)
     log.notice(msg)
@@ -340,11 +340,11 @@ def main_for(builder):
     if len(q.requests)<previouslen:
         q.write()
     q.unlock()
-    
+
 def main():
     if len(sys.argv) < 2:
         raise Exception, "fatal: need to have builder name as first arg"
     return main_for(sys.argv[1])
-    
+
 if __name__ == '__main__':
     loop.run_loop(main)

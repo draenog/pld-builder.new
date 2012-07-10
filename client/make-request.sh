@@ -296,13 +296,13 @@ while [ $# -gt 0 ] ; do
 			flags="$flags no-install-br"
 			;;
 
-		-j*)
-			jobs="${1#-j}"
-			;;
-
 		-j | --jobs)
 			jobs="$2"
 			shift
+			;;
+
+		-j*)
+			jobs="${1#-j}"
 			;;
 
 		-v)
@@ -616,45 +616,45 @@ gen_req() {
 		depend=$bid
 	fi
 
-		if [ "$f_upgrade" = "yes" ] ; then
-			msg "Upgrade mode: $f_upgrade"
+	if [ "$f_upgrade" = "yes" ] ; then
+		msg "Upgrade mode: $f_upgrade"
+	fi
+
+	for s in $specs; do
+		# skip marker
+		if [ "$s" = "^" ]; then
+			depend=
+			continue
 		fi
+		if [ "$no_depend" = yes ]; then
+			depend=
+		fi
+		bid=$(uuidgen)
+		echo "	<batch id='$bid' depends-on='$depend'>"
 
-		for s in $specs; do
-			# skip marker
-			if [ "$s" = "^" ]; then
-				depend=
-				continue
-			fi
-			if [ "$no_depend" = yes ]; then
-				depend=
-			fi
-			bid=$(uuidgen)
-			echo "	<batch id='$bid' depends-on='$depend'>"
-
-			name=$(echo "$s" | sed -e 's|:.*||')
-			branch=$(echo "$s" | sed -e 's|.*:||')
-			msg "Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}${target:+ target=$target}${depend:+ depends on $depend}"
-			echo "		 <spec>$name</spec>"
-			echo "		 <branch>$branch</branch>"
-			echo "		 ${kernel:+<kernel>$kernel</kernel>}"
-			echo "		 ${target:+<target>$target</target>}"
-			echo "		 <info></info>"
-			echo
-			for b in $with; do
-				echo "		 <with>$b</with>"
-			done
-			for b in $without; do
-				echo "		 <without>$b</without>"
-			done
-			echo
-			echo "$builders_xml"
-			echo "	</batch>"
-			i=$((i+1))
-
-			# let next job depend on previous
-			depend=$bid
+		name=$(echo "$s" | sed -e 's|:.*||')
+		branch=$(echo "$s" | sed -e 's|.*:||')
+		msg "Adding #$i $name:$branch${kernel:+ alt_kernel=$kernel}${target:+ target=$target}${depend:+ depends on $depend}"
+		echo "		 <spec>$name</spec>"
+		echo "		 <branch>$branch</branch>"
+		echo "		 ${kernel:+<kernel>$kernel</kernel>}"
+		echo "		 ${target:+<target>$target</target>}"
+		echo "		 <info></info>"
+		echo
+		for b in $with; do
+			echo "		 <with>$b</with>"
 		done
+		for b in $without; do
+			echo "		 <without>$b</without>"
+		done
+		echo
+		echo "$builders_xml"
+		echo "	</batch>"
+		i=$((i+1))
+
+		# let next job depend on previous
+		depend=$bid
+	done
 
 	if [ "$post_command" ]; then
 		bid=$(uuidgen)

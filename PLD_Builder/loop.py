@@ -20,7 +20,7 @@ def run_loop(fnc, secs = 5, max = 60):
                     sys.exit(s)
             else:
                 sys.exit(10)
-            
+
     start = time.time()
     while time.time() - start < max:
         last = time.time()

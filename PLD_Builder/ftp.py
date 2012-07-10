@@ -25,7 +25,7 @@ class FTP_Queue:
                 self.url = config.test_ftp_url
             else:
                 self.url = config.ftp_url
-        
+
     def add(self, file, type):
         # if /dev/null, say bye bye
         if self.url == "/dev/null":
@@ -46,7 +46,7 @@ Type: %s
 Requester: %s
 END
 """ % (self.url, l['name'], config.builder, time.time(), l['type'], self.requester_email)
-        
+
         for l in self.queue:
             f = open(path.ftp_queue_dir + '/' + l['id'] + ".desc", "w")
             f.write(desc(l))
@@ -63,7 +63,7 @@ def add(f, type="rpm"):
 
 def flush():
     queue.flush()
-    
+
 def kill():
     queue.kill()
 
@@ -72,6 +72,6 @@ def init(r=None, rpmqa=False):
 
 def status():
     return queue.status
-    
+
 def clear_status():
     queue.status = ""

@@ -18,7 +18,7 @@ def compute_deps():
     rpm_prov = {}
     # list of required files
     req_files = {}
-    
+
     def get_req():
         msg("rpm-req... ")
         f = chr_popen("rpm -qa --qf '@\n%{NAME}\n[%{REQUIRENAME}\n]'")
@@ -42,7 +42,7 @@ def compute_deps():
             msg("[%s: %s, %s] " % (what, rpm_prov[what], pkg))
         else:
             rpm_prov[what] = pkg
-    
+
     def get_prov():
         msg("rpm-prov... ")
         f = chr_popen("rpm -qa --qf '@\n%{NAME}\n[%{PROVIDENAME}\n]'")
@@ -60,7 +60,7 @@ def compute_deps():
                 del req_files[l]
         f.close()
         msg("done\n")
- 
+
     def get_prov_files():
         msg("rpm-files... ")
         f = chr_popen("rpm -qa --qf '@\n%{NAME}\n[%{FILENAMES}\n]'")
@@ -90,7 +90,7 @@ def compute_deps():
                     msg("[%s: %s] " % (pkg, req))
             requires[pkg] = pkg_reqs
         msg("done\n")
-        
+
     # map from pkg-name to list of pkg-names required by it
     # this is result
     requires = {}
@@ -103,7 +103,7 @@ def compute_deps():
 
 def remove_list(req, need):
     """List of packages scheduled for removal.
-    
+
     Given dependency information and list of needed packages compute list
     of packages that don't need to be present.
     """

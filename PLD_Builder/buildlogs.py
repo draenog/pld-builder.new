@@ -25,17 +25,17 @@ class Buildlogs_Queue:
         blogfile = os.path.basename(logfile)
         name = re.sub(r"\.spec\.log", "", blogfile) + "," + id + ".bz2"
         ret = os.system("bzip2 --best --force < %s > %s" \
-                    % (logfile, path.buildlogs_queue_dir + '/' + id + '.' + blogfile))
+                    % (logfile, path.buildlogs_queue_dir + '/' + config.builder + '.' + id + '.' + blogfile))
         if ret:
             log.error("bzip2 compression of %s failed; does bzip2 binary exist?" % (logfile))
 
         if failed: s = "FAIL"
         else: s = "OK"
-        f = open(path.buildlogs_queue_dir + '/' + id + '.' + blogfile + ".info", "w")
+        f = open(path.buildlogs_queue_dir + '/' + config.builder + '.' + id + '.' + blogfile + ".info", "w")
         f.write("Status: %s\nEND\n" % s)
         f.close()
 
-        self.queue.append({'name': name, 'id': id + '.' + blogfile, 'failed': failed})
+        self.queue.append({'name': name, 'id': config.builder + '.' + id + '.' + blogfile, 'failed': failed})
 
     def flush(self):
         def desc(l):
@@ -46,7 +46,7 @@ Type: buildlog
 Requester: %s
 END
 """ % (config.buildlogs_url, l['name'], config.builder, time.time(), self.requester_email)
-        
+
         q = self.queue[:]
         for l in q:
             f = open(path.buildlogs_queue_dir + '/' + l['id'] + ".desc.tmp", "w")

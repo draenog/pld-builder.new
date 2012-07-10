@@ -92,7 +92,7 @@ def handle_reqs(builder, reqs):
     q.lock(0)
     q.read()
     for r in reqs:
-        if r.kind != 'group': 
+        if r.kind != 'group':
             raise Exception, 'handle_reqs: fatal: huh? %s' % r.kind
         need_it = 0
         for b in r.batches:
@@ -110,14 +110,14 @@ def main():
         sys.exit(1)
     init_conf()
     acl.try_reload()
-    
+
     status.push("fetching requests")
     if has_new(config.control_url):
         q = fetch_queue(config.control_url)
         max_no = 0
         q_new = []
         for r in q:
-            if r.no > max_no: 
+            if r.no > max_no:
                 max_no = r.no
             if r.no > last_count:
                 q_new.append(r)
@@ -128,8 +128,8 @@ def main():
         f.close()
     status.pop()
     lck.close()
-    
+
 if __name__ == '__main__':
-    # http connection is established (and few bytes transferred through it) 
+    # http connection is established (and few bytes transferred through it)
     # each $secs seconds.
     loop.run_loop(main, secs = 10)

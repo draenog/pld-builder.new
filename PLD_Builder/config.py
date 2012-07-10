@@ -46,7 +46,7 @@ class Builder_Conf:
                 return d
             else:
                 log.panic("cannot find %s::%s" % (builder, o))
-        
+
         p.readfp(open(path.builder_conf))
 
         self.admin_email = get("admin_email")
@@ -101,7 +101,7 @@ class Builder_Conf:
         self.builder_user = get("builder_user", "builder")
         self.sudo_chroot_wrapper = get("sudo_chroot_wrapper", "")
         self.nice = get("nice", "0")
-        
+
         f = get("syslog", "")
         if f != "":
             if syslog_facilities.has_key(f):

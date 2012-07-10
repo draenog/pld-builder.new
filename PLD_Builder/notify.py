@@ -13,7 +13,7 @@ class Notifier:
         self.xml = StringIO.StringIO()
         self.xml.write("<notification group-id='%s' builder='%s'>\n" % \
                         (g.id, config.builder))
-    
+
     def send(self, r):
         sio = StringIO.StringIO()
         self.xml.write("</notification>\n")
@@ -24,10 +24,10 @@ class Notifier:
         notifyq.init(r)
         notifyq.add(sio)
         notifyq.flush()
-    
+
     def add_batch(self, b, s):
         self.xml.write("  <batch id='%s' status='%s' />\n" % (b.b_id, s))
-    
+
 n = None
 
 def begin(group):

@@ -24,11 +24,11 @@ def builders_order():
     for b in config.binary_builders:
         bs[b] = 0
         bl.append(b)
-        
+
     lck = lock.lock("got-lock")
     f = open(path.got_lock_file, "r+")
     line_no = 0
-    
+
     for l in f.xreadlines():
         line_no += 1
         b = string.strip(l)
@@ -39,7 +39,7 @@ def builders_order():
 
     def mycmp(b1, b2):
         return cmp(bs[b1], bs[b2])
-        
+
     bl.sort(mycmp)
 
     f.seek(0)

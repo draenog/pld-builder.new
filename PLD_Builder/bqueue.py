@@ -74,7 +74,7 @@ class B_Queue:
                 self.fd = open(self.name, "r+")
             else:
                 self.fd = open(self.name, "w+")
-        
+
     def read(self):
         self._open()
         self.signers = []
@@ -112,7 +112,7 @@ class B_Queue:
             return 1
         except IOError:
             return 0
-    
+
     def unlock(self):
         fcntl.flock(self.fd, fcntl.LOCK_UN)
 

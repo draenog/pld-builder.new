@@ -11,6 +11,6 @@ msg = sys.stdin.read()
 
 server = smtplib.SMTP(smtp_host)
 # server.set_debuglevel(1)
-server.sendmail("matkor@pld-linux.org","builder-ac@pld-linux.org", msg) # Adresses should be taken from .requestrc 
+server.sendmail("matkor@pld-linux.org","builder-ac@pld-linux.org", msg) # Adresses should be taken from .requestrc
 server.quit()
 

@@ -30,7 +30,7 @@ def get_keys(buf):
 
     rx = re.compile("^gpg: Signature made .*using [DR]SA key ID (.+)")
     keys = []
-    
+
     for l in d_stderr.split('\n'):
         m = rx.match(l)
         if m:

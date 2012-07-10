@@ -178,7 +178,7 @@ def install_br(r, b):
     if len(needed) == 0:
         b.log_line("no BR needed")
         return True
-    
+
     nbr = ""
     for bre in needed.keys():
         nbr = nbr + " " + re.escape(bre)
