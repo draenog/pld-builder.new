@@ -2,16 +2,21 @@
 
 umask 077
 
-if [ -d "$HOME/pld-builder.new/" ]; then
-	cd "$HOME/pld-builder.new/"
+CONFIG=$HOME/.pldbuilderrc
+[ -f "$CONFIG" ] && . $CONFIG
+[ -n "$BUILDERPATH" ] || BUILDERPATH="$HOME/pld-builder.new/"
+export BUILDERPATH
+
+if [ -d "$BUILDERPATH" ]; then
+	cd "$BUILDERPATH"
 else
-	echo "the '$HOME/pld-builder.new/' directory does not exist"
+	echo "the $BUILDERPATH directory does not exist"
 	exit 1
 fi
 
 
-if [ -f "$HOME/pld-builder.new/config/global" ]; then
-	. $HOME/pld-builder.new/config/global
+if [ -f "$BUILDERPATH/config/global" ]; then
+	. $BUILDERPATH/config/global
 fi
 
 if [ "$1" != "y" ] ; then
