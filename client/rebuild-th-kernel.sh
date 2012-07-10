@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 dir=$(cd "$(dirname "$0")"; pwd)
 rpmdir=$(rpm -E %_topdir)
@@ -6,39 +7,43 @@ dist=th
 
 pkgs_head="
 	dahdi-linux
-   	ipset
-   	iscsitarget
-   	lirc
-   	madwifi-ng
-   	open-vm-tools
-   	r8168
-   	VirtualBox
-   	xorg-driver-video-nvidia
-   	xorg-driver-video-nvidia-legacy3
-   	xtables-addons
-   	xorg-driver-video-fglrx
+	e1000e
+	igb
+	ipset
+	ixgbe
+	linuxrdac
+	lirc
+	madwifi-ng
+	open-vm-tools
+	r8168
+	VirtualBox
+	xorg-driver-video-fglrx
+	xorg-driver-video-fglrx-legacy-12.x
+	xorg-driver-video-nvidia
+	xtables-addons
 "
 
 pkgs_longterm="
-	$pkgs_head
+	iscsitarget
 	openvswitch
-"
-pkgs_longterm_only="
-	e1000e
-	igb
+	xorg-driver-video-nvidia-legacy3
 "
 
 # autotag from rpm-build-macros
 # displays latest used tag for a specfile
 autotag() {
-	local out s
-	for s in "$@"; do
+	local out spec pkg
+	for spec in "$@"; do
 		# strip branches
-		s=${s%:*}
+		pkg=${spec%:*}
 		# ensure package ends with .spec
-		s=${s%.spec}.spec
-		out=$(cvs status -v $s | awk "!/Sticky/&&/auto-$dist-/{if (!a++) print \$1}")
-		echo "$s:$out"
+		spec=${pkg%.spec}.spec
+		# and pkg without subdir
+		pkg=${pkg#*/}
+		# or .ext
+		pkg=${pkg%%.spec}
+		out=$(cvs status -v $spec | awk "!/Sticky/&&/auto-$dist-$pkg-$alt_kernel/{if (!a++) print \$1}")
+		echo "$spec:$out"
 	done
 }
 
@@ -56,6 +61,7 @@ get_last_tags() {
 			echo "$pkg"
 		else
 			spec=$(autotag $pkg/$pkg.spec)
+			spec=${spec#*/}
 			echo >&2 "... $spec"
 			echo $spec
 		fi
@@ -65,18 +71,32 @@ get_last_tags() {
 cd $rpmdir
 case "$1" in
 	head)
+		kernel=$(get_last_tags kernel)
+		kernel=$(echo ${kernel#*auto-??-} | tr _ .)
+		specs=""
 		for pkg in $pkgs_head; do
+			echo >&2 "Rebuilding $pkg..."
 			$rpmdir/builder -g $pkg -ns
-			echo ./relup.sh -ui $a/$a.spec && make-request.sh -d th $a.spec
+			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec
+			specs="$specs $pkg.spec"
 		done
+		$dir/make-request.sh -nd -r -d $dist $specs
 		;;
 	longterm)
-		cd $rpmdir
-		specs=$(get_last_tags $pkgs_longterm)
-		$dir/make-request.sh -r -d $dist --kernel longterm --without userspace $specs
+		kernel=$(alt_kernel=longterm get_last_tags kernel)
+		kernel=$(echo ${kernel#*auto-??-} | tr _ .)
+		specs=""
+		for pkg in $pkgs_longterm; do
+			echo >&2 "Rebuilding $pkg..."
+			$rpmdir/builder -g $pkg -ns
+			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec
+			specs="$specs $pkg.spec"
+		done
+		# first build with main pkg (userspace), later build from tag
+		$dir/make-request.sh -nd -r -d $dist --without kernel $specs
 
-		specs=$pkgs_longterm_only
-		$dir/make-request.sh -r -d $dist --kernel longterm $specs
+		specs=$(get_last_tags $pkgs_head $pkgs_longterm)
+		$dir/make-request.sh -nd -r -d $dist --kernel longterm --without userspace $specs
 		;;
 	*)
 		# try to parse all args, filling them with last autotag
@@ -96,6 +116,6 @@ case "$1" in
 			shift
 		done
 		specs=$(get_last_tags $specs)
-		$dir/make-request.sh -r -d $dist $args $specs
+		$dir/make-request.sh -nd -r -d $dist $args $specs
 		;;
 esac

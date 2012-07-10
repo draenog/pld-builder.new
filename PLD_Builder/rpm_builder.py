@@ -64,10 +64,16 @@ def check_skip_build(r, b):
             f = urllib2.urlopen(req)
             good = True
         except urllib2.HTTPError, error:
-                return False
+            return False
         except urllib2.URLError, error:
             # see errno.h
-            if error.errno in [-3, 60, 61, 110, 111]:
+            try:
+                errno = error.errno
+            except AttributeError:
+                # python 2.4
+                errno = error.reason[0]
+
+            if errno in [-3, 60, 61, 110, 111]:
                 b.log_line("unable to connect... trying again")
                 continue
             else:
@@ -101,7 +107,13 @@ def fetch_src(r, b):
                 return False
         except urllib2.URLError, error:
             # see errno.h
-            if error.errno in [-3, 60, 61, 110, 111]:
+            try:
+                errno = error.errno
+            except AttributeError:
+                # python 2.4
+                errno = error.reason[0]
+
+            if errno in [-3, 60, 61, 110, 111]:
                 b.log_line("unable to connect to %s... trying again" % (src_url))
                 continue
             else:
@@ -131,6 +143,9 @@ def prepare_env():
         test ! -c /dev/random && rm -f /dev/random && mknod -m 644 /dev/random c 1 8
         test ! -c /dev/urandom && rm -f /dev/urandom && mknod -m 644 /dev/urandom c 1 9
         test ! -c /dev/zero && rm -f /dev/zero && mknod -m 666 /dev/zero c 1 5
+
+        # need entry for "/" in mtab, for diskspace() to work in rpm
+        [ -z $(awk '$2 == "/" {print $1}' /etc/mtab) ] && mount -f -t rootfs rootfs /
 
         # make neccessary files readable for builder user
         # TODO: see if they really aren't readable for builder

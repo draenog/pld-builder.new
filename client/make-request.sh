@@ -11,10 +11,11 @@ command=
 command_flags=
 gpg_opts=
 default_branch='HEAD'
-distro=
+dist=
 url=
 no_depend=no
 verbose=no
+autotag=no
 
 if [ -x /usr/bin/python ]; then
 	send_mode="python"
@@ -39,7 +40,7 @@ send_mode="$send_mode"
 url="$url"
 mailer="/usr/sbin/sendmail -t"
 gpg_opts=""
-distro=th
+dist=th
 url="http://src.th.pld-linux.org:1234/"
 
 # defaults:
@@ -50,6 +51,10 @@ fi
 
 if [ -f "$USER_CFG" ]; then
 	. $USER_CFG
+	# legacy fallback
+	if [ "${distro:+set}" = "set" ]; then
+		dist=$distro
+	fi
 fi
 
 # internal options, not to be overriden
@@ -146,6 +151,45 @@ df_fetch() {
 	done
 }
 
+# autotag from rpm-build-macros
+# displays latest used tag for a specfile
+autotag() {
+	local out s
+	for s in "$@"; do
+		# strip branches
+		s=${s%:*}
+		# ensure package ends with .spec
+		s=${s%.spec}.spec
+		out=$(cvs status -v $s | awk "!/Sticky/&&/auto-$dist-/{if (!a++) print \$1}")
+		echo "$s:$out"
+	done
+}
+
+# get autotag for specs
+# WARNING: This may checkout some files from CVS
+get_autotag() {
+	local pkg spec rpmdir
+
+	rpmdir=$(rpm -E %_topdir)
+	cd $rpmdir
+	for pkg in "$@"; do
+		# strip branches
+		pkg=${pkg%:*}
+		# strip .spec extension
+		pkg=${pkg%.spec}
+		# checkout only if missing
+		if [ ! -e $pkg/$pkg.spec ]; then
+			$rpmdir/builder -g $pkg -ns -r HEAD 1>&2
+		fi
+		if [ ! -e $pkg/$pkg.spec ]; then
+			# just print it out, to fallback to base pkg name
+			echo "$pkg"
+		else
+			autotag $pkg/$pkg.spec
+		fi
+	done
+}
+
 usage() {
 	cat <<EOF
 Usage: make-request.sh [OPTION] ... [SPECFILE] ....
@@ -155,8 +199,11 @@ Mandatory arguments to long options are mandatory for short options too.
       --config-file /path/to/config/file
             Source additional config file (after $USER_CFG), useful when
             when sending build requests to Ac/Th from the same account
+      -a
+            Try to use latest auto-tag for the spec when building
+            WARNING: This will checkout new files to your packages dir
       -b 'BUILDER BUILDER ...',  --builder='BUILDER BUILDER ...'
-           Sends request to given builders (in 'version-arch' format)
+            Sends request to given builders (in 'version-arch' format)
       --with VALUE, --without VALUE
             Build package with(out) a given bcond
       --kernel VALUE
@@ -184,8 +231,8 @@ Mandatory arguments to long options are mandatory for short options too.
       -j, --jobs
             Number of parallel jobs for single build
       -f, --flag
-      -d, --distro DISTRO
-            Specify value for \$distro
+      -d, --dist DISTRIBUTION_ID
+            Specify value for \$dist
       -df,  --distfiles-fetch[-request] PACKAGE
             Send distfiles request to fetch sources for PACKAGE
       -cf, --command-flag
@@ -216,8 +263,8 @@ EOF
 	exit 0
 }
 
-# validate distro, set $distro
-set_distro() {
+# validate distro, set $dist
+set_dist() {
 	case "$1" in
 	ac)
 		;;
@@ -234,17 +281,17 @@ set_distro() {
 	aidath)
 		;;
 	*)
-		die "distro \`$1' not known"
+		die "dist \`$1' not known"
 		;;
 	esac
 
-	distro=$1
+	dist=$1
 }
 
 while [ $# -gt 0 ] ; do
 	case "$1" in
-		--distro | -d)
-			set_distro $2
+		-d | --dist | --distro)
+			set_dist $2
 			shift
 			;;
 
@@ -258,6 +305,10 @@ while [ $# -gt 0 ] ; do
 				builders="$builders ${b%:*}"
 			done
 			shift
+			;;
+
+		-a)
+			autotag=yes
 			;;
 
 		--with)
@@ -418,7 +469,7 @@ while [ $# -gt 0 ] ; do
 	shift
 done
 
-case "$distro" in
+case "$dist" in
 ac)
 	builder_email="builder-ac@pld-linux.org"
 	default_builders="ac-*"
@@ -426,13 +477,13 @@ ac)
 	url="http://ep09.pld-linux.org:1289/"
 	control_url="http://ep09.pld-linux.org/~buildsrc"
 	;;
-ac-java) # fake "distro" for java available ac architectures
+ac-java) # fake "dist" for java available ac architectures
 	builder_email="builder-ac@pld-linux.org"
 	default_builders="ac-i586 ac-i686 ac-athlon ac-amd64"
 	default_branch="AC-branch"
 	url="http://ep09.pld-linux.org:1289/"
 	;;
-ac-xen) # fake "distro" for xen-enabled architectures
+ac-xen) # fake "dist" for xen-enabled architectures
 	builder_email="builder-ac@pld-linux.org"
 	default_builders="ac-i686 ac-athlon ac-amd64"
 	default_branch="AC-branch"
@@ -455,7 +506,7 @@ th)
 	url="http://src.th.pld-linux.org:1234/"
 	control_url="http://src.th.pld-linux.org"
 	;;
-th-java) # fake "distro" for java available th architectures
+th-java) # fake "dist" for java available th architectures
 	builder_email="builderth@pld-linux.org"
 	default_builders="th-x86_64 th-athlon th-i686"
 	url="http://src.th.pld-linux.org:1234/"
@@ -465,11 +516,11 @@ aidath)
 	default_builders="aidath-*"
 	;;
 *)
-	die "distro \`$distro' not known"
+	die "dist \`$dist' not known"
 	;;
 esac
 
-# need to do this after distro selection
+# need to do this after dist selection
 if [ "$skip" ]; then
 	skip=$(skip="$skip" control_url="$control_url" python -c '
 import urllib2
@@ -525,7 +576,7 @@ print string.join(skip, ",")
 	priority=-1
 	command="skip:$skip"
 	command_flags="no-chroot"
-	builders="$distro-src"
+	builders="$dist-src"
 fi
 
 branch=${branch:-$default_branch}
@@ -533,7 +584,7 @@ branch=${branch:-$default_branch}
 specs=`for s in $specs; do
 	case "$s" in
 	^)
-		# skip marker
+		# skip marker - pass it along
 		echo $s
 		;;
 	*.spec:*) # spec with branch
@@ -551,6 +602,11 @@ specs=`for s in $specs; do
 	esac
 done`
 
+if [ "$autotag" = "yes" ]; then
+	msg "Auto autotag build enabled"
+	specs=$(get_autotag $specs)
+fi
+
 if [ "$df_fetch" = "yes" ]; then
 	df_fetch $specs
 	exit 0
@@ -558,7 +614,7 @@ fi
 
 if [ "$upgrade_macros" = "yes" ]; then
 	command="poldek --up; poldek -uv rpm-build-macros"
-	builders="$distro-src"
+	builders="$dist-src"
 	f_upgrade=no
 	build_mode=test
 fi
@@ -608,12 +664,18 @@ gen_req() {
 		msg "Using jobs $jobs"
 		echo "	<maxjobs>$jobs</maxjobs>"
 	fi
-	msg "Build mode: $build_mode"
 	if [ -z "$url" ]; then
 		msg "Using email $builder_email"
 	else
 		msg "Using URL $url"
 	fi
+
+	if [ "$build_mode" = "ready" ]; then
+		msg "Build mode: $(tput setaf 2)$build_mode$c_norm"
+	else
+		msg "Build mode: $(tput setaf 3)$build_mode$c_norm"
+	fi
+
 	msg "Queue-ID: $id"
 	echo
 
@@ -701,21 +763,26 @@ gen_req() {
 
 gen_email () {
 	# make request first, so the STDERR/STDOUT streams won't be mixed
-	local req=$(gen_req)
+	local tmp req
+	tmp=$(mktemp)
+	gen_req > $tmp
 
 	if [ "$verbose" = "yes" ]; then
-		echo >&2 -E "$req"
+		cat $tmp >&2
 	fi
-cat <<EOF
-From: $requester
-To: $builder_email
-Subject: build request
-Message-Id: <$id@$(hostname)>
-X-New-PLD-Builder: request
-X-Requester-Version: \$Id$
 
-$(echo -E "$req" | gpg --clearsign --default-key $default_key $gpg_opts)
-EOF
+	cat <<-EOF
+	From: $requester
+	To: $builder_email
+	Subject: build request
+	Message-Id: <$id@$(hostname)>
+	X-New-PLD-Builder: request
+	X-Requester-Version: \$Id$
+
+	EOF
+
+	gpg --clearsign --default-key $default_key $gpg_opts --output=- $tmp
+	rm -f $tmp
 }
 
 gen_email | send_request
