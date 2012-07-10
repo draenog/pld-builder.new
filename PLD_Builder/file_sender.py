@@ -52,7 +52,7 @@ def copy_file(src, target):
     except:
         global problems
         exctype, value = sys.exc_info()[:2]
-        problem[src] = "cannot copy file: %s" % traceback.format_exception_only(exctype, value)
+        problems[src] = "cannot copy file: %s" % traceback.format_exception_only(exctype, value)
         return 1
 
 def rsync_file(src, target, host):
