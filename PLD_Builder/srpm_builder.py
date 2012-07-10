@@ -99,7 +99,7 @@ def build_srpm(r, b):
 
     b.src_rpm = ""
     builder_opts = "-nu -nm --nodeps --http"
-    if ("test-build" in r.flags) or b.branch and b.branch.startswith(config.tag_prefixes[0]):
+    if ("test-build" in r.flags):
                     tag_test=""
     else:
                     tag_test=" -Tp %s -tt" % (config.tag_prefixes[0],)
