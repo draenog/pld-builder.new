@@ -1,6 +1,6 @@
 # vi: encoding=utf-8 ts=8 sts=4 sw=4 et
 
-import re
+import re, os
 import string
 import StringIO
 
@@ -100,10 +100,14 @@ def uninstall(conflicting, b):
 
 def uninstall_self_conflict(b):
     b.log_line("checking BuildConflict-ing packages")
-    rpmbuild_opt = "%s %s %s" % (b.target_string(), b.kernel_string(), b.bconds_string())
-    tmpdir = "/tmp/BR." + b.b_id[0:6]
-    f = chroot.popen("cd rpm/SPECS; TMPDIR=%s rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %s %s 2>&1" \
-            % (tmpdir, rpmbuild_opt, b.spec))
+    packagename = b.spec[:-5]
+    tmpdir = os.environ.get('HOME') + "/rpm/BUILD/%s/tmp" % packagename
+    f = chroot.popen("set -ex; TMPDIR=%(tmpdir)s rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %(rpmdefs)s rpm/packages/%(package)s/%(spec)s 2>&1" % {
+        'tmpdir': tmpdir,
+        'rpmdefs' : b.rpmbuild_opts(),
+        'package' : packagename,
+        'spec': b.spec,
+    })
     # java-sun >= 1.5 conflicts with soprano-2.1.67-1.src
     # java-sun conflicts with soprano-2.1.67-1.src
     rx = re.compile(r"\s+(?P<name>[\w-]+)\s+.*conflicts with [^\s]+-[^-]+-[^-]+\.src($| .*)")
@@ -124,10 +128,15 @@ def install_br(r, b):
         # ignore internal rpm dependencies, see lib/rpmns.c for list
         ignore_br = re.compile(r'^\s*(rpmlib|cpuinfo|getconf|uname|soname|user|group|mounted|diskspace|digest|gnupg|macro|envvar|running|sanitycheck|vcheck|signature|verify|exists|executable|readable|writable)\(.*')
 
-        tmpdir = "/tmp/BR." + b.b_id[0:6]
+        packagename = b.spec[:-5]
+        tmpdir = os.environ.get('HOME') + "/rpm/BUILD/%s/tmp" % packagename
         chroot.run("install -m 700 -d %s" % tmpdir)
-        cmd = "cd rpm/SPECS; TMPDIR=%s rpmbuild --nobuild %s %s 2>&1" \
-                    % (tmpdir, b.bconds_string(), b.spec)
+        cmd = "set -ex; TMPDIR=%(tmpdir)s rpmbuild --nobuild %(rpmdefs)s rpm/packages/%(package)s/%(spec)s 2>&1" % {
+            'tmpdir': tmpdir,
+            'rpmdefs' : b.rpmbuild_opts(),
+            'package' : packagename,
+            'spec': b.spec,
+        }
         f = chroot.popen(cmd)
         rx = re.compile(r"^\s*(?P<name>[^\s]+) .*is needed by")
         needed = {}
@@ -138,7 +147,6 @@ def install_br(r, b):
             if m and not ignore_br.match(l):
                 needed[m.group('name')] = 1
         f.close()
-        chroot.run("rm -rf %s" % tmpdir)
         return needed
 
     needed = get_missing_br(r, b);

@@ -70,7 +70,7 @@ def rsync_file(src, target, host):
     # password, it opens /dev/tty and still asks if password is needed and
     # missing, therefore we always set RSYNC_PASSWORD env var
     os.environ["RSYNC_PASSWORD"] = password
-    rsync = "rsync --verbose --archive"
+    rsync = "rsync --verbose --archive --timeout=360 --contimeout=360"
     f = os.popen("%s %s %s 2>&1" % (rsync, src, target))
     p = f.read()
     ret = f.close()
@@ -81,7 +81,7 @@ def rsync_file(src, target, host):
 
 def rsync_ssh_file(src, target):
     global problems
-    rsync = "rsync --verbose --archive -e ssh"
+    rsync = "rsync --verbose --archive --timeout=360 -e ssh"
     f = os.popen("%s %s %s 2>&1 < /dev/null" % (rsync, src, target))
     p = f.read()
     ret = f.close()

@@ -144,7 +144,14 @@ def prepare_env():
     """, 'root')
 
 def build_rpm(r, b):
-    status.push("building %s" % b.spec)
+    if len(b.spec) <= 5:
+        # should not really get here
+        b.log_line("error: No .spec not given of malformed: '%s'" % b.spec)
+        res = "FAIL_INTERNAL"
+        return res
+
+    packagename = b.spec[:-5]
+    status.push("building %s (%s)" % (b.spec, packagename))
     b.log_line("request from: %s" % r.requester)
 
     if check_skip_build(r, b):
@@ -156,12 +163,23 @@ def build_rpm(r, b):
     fetch_src(r, b)
     b.log_line("installing srpm: %s" % b.src_rpm)
     res = chroot.run("""
-        install -d rpm/SPECS rpm/SOURCES
-        rpm -Uhv %s
-    """ % b.src_rpm, logfile = b.logfile)
-    chroot.run("rm -f %s" % b.src_rpm, logfile = b.logfile)
+        # b.id %(bid)s
+        set -ex;
+        install -d rpm/packages/%(package)s rpm/BUILD/%(package)s;
+        rpm -Uhv %(rpmdefs)s %(src_rpm)s;
+        rm -f %(src_rpm)s;
+    """ % {
+        'bid' : b.b_id,
+        'package' : packagename,
+        'rpmdefs' : b.rpmbuild_opts(),
+        'src_rpm' : b.src_rpm
+    }, logfile = b.logfile)
     b.files = []
-    tmpdir = "/tmp/B." + b.b_id[0:6]
+
+    # it's better to have TMPDIR and BUILD dir on same partition:
+    # + /usr/bin/bzip2 -dc /home/services/builder/rpm/packages/kernel/patch-2.6.27.61.bz2
+    # patch: **** Can't rename file /tmp/B.a1b1d3/poKWwRlp to drivers/scsi/hosts.c : No such file or directory
+    tmpdir = os.environ.get('HOME') + "/rpm/BUILD/%s/tmp" % packagename
     if res:
         b.log_line("error: installing src rpm failed")
         res = "FAIL_SRPM_INSTALL"
@@ -170,10 +188,15 @@ def build_rpm(r, b):
         chroot.run("install -m 700 -d %s" % tmpdir)
 
         b.default_target(config.arch)
-        rpmbuild_opt = "%s %s %s" % (b.target_string(), b.kernel_string(), b.bconds_string())
         # check for build arch before filling BR
-        cmd = "cd rpm/SPECS; TMPDIR=%s exec nice -n %s rpmbuild -bp --short-circuit --nodeps --define 'prep exit 0' %s %s" % \
-            (tmpdir, config.nice, rpmbuild_opt, b.spec)
+        cmd = "set -ex; TMPDIR=%(tmpdir)s exec nice -n %(nice)s " \
+            "rpmbuild -bp --short-circuit --nodeps %(rpmdefs)s --define 'prep exit 0' rpm/packages/%(package)s/%(spec)s" % {
+            'tmpdir': tmpdir,
+            'nice' : config.nice,
+            'rpmdefs' : b.rpmbuild_opts(),
+            'package' : packagename,
+            'spec': b.spec,
+        }
         res = chroot.run(cmd, logfile = b.logfile)
         if res:
             res = "UNSUPP"
@@ -188,8 +211,16 @@ def build_rpm(r, b):
                 max_jobs = max(min(int(os.sysconf('SC_NPROCESSORS_ONLN') + 1), config.max_jobs), 1)
                 if r.max_jobs > 0:
                     max_jobs = max(min(config.max_jobs, r.max_jobs), 1)
-                cmd = "echo build-id: %s; cd rpm/SPECS; TMPDIR=%s exec nice -n %s rpmbuild -bb --define '_smp_mflags -j%d' %s %s" % \
-                            (r.id, tmpdir, config.nice, max_jobs, rpmbuild_opt, b.spec)
+                cmd = "set -ex; : build-id: %(r_id)s; TMPDIR=%(tmpdir)s exec nice -n %(nice)s " \
+                    "rpmbuild -bb --define '_smp_mflags -j%(max_jobs)d' %(rpmdefs)s rpm/packages/%(package)s/%(spec)s" % {
+                    'r_id' : r.id,
+                    'tmpdir': tmpdir,
+                    'nice' : config.nice,
+                    'rpmdefs' : b.rpmbuild_opts(),
+                    'package' : packagename,
+                    'max_jobs' : max_jobs,
+                    'spec': b.spec,
+                }
                 b.log_line("building RPM using: %s" % cmd)
                 begin_time = time.time()
                 res = chroot.run(cmd, logfile = b.logfile)
@@ -209,10 +240,14 @@ def build_rpm(r, b):
                         res = "FAIL_%s" % last_section.upper()
                 b.files = files
 
-    chroot.run("rm -rf %s; cd rpm/SPECS; rpmbuild --nodeps --nobuild " \
-                         "--clean --rmspec --rmsource %s" % \
-                         (tmpdir, b.spec), logfile = b.logfile)
-    chroot.run("chmod -R u+rwX rpm/BUILD/*; rm -rf rpm/BUILD/*", logfile = b.logfile)
+    chroot.run("""
+        set -ex;
+        rpmbuild %(rpmdefs)s --nodeps --nobuild --clean --rmspec --rmsource rpm/packages/%(package)s/%(spec)s
+        rm -rf %(tmpdir)s;
+        chmod -R u+rwX rpm/BUILD/%(package)s;
+        rm -rf rpm/BUILD/%(package)s;
+    """ %
+        {'tmpdir' : tmpdir, 'spec': b.spec, 'package' : packagename, 'rpmdefs' : b.rpmbuild_opts()}, logfile = b.logfile)
 
     def ll(l):
         util.append_to(b.logfile, l)
