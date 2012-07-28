@@ -589,17 +589,12 @@ specs=`for s in $specs; do
 		# skip marker - pass it along
 		echo $s
 		;;
-	*.spec:*) # spec with branch
-		basename $s
-		;;
-	*.spec) # spec without branch
-		echo $(basename $s):$branch
-		;;
 	*:*) # package name with branch
-		basename $s | sed -e 's/:/.spec:/'
+		_specfile=$(basename ${s%:*})
+		echo ${_specfile%.spec}.spec:${s##*:}
 		;;
 	*) # just package name
-		echo $(basename $s).spec:$branch
+		echo $(basename ${s%.spec}.spec):$branch
 		;;
 	esac
 done`
