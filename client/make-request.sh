@@ -160,7 +160,9 @@ autotag() {
 		s=${s%:*}
 		# ensure package ends with .spec
 		s=${s%.spec}.spec
-		out=$(cvs status -v $s | awk "!/Sticky/&&/auto-$dist-/{if (!a++) print \$1}")
+		local gitdir=$(dirname $s)/.git
+		out=$(git --git-dir="$gitdir" for-each-ref --count=1 --sort=-committerdate refs/tags/auto/$dist \
+			--format='%(refname:short)')
 		echo "$s:$out"
 	done
 }
