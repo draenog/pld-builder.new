@@ -595,7 +595,7 @@ specs=`for s in $specs; do
 		echo ${_specfile%.spec}.spec:${s##*:}
 		;;
 	*) # just package name
-		echo $(basename ${s%.spec}.spec):$branch
+		echo $(basename ${s%.spec}).spec:$branch
 		;;
 	esac
 done`
