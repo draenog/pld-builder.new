@@ -32,7 +32,7 @@ pkgs_longterm="
 # autotag from rpm-build-macros
 # displays latest used tag for a specfile
 autotag() {
-	local out spec pkg fmt eval_git
+	local out spec pkg
 	for spec in "$@"; do
 		# strip branches
 		pkg=${spec%:*}
@@ -43,9 +43,7 @@ autotag() {
 		# or .ext
 		pkg=${pkg%%.spec}
 		cd $pkg
-		fmt='r=%(refname); echo ${r#refs/tags/}'
-		eval_git=`git for-each-ref refs/tags/auto/${dist}/${pkg}-${alt_kernel}* --sort=-authordate --format="$fmt" --count=1 --shell`
-		out=$(eval $eval_git)
+		out=$(git for-each-ref refs/tags/auto/${dist}/${pkg}-${alt_kernel}* --sort=-authordate --format='%(refname:short)' --count=1)
 		echo "$spec:$out"
 		cd -
 	done
