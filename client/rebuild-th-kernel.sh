@@ -43,6 +43,7 @@ autotag() {
 		# or .ext
 		pkg=${pkg%%.spec}
 		cd $pkg
+		git fetch --tags
 		out=$(git for-each-ref refs/tags/auto/${dist}/${pkg}-${alt_kernel}* --sort=-authordate --format='%(refname:short)' --count=1)
 		echo "$spec:$out"
 		cd - >/dev/null
