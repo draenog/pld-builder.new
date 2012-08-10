@@ -76,7 +76,7 @@ cd $rpmdir
 case "$1" in
 	head)
 		kernel=$(get_last_tags kernel)
-		kernel=$(echo ${kernel#*auto-??-} | tr _ .)
+		kernel=$(echo ${kernel#*auto/??/} | tr _ .)
 		specs=""
 		for pkg in $pkgs_head; do
 			echo >&2 "Rebuilding $pkg..."
@@ -88,7 +88,7 @@ case "$1" in
 		;;
 	longterm)
 		kernel=$(alt_kernel=longterm get_last_tags kernel)
-		kernel=$(echo ${kernel#*auto-??-} | tr _ .)
+		kernel=$(echo ${kernel#*auto/??/} | tr _ .)
 		specs=""
 		for pkg in $pkgs_longterm; do
 			echo >&2 "Rebuilding $pkg..."
