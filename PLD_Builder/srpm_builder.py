@@ -90,7 +90,7 @@ def transfer_file(r, b):
         ftp.add(fname, "uploadinfo")
 
 def build_srpm(r, b):
-    if len(b.spec) == 0:
+    if len(b.spec) <= len('.spec'):
         # should not really get here
         util.append_to(b.logfile, "error: No .spec given but build src.rpm wanted")
         return "FAIL"
