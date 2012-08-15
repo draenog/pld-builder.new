@@ -133,16 +133,16 @@ df_fetch() {
 
 	for spec in $specs; do
 		local SPEC=$(echo "$spec" | sed -e 's|:.*||')
+                SPEC=${SPEC%.spec}
 		local BRANCH=$(echo "$spec" | sed -e 's|.*:||')
 		echo >&2 "Distfiles Request: $SPEC:$BRANCH via $MAILER ${VIA_ARGS:+ ($VIA_ARGS)}"
 		cat <<-EOF | "$MAILER" -t -i $VIA_ARGS
 			To: $DMAIL
 			From: $LOGIN <$LOGIN@$HOST>
 			Subject: fetchsrc_request notify
-			X-CVS-Module: SPECS
 			X-distfiles-request: yes
 			X-Login: $LOGIN
-			X-Spec: $SPEC
+			X-Package: $SPEC
 			X-Branch: $BRANCH
 			X-Flags: force-reply
 
