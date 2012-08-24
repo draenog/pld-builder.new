@@ -160,16 +160,15 @@ autotag() {
 		s=${s%:*}
 		# ensure package ends with .spec
 		s=${s%.spec}.spec
-		local gitdir=$(dirname $s)/.git
-		git --git-dir="$gitdir" fetch --tags
-		out=$(git --git-dir="$gitdir" for-each-ref --count=1 --sort=-authordate refs/tags/auto/$dist \
+		git fetch --tags
+		out=$(git for-each-ref --count=1 --sort=-authordate refs/tags/auto/$dist \
 			--format='%(refname:short)')
 		echo "$s:$out"
 	done
 }
 
 # get autotag for specs
-# WARNING: This may checkout some files from CVS
+# WARNING: This may checkout some files from VCS
 get_autotag() {
 	local pkg spec rpmdir
 
