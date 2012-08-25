@@ -187,7 +187,8 @@ get_autotag() {
 			# just print it out, to fallback to base pkg name
 			echo "$pkg"
 		else
-			autotag $pkg/$pkg.spec
+			cd $pkg
+			autotag $pkg.spec
 		fi
 	done
 }
