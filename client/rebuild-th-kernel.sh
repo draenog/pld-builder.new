@@ -28,7 +28,7 @@ pkgs_longterm=
 # autotag from rpm-build-macros
 # displays latest used tag for a specfile
 autotag() {
-	local out spec pkg
+	local out spec pkg ref
 	for spec in "$@"; do
 		# strip branches
 		pkg=${spec%:*}
@@ -40,7 +40,12 @@ autotag() {
 		pkg=${pkg%%.spec}
 		cd $pkg
 		git fetch --tags
-		out=$(git for-each-ref refs/tags/auto/${dist}/${pkg}-${alt_kernel}* --sort=-authordate --format='%(refname:short)' --count=1)
+		if [ -n "$alt_kernel" ]; then
+			ref="refs/tags/auto/${dist}/${pkg}-${alt_kernel}-[0-9]*"
+		else
+			ref="refs/tags/auto/${dist}/${pkg}-[0-9]*"
+		fi
+		out=$(git for-each-ref $ref --sort=-authordate --format='%(refname:short)' --count=1)
 		echo "$spec:$out"
 		cd - >/dev/null
 	done
