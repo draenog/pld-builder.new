@@ -11,6 +11,7 @@ pkgs_head="
 	igb
 	ipset
 	ixgbe
+	lin_tape
 	linuxrdac
 	lirc
 	madwifi-ng
