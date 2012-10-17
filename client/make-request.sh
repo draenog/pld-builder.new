@@ -108,6 +108,12 @@ print >> sys.stdout, "Request queued via HTTP."
 	esac
 }
 
+# htmlspecialchars: escape <, > and &
+hsc() {
+	local input=$1
+	echo -E "$input" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g'
+}
+
 # simple df_fetcher, based on packages/fetchsrc_request
 # TODO: tcp (smtp) mode
 # TODO: adjust for ~/.requestrc config
@@ -291,7 +297,7 @@ set_dist() {
 	dist=$1
 }
 
-while [ $# -gt 0 ] ; do
+while [ $# -gt 0 ]; do
 	case "$1" in
 		-d | --dist | --distro)
 			set_dist $2
@@ -692,7 +698,7 @@ gen_req() {
 		echo -E >&2 "* Command: $command"
 		echo "	<batch id='$bid' depends-on=''>"
 		echo "		 <command flags='$command_flags'>"
-		echo -E "$command" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g'
+		hsc "$command"
 		echo "</command>"
 		echo "		 <info></info>"
 		echo "$builders_xml"
@@ -748,7 +754,7 @@ gen_req() {
 		echo -E >&2 "* Post-Command: $post_command"
 		echo "	<batch id='$bid' depends-on='$depend'>"
 		echo "		 <command flags='$command_flags'>"
-		echo -E "$post_command" | sed -e 's,&,\&amp;,g;s,<,\&lt;,g;s,>,\&gt;,g'
+		hsc "$post_command"
 		echo "</command>"
 		echo "		 <info></info>"
 		echo "$builders_xml"
