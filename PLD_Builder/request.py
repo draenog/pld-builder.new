@@ -310,7 +310,7 @@ class Batch:
         """
             return all rpmbuild options related to this build
         """
-        rpmopts = self.bconds_string() + self.kernel_string() + self.target_string() + defines_string()
+        rpmopts = self.bconds_string() + self.kernel_string() + self.target_string() + self.defines_string()
         rpmdefs = \
             "--define '_topdir %(echo $HOME/rpm)' " \
             "--define '_specdir %{_topdir}/packages/%{name}' "  \
