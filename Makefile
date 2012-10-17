@@ -16,7 +16,7 @@ clean:
 	find -name '*.pyc' | xargs rm -f
 	rm -f *.tar.bz2
 
-dist: compile $(PACKAGE)-$(VERSION).$(SNAP).tar.bz2 compile
+dist: $(PACKAGE)-$(VERSION).$(SNAP).tar.bz2
 	test ! -x ./dropin || ./dropin $<
 
 %.tar.bz2: %.tar
