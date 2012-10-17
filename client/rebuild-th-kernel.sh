@@ -11,6 +11,7 @@ pkgs_head="
 	igb
 	ipset
 	ixgbe
+	lin_tape
 	linuxrdac
 	lirc
 	madwifi-ng
@@ -23,16 +24,12 @@ pkgs_head="
 	xtables-addons
 "
 
-pkgs_longterm="
-	iscsitarget
-	openvswitch
-	xorg-driver-video-nvidia-legacy3
-"
+pkgs_longterm=
 
 # autotag from rpm-build-macros
 # displays latest used tag for a specfile
 autotag() {
-	local out spec pkg
+	local out spec pkg ref
 	for spec in "$@"; do
 		# strip branches
 		pkg=${spec%:*}
@@ -44,7 +41,12 @@ autotag() {
 		pkg=${pkg%%.spec}
 		cd $pkg
 		git fetch --tags
-		out=$(git for-each-ref refs/tags/auto/${dist}/${pkg}-${alt_kernel}* --sort=-authordate --format='%(refname:short)' --count=1)
+		if [ -n "$alt_kernel" ]; then
+			ref="refs/tags/auto/${dist}/${pkg}-${alt_kernel}-[0-9]*"
+		else
+			ref="refs/tags/auto/${dist}/${pkg}-[0-9]*"
+		fi
+		out=$(git for-each-ref $ref --sort=-authordate --format='%(refname:short)' --count=1)
 		echo "$spec:$out"
 		cd - >/dev/null
 	done
@@ -89,15 +91,16 @@ case "$1" in
 		kernel=$(alt_kernel=longterm get_last_tags kernel)
 		kernel=$(echo ${kernel#*auto/??/} | tr _ .)
 		specs=""
-		for pkg in $pkgs_longterm; do
-			echo >&2 "Rebuilding $pkg..."
-			$rpmdir/builder -g $pkg -ns
-			$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec
-			specs="$specs $pkg.spec"
-		done
-		# first build with main pkg (userspace), later build from tag
-		$dir/make-request.sh -nd -r -d $dist --without kernel $specs
-
+		if [ -n "$pkgs_longterm" ]; then
+			for pkg in $pkgs_longterm; do
+				echo >&2 "Rebuilding $pkg..."
+				$rpmdir/builder -g $pkg -ns
+				$rpmdir/relup.sh -m "rebuild for $kernel" -ui $pkg/$pkg.spec
+				specs="$specs $pkg.spec"
+			done
+			# first build with main pkg (userspace), later build from tag
+			$dir/make-request.sh -nd -r -d $dist --without kernel $specs
+		fi
 		specs=$(get_last_tags $pkgs_head $pkgs_longterm)
 		$dir/make-request.sh -nd -r -d $dist --kernel longterm --without userspace $specs
 		;;
