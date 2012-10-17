@@ -1,22 +1,26 @@
 PACKAGE		:= pld-builder
-VERSION		:= 0.5
+VERSION		:= 0.6
 SNAP		:= $(shell date +%Y%m%d)
 
 # for make dist
-CVSROOT		:= :pserver:cvs@cvs.pld-linux.org:/cvsroot
-CVSMODULE	:= pld-builder.new
-CVSTAG		:= HEAD
+REMOTE		:= ssh://git@git.pld-linux.org/projects/$(MODULE)
+MODULE		:= pld-builder.new
+BRANCH		:= master
 
-all:
+all: compile
+
+compile:
 	python -c "import compileall; compileall.compile_dir('.')"
 
 clean:
 	find -name '*.pyc' | xargs rm -f
+	rm -f *.tar.bz2
 
-dist:
-	rm -rf $(PACKAGE)-$(VERSION).$(SNAP)
-	mkdir -p $(PACKAGE)-$(VERSION).$(SNAP)
-	cvs -d $(CVSROOT) export -d $(PACKAGE)-$(VERSION).$(SNAP) -r $(CVSTAG) $(CVSMODULE)
-	tar -cjf $(PACKAGE)-$(VERSION).$(SNAP).tar.bz2 $(PACKAGE)-$(VERSION).$(SNAP)
-	rm -rf $(PACKAGE)-$(VERSION).$(SNAP)
-	test -x ./dropin && ./dropin $(PACKAGE)-$(VERSION).$(SNAP).tar.bz2
+dist: compile $(PACKAGE)-$(VERSION).$(SNAP).tar.bz2 compile
+	test ! -x ./dropin || ./dropin $<
+
+%.tar.bz2: %.tar
+	bzip2 -9 $<
+
+%.tar:
+	git archive --prefix=$(patsubst %.tar,%,$@)/ $(BRANCH) -o $@
