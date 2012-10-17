@@ -157,6 +157,7 @@ class Batch:
         self.builders_status_time = {}
         self.builders_status_buildtime = {}
         self.kernel = ""
+        self.defines = {}
         self.target = []
         self.branch = ""
         self.src_rpm = ""
@@ -188,6 +189,9 @@ class Batch:
                 self.info = text(c)
             elif c.nodeName == "kernel":
                 self.kernel = text(c)
+            elif c.nodeName == "define":
+                define = attr(c, "name")
+                self.defines[define] = text(c)
             elif c.nodeName == "target":
                 self.target.append(text(c))
             elif c.nodeName == "skip":
@@ -219,6 +223,7 @@ class Batch:
         f.write("  batch: %s/%s\n" % (self.src_rpm, self.spec))
         f.write("    info: %s\n" % self.info)
         f.write("    kernel: %s\n" % self.kernel)
+        f.write("    defines: %s\n" % self.defines_string())
         f.write("    target: %s\n" % self.target_string())
         f.write("    branch: %s\n" % self.branch)
         f.write("    bconds: %s\n" % self.bconds_string())
@@ -240,11 +245,11 @@ class Batch:
                 'branch': self.branch,
                 'package': self.spec[:-5],
             }
-            desc = "%(src_rpm)s (<a href=\"%(package_url)s\">%(spec)s -r %(branch)s</a>%(bconds)s)" % {
+            desc = "%(src_rpm)s (<a href=\"%(package_url)s\">%(spec)s -r %(branch)s</a>%(rpmopts)s)" % {
                 'src_rpm': self.src_rpm,
                 'spec': self.spec,
                 'branch': self.branch,
-                'bconds': self.bconds_string() + self.kernel_string() + self.target_string(),
+                'rpmopts': self.bconds_string() + self.kernel_string() + self.target_string() + self.defines_string(),
                 'package_url': package_url,
             }
         f.write("%s <small>[" % desc)
@@ -305,13 +310,13 @@ class Batch:
         """
             return all rpmbuild options related to this build
         """
-        bconds = self.bconds_string() + self.kernel_string() + self.target_string()
+        rpmopts = self.bconds_string() + self.kernel_string() + self.target_string() + defines_string()
         rpmdefs = \
             "--define '_topdir %(echo $HOME/rpm)' " \
             "--define '_specdir %{_topdir}/packages/%{name}' "  \
             "--define '_sourcedir %{_specdir}' " \
             "--define '_builddir %{_topdir}/BUILD/%{name}' "
-        return rpmdefs + bconds
+        return rpmdefs + rpmopts
 
     def kernel_string(self):
         r = ""
@@ -331,6 +336,18 @@ class Batch:
             r = r + " --with " + b
         for b in self.bconds_without:
             r = r + " --without " + b
+        return r
+
+    def defines_string(self):
+        r = ""
+        for key,value in self.defines.items():
+            r += " --define '%s %s'" % (key, value)
+        return r
+
+    def defines_xml(self):
+        r = ""
+        for key,value in self.defines.items():
+            r += "<define name='%s'>%s</define>\n" % (escape(key), escape(value))
         return r
 
     def default_target(self, arch):
@@ -356,6 +373,8 @@ class Batch:
             f.write("           <target>%s</target>\n" % escape(b))
         for b in self.bconds_without:
             f.write("           <without>%s</without>\n" % escape(b))
+        if self.defines:
+            f.write("           %s\n" % self.defines_xml())
         for b in self.builders:
             if self.builders_status_buildtime.has_key(b):
                 t = self.builders_status_buildtime[b]
