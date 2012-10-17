@@ -145,7 +145,7 @@ def prepare_env():
         test ! -c /dev/zero && rm -f /dev/zero && mknod -m 666 /dev/zero c 1 5
 
         # need entry for "/" in mtab, for diskspace() to work in rpm
-        [ -z $(awk '$2 == "/" {print $1}' /etc/mtab) ] && mount -f -t rootfs rootfs /
+        [ -z $(awk '$2 == "/" {print $1; exit}' /etc/mtab) ] && mount -f -t rootfs rootfs /
 
         # make neccessary files readable for builder user
         # TODO: see if they really aren't readable for builder
