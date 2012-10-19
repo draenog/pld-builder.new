@@ -101,7 +101,7 @@ def uninstall(conflicting, b):
 def uninstall_self_conflict(b):
     b.log_line("checking BuildConflict-ing packages")
     packagename = b.spec[:-5]
-    tmpdir = os.environ.get('HOME') + "/rpm/BUILD/%s.%s/tmp" % packagename, b.b_id[0:6]
+    tmpdir = "/tmp/B.%s.%s/tmp" % (packagename, b.b_id[0:6])
     chroot.run("install -m 700 -d %s" % tmpdir)
     f = chroot.popen("set -e; TMPDIR=%(tmpdir)s rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %(rpmdefs)s rpm/packages/%(package)s/%(spec)s 2>&1" % {
         'tmpdir': tmpdir,
@@ -132,7 +132,7 @@ def install_br(r, b):
         ignore_br = re.compile(r'^\s*(rpmlib|cpuinfo|getconf|uname|soname|user|group|mounted|diskspace|digest|gnupg|macro|envvar|running|sanitycheck|vcheck|signature|verify|exists|executable|readable|writable)\(.*')
 
         packagename = b.spec[:-5]
-        tmpdir = os.environ.get('HOME') + "/rpm/BUILD/%s.%s/tmp" % packagename, b.b_id[0:6]
+        tmpdir = "/tmp/B.%s.%s/tmp" % (packagename, b.b_id[0:6])
         chroot.run("install -m 700 -d %s" % tmpdir)
         cmd = "set -e; TMPDIR=%(tmpdir)s rpmbuild --nobuild %(rpmdefs)s rpm/packages/%(package)s/%(spec)s 2>&1" % {
             'tmpdir': tmpdir,
