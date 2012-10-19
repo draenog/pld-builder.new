@@ -101,7 +101,7 @@ def uninstall(conflicting, b):
 def uninstall_self_conflict(b):
     b.log_line("checking BuildConflict-ing packages")
     packagename = b.spec[:-5]
-    tmpdir = "/tmp/B.%s.%s" % packagename, b.b_id[0:6]
+    tmpdir = "/tmp/B.%s.%s" % (packagename, b.b_id[0:6])
     chroot.run("install -m 700 -d %s" % tmpdir)
     f = chroot.popen("set -e; TMPDIR=%(tmpdir)s rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %(rpmdefs)s rpm/packages/%(package)s/%(spec)s 2>&1" % {
         'tmpdir': tmpdir,
