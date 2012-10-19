@@ -191,7 +191,7 @@ def build_rpm(r, b):
     }, logfile = b.logfile)
     b.files = []
 
-    tmpdir = "/tmp/B.%s.%s/tmp" % (packagename, b.b_id[0:6])
+    tmpdir = "/tmp/B.%s.%s" % (packagename, b.b_id[0:6])
     if res:
         b.log_line("error: installing src rpm failed")
         res = "FAIL_SRPM_INSTALL"

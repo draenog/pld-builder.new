@@ -101,7 +101,7 @@ def uninstall(conflicting, b):
 def uninstall_self_conflict(b):
     b.log_line("checking BuildConflict-ing packages")
     packagename = b.spec[:-5]
-    tmpdir = "/tmp/B.%s.%s/tmp" % (packagename, b.b_id[0:6])
+    tmpdir = "/tmp/B.%s.%s" % packagename, b.b_id[0:6]
     chroot.run("install -m 700 -d %s" % tmpdir)
     f = chroot.popen("set -e; TMPDIR=%(tmpdir)s rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %(rpmdefs)s rpm/packages/%(package)s/%(spec)s 2>&1" % {
         'tmpdir': tmpdir,
@@ -157,7 +157,6 @@ def install_br(r, b):
 
     if len(needed) == 0:
         b.log_line("no BR needed")
-        chroot.run("rm -rf %s" % tmpdir)
         return True
 
     nbr = ""
@@ -183,7 +182,6 @@ def install_br(r, b):
         b.log_line("no conflicts found")
     else:
         if not uninstall(conflicting, b):
-            chroot.run("rm -rf %s" % tmpdir)
             return False
 
     # recheck BuildRequires since above uninstallation could remove some required deps
@@ -191,7 +189,6 @@ def install_br(r, b):
 
     if len(needed) == 0:
         b.log_line("no BR needed")
-        chroot.run("rm -rf %s" % tmpdir)
         return True
 
     nbr = ""
@@ -203,7 +200,6 @@ def install_br(r, b):
     res = chroot.run("poldek --noask --caplookup -Q -v --upgrade %s" % br,
             user = "root",
             logfile = b.logfile)
-    chroot.run("rm -rf %s" % tmpdir)
     if res != 0:
         b.log_line("error: BR installation failed")
         return False
