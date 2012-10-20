@@ -312,10 +312,10 @@ class Batch:
         """
         rpmopts = self.bconds_string() + self.kernel_string() + self.target_string() + self.defines_string()
         rpmdefs = \
-            "--define '_topdir %(echo $HOME/rpm)' " \
-            "--define '_specdir %{_topdir}/packages/%{name}' "  \
-            "--define '_sourcedir %{_specdir}' " \
-            "--define '_builddir %{_topdir}/BUILD/%{name}' "
+            "--define '_topdir %%(echo $HOME/rpm)' " \
+            "--define '_specdir %%{_topdir}/packages/%s' "  \
+            "--define '_sourcedir %%{_specdir}' " \
+            "--define '_builddir %%{_topdir}/BUILD/%%{name}' " % self.spec[:-5]
         return rpmdefs + rpmopts
 
     def kernel_string(self):
