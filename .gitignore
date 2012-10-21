@@ -1,0 +1,7 @@
+config/acl.conf
+config/builder.conf
+config/rsync-passwords
+config/*.tar
+PLD_Builder/*.pyc
+lock/
+spool/
