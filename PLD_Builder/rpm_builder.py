@@ -180,7 +180,7 @@ def build_rpm(r, b):
     res = chroot.run("""
         set -ex;
         install -d %(topdir)s/{BUILD,RPMS};
-        rpm -Uhv %(rpmdefs)s %(src_rpm)s;
+        rpm -Uhv --nodeps %(rpmdefs)s %(src_rpm)s;
         rm -f %(src_rpm)s;
     """ % {
         'topdir' : b._topdir,
