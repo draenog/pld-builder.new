@@ -18,7 +18,7 @@ def unpackaged_files(b):
             copy_mode = 1
             out.append(l)
         elif copy_mode:
-            if l[0] != ' ':
+            if l[0] != ' ' and l[0] != '\t':
                 copy_mode = 0
             else:
                 out.append(l)
