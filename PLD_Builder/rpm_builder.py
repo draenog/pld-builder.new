@@ -252,15 +252,10 @@ def build_rpm(r, b):
 
     chroot.run("""
         set -ex;
-        rpmbuild --nodeps --nobuild --clean --rmspec --rmsource %(rpmdefs)s %(topdir)s/%(spec)s;
-        rm -rf %(tmpdir)s;
         chmod -R u+rwX %(topdir)s/BUILD;
-        rm -rf %(topdir)s/BUILD;
+        rm -rf %(topdir)s;
     """ % {
-        'tmpdir' : tmpdir,
-        'spec': b.spec,
         'topdir' : b._topdir,
-        'rpmdefs' : b.rpmbuild_opts()
     }, logfile = b.logfile)
 
     def ll(l):
