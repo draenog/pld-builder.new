@@ -250,10 +250,11 @@ def build_rpm(r, b):
                         res = "FAIL_%s" % last_section.upper()
                 b.files = files
 
+    # cleanup tmp and build files
     chroot.run("""
         set -ex;
         chmod -R u+rwX %(topdir)s/BUILD;
-        rm -rf %(topdir)s;
+        rm -rf %(topdir)s/{tmp,BUILD}
     """ % {
         'topdir' : b._topdir,
     }, logfile = b.logfile)
@@ -284,6 +285,14 @@ def build_rpm(r, b):
         local = r.tmp_dir + os.path.basename(f)
         chroot.cp(f, outfile = local, rm = True)
         ftp.add(local)
+
+    # cleanup all remains from this build
+    chroot.run("""
+        set -ex;
+        rm -rf %(topdir)s;
+    """ % {
+        'topdir' : b._topdir,
+    }, logfile = b.logfile)
 
     def uploadinfo(b):
         c="file:SRPMS:%s\n" % b.src_rpm

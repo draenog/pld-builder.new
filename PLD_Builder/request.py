@@ -337,7 +337,7 @@ class Batch:
             "--define '_specdir %{_topdir}' "  \
             "--define '_sourcedir %{_specdir}' " \
             "--define '_rpmdir %{_topdir}/RPMS' " \
-            "--define '_builddir %{_specdir}/BUILD' "
+            "--define '_builddir %{_topdir}/BUILD' "
         return rpmdefs + rpmopts
 
     def kernel_string(self):
