@@ -118,10 +118,8 @@ def uninstall_self_conflict(b):
             conflicting[m.group('name')] = 1
     f.close()
     if len(conflicting) and not uninstall(conflicting, b):
-        chroot.run("rm -rf %s" % tmpdir)
         return False
     b.log_line("no BuildConflicts found")
-    chroot.run("rm -rf %s" % tmpdir)
     return True
 
 def install_br(r, b):
