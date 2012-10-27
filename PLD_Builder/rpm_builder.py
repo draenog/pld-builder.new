@@ -238,7 +238,7 @@ def build_rpm(r, b):
                 b.log_line("ended at: %s, done in %s" % (time.asctime(), datetime.timedelta(0, end_time - begin_time)))
                 if res:
                     res = "FAIL"
-                files = util.collect_files(b.logfile)
+                files = util.collect_files(b.logfile, basedir = b._topdir)
                 if len(files) > 0:
                     r.chroot_files.extend(files)
                 else:

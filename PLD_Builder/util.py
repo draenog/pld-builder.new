@@ -49,9 +49,9 @@ def clean_tmp(dir):
     # FIXME: use python
     os.system("rm -f %s/* 2>/dev/null; rmdir %s 2>/dev/null" % (dir, dir))
 
-def collect_files(log):
+def collect_files(log, basedir = "/home"):
     f = open(log, 'r')
-    rx = re.compile(r"^Wrote: (/home.*\.rpm)$")
+    rx = re.compile(r"^Wrote: (%s.*\.rpm)$" % basedir)
     files = []
     for l in f.xreadlines():
         m = rx.search(l)

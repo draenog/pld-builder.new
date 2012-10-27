@@ -173,7 +173,7 @@ class Batch:
 
         self.parse_xml(e)
 
-        self._topdir = os.path.abspath(os.path.join(os.environ.get('HOME'), 'rpmbuild', self.b_id))
+        self._topdir = '/tmp/B.%s' % self.b_id
 
     def parse_xml(self, e):
         for c in e.childNodes:
