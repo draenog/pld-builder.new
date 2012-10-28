@@ -314,8 +314,7 @@ class Batch:
         rpmdefs = \
             "--define '_topdir %%(echo $HOME/rpm)' " \
             "--define '_specdir %%{_topdir}/packages/%s' "  \
-            "--define '_sourcedir %%{_specdir}' " \
-            "--define '_builddir %%{_topdir}/BUILD/%%{name}' " % self.spec[:-5]
+            "--define '_sourcedir %%{_specdir}' " % self.spec[:-5]
         return rpmdefs + rpmopts
 
     def kernel_string(self):
