@@ -61,6 +61,7 @@ fi
 specs=
 df_fetch=no
 upgrade_macros=no
+cr=$(printf "\r")
 
 # Set colors
 c_star=$(tput setaf 2)
@@ -219,6 +220,8 @@ Mandatory arguments to long options are mandatory for short options too.
             set alt_kernel to VALUE
       --target VALUE
             set --target to VALUE
+      -D "NAME VALUE"|--define "NAME VALUE"
+            define macro named NAME with value VALUE
       -s BUILD_ID, --skip BUILD_ID[,BUILD_ID][,BUILD_ID]
             mark build ids on src builder to be skipped
       --branch VALUE
@@ -342,6 +345,13 @@ while [ $# -gt 0 ]; do
 
 		--target)
 			target=$2
+			shift
+			;;
+
+		-D|--define)
+			value=${2#* }
+			name=${2%% *}
+			define="$define$cr$name=$value"
 			shift
 			;;
 
@@ -685,7 +695,7 @@ gen_req() {
 
 	# job to depend on
 	local depend=
-	local b i=1
+	local b i=1 val
 	local name branch builders_xml
 
 	for b in $builders; do
@@ -729,6 +739,16 @@ gen_req() {
 		echo "		 <branch>$branch</branch>"
 		echo "		 ${kernel:+<kernel>$kernel</kernel>}"
 		echo "		 ${target:+<target>$target</target>}"
+
+		oIFS=$IFS; IFS=$cr
+		for b in $define; do
+			[ -z "$b" ] && continue
+			value=${b#*=}
+			b=${b%%=*}
+			echo "		 <define name='$(hsc $b)'>$(hsc "$value")</define>"
+		done
+		IFS=$oIFS
+
 		echo "		 <info></info>"
 		echo
 		for b in $with; do
