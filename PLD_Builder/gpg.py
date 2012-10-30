@@ -78,11 +78,15 @@ def sign(buf):
     d_stdout = None
     d_stderr = None
     cmd = ['/usr/bin/gpg', '--batch', '--no-tty', '--clearsign']
+    # TODO: check for gpg return code!
     gpg_run = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     try:
         d_stdout, d_stderr = gpg_run.communicate(buf.encode('utf-8'))
     except OSError, e:
         log.error("gnupg signing failed, does gpg binary exist? : %s" % e)
         raise
+
+    if len(d_stderr):
+        log.error("gpg: %s" % d_stderr)
 
     return d_stdout

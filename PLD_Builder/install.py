@@ -100,13 +100,11 @@ def uninstall(conflicting, b):
 
 def uninstall_self_conflict(b):
     b.log_line("checking BuildConflict-ing packages")
-    packagename = b.spec[:-5]
-    tmpdir = "/tmp/B.%s.%s" % (packagename, b.b_id[0:6])
-    chroot.run("install -m 700 -d %s" % tmpdir)
-    f = chroot.popen("set -e; TMPDIR=%(tmpdir)s rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %(rpmdefs)s rpm/packages/%(package)s/%(spec)s 2>&1" % {
-        'tmpdir': tmpdir,
+    f = chroot.popen("set -e; TMPDIR=%(tmpdir)s " \
+        "rpmbuild -bp --nobuild --short-circuit --define 'prep exit 0' %(rpmdefs)s %(topdir)s/%(spec)s 2>&1" % {
+        'tmpdir': b.tmpdir(),
         'rpmdefs' : b.rpmbuild_opts(),
-        'package' : packagename,
+        'topdir' : b._topdir,
         'spec': b.spec,
     })
     # java-sun >= 1.5 conflicts with soprano-2.1.67-1.src
@@ -120,10 +118,8 @@ def uninstall_self_conflict(b):
             conflicting[m.group('name')] = 1
     f.close()
     if len(conflicting) and not uninstall(conflicting, b):
-        chroot.run("rm -rf %s" % tmpdir)
         return False
     b.log_line("no BuildConflicts found")
-    chroot.run("rm -rf %s" % tmpdir)
     return True
 
 def install_br(r, b):
@@ -131,13 +127,12 @@ def install_br(r, b):
         # ignore internal rpm dependencies, see lib/rpmns.c for list
         ignore_br = re.compile(r'^\s*(rpmlib|cpuinfo|getconf|uname|soname|user|group|mounted|diskspace|digest|gnupg|macro|envvar|running|sanitycheck|vcheck|signature|verify|exists|executable|readable|writable)\(.*')
 
-        packagename = b.spec[:-5]
-        tmpdir = "/tmp/B.%s.%s/tmp" % (packagename, b.b_id[0:6])
+        tmpdir = b.tmpdir()
         chroot.run("install -m 700 -d %s" % tmpdir)
-        cmd = "set -e; TMPDIR=%(tmpdir)s rpmbuild --nobuild %(rpmdefs)s rpm/packages/%(package)s/%(spec)s 2>&1" % {
+        cmd = "set -e; TMPDIR=%(tmpdir)s rpmbuild --nobuild %(rpmdefs)s %(topdir)s/%(spec)s 2>&1" % {
             'tmpdir': tmpdir,
+            'topdir' : b._topdir,
             'rpmdefs' : b.rpmbuild_opts(),
-            'package' : packagename,
             'spec': b.spec,
         }
         f = chroot.popen(cmd)

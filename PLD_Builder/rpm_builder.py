@@ -135,7 +135,7 @@ def fetch_src(r, b):
     else:
         b.log_line("fetched %d bytes, %.1f K/s" % (bytes, bytes / 1024.0 / t))
 
-def prepare_env():
+def prepare_env(logfile = None):
     chroot.run("""
         test ! -f /proc/uptime && mount /proc 2>/dev/null
         test ! -c /dev/full && rm -f /dev/full && mknod -m 666 /dev/full c 1 7
@@ -156,16 +156,16 @@ def prepare_env():
 
         # try to limit network access for builder account
         /bin/setfacl -m u:builder:--- /etc/resolv.conf
-    """, 'root')
+    """, 'root', logfile = logfile)
 
 def build_rpm(r, b):
-    if len(b.spec) <= 5:
+    packagename = b.get_package_name()
+    if not packagename:
         # should not really get here
         b.log_line("error: No .spec not given of malformed: '%s'" % b.spec)
         res = "FAIL_INTERNAL"
         return res
 
-    packagename = b.spec[:-5]
     status.push("building %s (%s)" % (b.spec, packagename))
     b.log_line("request from: %s" % r.requester)
 
@@ -178,20 +178,18 @@ def build_rpm(r, b):
     fetch_src(r, b)
     b.log_line("installing srpm: %s" % b.src_rpm)
     res = chroot.run("""
-        # b.id %(bid)s
         set -ex;
-        install -d rpm/packages/%(package)s rpm/BUILD/%(package)s;
+        install -d %(topdir)s/{BUILD,RPMS};
         rpm -Uhv --nodeps %(rpmdefs)s %(src_rpm)s;
         rm -f %(src_rpm)s;
     """ % {
-        'bid' : b.b_id,
-        'package' : packagename,
+        'topdir' : b._topdir,
         'rpmdefs' : b.rpmbuild_opts(),
         'src_rpm' : b.src_rpm
     }, logfile = b.logfile)
     b.files = []
 
-    tmpdir = "/tmp/B.%s.%s" % (packagename, b.b_id[0:6])
+    tmpdir = b.tmpdir()
     if res:
         b.log_line("error: installing src rpm failed")
         res = "FAIL_SRPM_INSTALL"
@@ -202,11 +200,11 @@ def build_rpm(r, b):
         b.default_target(config.arch)
         # check for build arch before filling BR
         cmd = "set -ex; TMPDIR=%(tmpdir)s exec nice -n %(nice)s " \
-            "rpmbuild -bp --short-circuit --nodeps %(rpmdefs)s --define 'prep exit 0' rpm/packages/%(package)s/%(spec)s" % {
+            "rpmbuild -bp --short-circuit --nodeps %(rpmdefs)s --define 'prep exit 0' %(topdir)s/%(spec)s" % {
             'tmpdir': tmpdir,
             'nice' : config.nice,
+            'topdir' : b._topdir,
             'rpmdefs' : b.rpmbuild_opts(),
-            'package' : packagename,
             'spec': b.spec,
         }
         res = chroot.run(cmd, logfile = b.logfile)
@@ -224,12 +222,12 @@ def build_rpm(r, b):
                 if r.max_jobs > 0:
                     max_jobs = max(min(config.max_jobs, r.max_jobs), 1)
                 cmd = "set -ex; : build-id: %(r_id)s; TMPDIR=%(tmpdir)s exec nice -n %(nice)s " \
-                    "rpmbuild -bb --define '_smp_mflags -j%(max_jobs)d' %(rpmdefs)s rpm/packages/%(package)s/%(spec)s" % {
+                    "rpmbuild -bb --define '_smp_mflags -j%(max_jobs)d' %(rpmdefs)s %(topdir)s/%(spec)s" % {
                     'r_id' : r.id,
                     'tmpdir': tmpdir,
                     'nice' : config.nice,
                     'rpmdefs' : b.rpmbuild_opts(),
-                    'package' : packagename,
+                    'topdir' : b._topdir,
                     'max_jobs' : max_jobs,
                     'spec': b.spec,
                 }
@@ -240,7 +238,7 @@ def build_rpm(r, b):
                 b.log_line("ended at: %s, done in %s" % (time.asctime(), datetime.timedelta(0, end_time - begin_time)))
                 if res:
                     res = "FAIL"
-                files = util.collect_files(b.logfile)
+                files = util.collect_files(b.logfile, basedir = b._topdir)
                 if len(files) > 0:
                     r.chroot_files.extend(files)
                 else:
@@ -252,14 +250,14 @@ def build_rpm(r, b):
                         res = "FAIL_%s" % last_section.upper()
                 b.files = files
 
+    # cleanup tmp and build files
     chroot.run("""
         set -ex;
-        rpmbuild %(rpmdefs)s --nodeps --nobuild --clean --rmspec --rmsource rpm/packages/%(package)s/%(spec)s
-        rm -rf %(tmpdir)s;
-        chmod -R u+rwX rpm/BUILD/%(package)s;
-        rm -rf rpm/BUILD/%(package)s;
-    """ %
-        {'tmpdir' : tmpdir, 'spec': b.spec, 'package' : packagename, 'rpmdefs' : b.rpmbuild_opts()}, logfile = b.logfile)
+        chmod -R u+rwX %(topdir)s/BUILD;
+        rm -rf %(topdir)s/{tmp,BUILD}
+    """ % {
+        'topdir' : b._topdir,
+    }, logfile = b.logfile)
 
     def ll(l):
         util.append_to(b.logfile, l)
@@ -287,6 +285,14 @@ def build_rpm(r, b):
         local = r.tmp_dir + os.path.basename(f)
         chroot.cp(f, outfile = local, rm = True)
         ftp.add(local)
+
+    # cleanup all remains from this build
+    chroot.run("""
+        set -ex;
+        rm -rf %(topdir)s;
+    """ % {
+        'topdir' : b._topdir,
+    }, logfile = b.logfile)
 
     def uploadinfo(b):
         c="file:SRPMS:%s\n" % b.src_rpm
