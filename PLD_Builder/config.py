@@ -90,6 +90,7 @@ class Builder_Conf:
         self.arch = get("arch")
         self.chroot = get("chroot")
         self.buildlogs_url = get("buildlogs_url", "/dev/null")
+        self.buildlogs = get("buildlogs", "http://buildlogs.pld-linux.org/")
         self.ftp_url = get("ftp_url")
         self.notify_url = get("notify_url")
         self.test_ftp_url = get("test_ftp_url", "/dev/null")
