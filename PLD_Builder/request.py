@@ -232,7 +232,7 @@ class Batch:
         path = os.path.join(self._topdir, 'BUILD', 'tmp')
         if not os.path.isdir(path):
             try:
-                os.mkdir(path)
+                os.makedirs(path)
             except OSError as e:
                 log.error("Cannot create directory %s: %s" % (path, e.strerror))
                 raise
