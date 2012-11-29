@@ -235,7 +235,6 @@ class Batch:
                 os.makedirs(path)
             except OSError as e:
                 log.error("Cannot create directory %s: %s" % (path, e.strerror))
-                raise
         return path
 
     def is_done(self):
