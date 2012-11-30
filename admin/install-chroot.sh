@@ -151,7 +151,7 @@ cachedir = $chroot_dir/spools/poldek
 keep_downloads = no
 EOF
 
-cat > install-$chroot_name.sh <<EOF
+cat > install-$chroot_type.sh <<EOF
 #!/bin/sh
 set -x
 cd $PWD
@@ -163,12 +163,12 @@ rpm --root $chroot_dir --initdb
 poldek --conf poldek.conf --root $chroot_dir --ask -i\
 	$builder_pkgs $builder_arch_pkgs
 EOF
-chmod 755 install-$chroot_name.sh
+chmod 755 install-$chroot_type.sh
 
 echo "About to remove '$chroot_dir' and install it again, using"
-echo "install-$chroot_name.sh:"
+echo "install-$chroot_type.sh:"
 echo 
-cat install-$chroot_name.sh
+cat install-$chroot_type.sh
 echo 
 cat <<EOF
 what to do?
@@ -182,7 +182,7 @@ case "$ans" in
   r )
     ;;
   s )
-    sudo ./install-$chroot_name.sh
+    sudo ./install-$chroot_type.sh
     ;;
   * )
     echo "bye"
@@ -200,7 +200,7 @@ cachedir = /spools/poldek
 keep_downloads = no
 EOF
 
-chr "useradd -u "$builder_uid" -c 'PLD $chroot_name builder' -d /home/users/builder -m -g users -s /bin/sh builder"
+chr "useradd -u "$builder_uid" -c 'PLD $chroot_type builder' -d /home/users/builder -m -g users -s /bin/sh builder"
 chr "cat > /etc/resolv.conf" < /etc/resolv.conf
 chr "cat > /etc/mtab" < /dev/null
 chr "mkdir -p /spools/ready/" < /dev/null
