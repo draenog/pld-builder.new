@@ -145,7 +145,6 @@ def install_br(r, b):
             if m and not ignore_br.match(l):
                 needed[m.group('name')] = 1
         f.close()
-        chroot.run("rm -rf %s" % tmpdir)
         return needed
 
     needed = get_missing_br(r, b);
