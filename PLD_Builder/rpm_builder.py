@@ -195,8 +195,6 @@ def build_rpm(r, b):
         res = "FAIL_SRPM_INSTALL"
     else:
         prepare_env()
-        chroot.run("install -m 700 -d %s" % tmpdir)
-
         b.default_target(config.arch)
         # check for build arch before filling BR
         cmd = "set -ex; TMPDIR=%(tmpdir)s exec nice -n %(nice)s " \
