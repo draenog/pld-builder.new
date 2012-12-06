@@ -88,7 +88,7 @@ class Builder_Conf:
         if builder not in p.sections():
             log.panic("builder %s not in config file" % builder)
         self.arch = get("arch")
-        self.chroot = get("chroot").rstrip('/')
+        self.chroot = get("chroot")
         self.buildlogs_url = get("buildlogs_url", "/dev/null")
         self.buildlogs = get("buildlogs", "http://buildlogs.pld-linux.org/")
         self.ftp_url = get("ftp_url")
