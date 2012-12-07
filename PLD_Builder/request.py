@@ -230,13 +230,6 @@ class Batch:
         # + /usr/bin/bzip2 -dc /home/services/builder/rpm/packages/kernel/patch-2.6.27.61.bz2
         # patch: **** Can't rename file /tmp/B.a1b1d3/poKWwRlp to drivers/scsi/hosts.c : No such file or directory
         path = os.path.join(self._topdir, 'BUILD', 'tmp')
-        chroot_path = config.chroot + path
-        if not os.path.isdir(chroot_path):
-            try:
-                os.makedirs(chroot_path)
-                self.log_line("Creating tmpdir: " + chroot_path)
-            except OSError as e:
-                self.log_line("Cannot create directory %s: %s" % (chroot_path, e.strerror))
         return path
 
     def is_done(self):
