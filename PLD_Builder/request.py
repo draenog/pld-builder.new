@@ -234,8 +234,9 @@ class Batch:
         if not os.path.isdir(chroot_path):
             try:
                 os.makedirs(chroot_path)
+                self.log_line("Creating tmpdir: " + chroot_path)
             except OSError as e:
-                log.error("Cannot create directory %s: %s" % (chroot_path, e.strerror))
+                self.log_line("Cannot create directory %s: %s" % (chroot_path, e.strerror))
         return path
 
     def is_done(self):
