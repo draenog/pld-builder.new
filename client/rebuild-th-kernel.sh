@@ -12,12 +12,15 @@ pkgs_head="
 	ipset
 	ixgbe
 	lin_tape
+	linux-fusion
 	linuxrdac
 	lirc
 	madwifi-ng
+	nvidiabl
 	open-vm-tools
 	r8168
 	VirtualBox
+	vpb-driver
 	xorg-driver-video-fglrx
 	xorg-driver-video-fglrx-legacy-12.x
 	xorg-driver-video-nvidia
