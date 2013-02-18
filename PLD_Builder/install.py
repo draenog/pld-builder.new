@@ -128,7 +128,6 @@ def install_br(r, b):
         ignore_br = re.compile(r'^\s*(rpmlib|cpuinfo|getconf|uname|soname|user|group|mounted|diskspace|digest|gnupg|macro|envvar|running|sanitycheck|vcheck|signature|verify|exists|executable|readable|writable)\(.*')
 
         tmpdir = b.tmpdir()
-        chroot.run("install -m 700 -d %s" % tmpdir)
         cmd = "set -e; TMPDIR=%(tmpdir)s rpmbuild --nobuild %(rpmdefs)s %(topdir)s/%(spec)s 2>&1" % {
             'tmpdir': tmpdir,
             'topdir' : b._topdir,
@@ -145,7 +144,6 @@ def install_br(r, b):
             if m and not ignore_br.match(l):
                 needed[m.group('name')] = 1
         f.close()
-        chroot.run("rm -rf %s" % tmpdir)
         return needed
 
     needed = get_missing_br(r, b);

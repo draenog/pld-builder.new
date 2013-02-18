@@ -21,7 +21,7 @@ EOF
 }
 
 default_config () {
-  builder_pkgs="rpm-build poldek pwdutils net-tools which rpm-perlprov rpm-php-pearprov rpm-pythonprov bash vim"
+  builder_pkgs="rpm-build poldek pwdutils net-tools which rpm-perlprov rpm-php-pearprov rpm-pythonprov bash vim util-linux"
   builder_uid=`id -u`
   dist_url="ftp://ftp.$DIST.pld-linux.org"
 
@@ -104,7 +104,7 @@ set -x
 rm -rf rpm
 mkdir rpm
 cd rpm
-git clone $git_server/rpm-build-tools rpm-build-tools
+git clone $git_server/packages/rpm-build-tools rpm-build-tools
 ./rpm-build-tools/builder.sh --init-rpm-dir
 echo "%packager       PLD bug tracking system ( http://bugs.pld-linux.org/ )">~/.rpmmacros
 echo "%vendor         PLD">>~/.rpmmacros
@@ -151,7 +151,7 @@ cachedir = $chroot_dir/spools/poldek
 keep_downloads = no
 EOF
 
-cat > install-$chroot_name.sh <<EOF
+cat > install-$chroot_type.sh <<EOF
 #!/bin/sh
 set -x
 cd $PWD
@@ -159,16 +159,16 @@ rm -rf $chroot_dir
 mkdir -p $chroot_dir/spools/poldek
 mkdir $chroot_dir/dev
 mknod $chroot_dir/dev/null -m 666 c 1 3
-rpm --root $chroot_dir --initdb
+rpm --root $chroot_dir -qa
 poldek --conf poldek.conf --root $chroot_dir --ask -i\
 	$builder_pkgs $builder_arch_pkgs
 EOF
-chmod 755 install-$chroot_name.sh
+chmod 755 install-$chroot_type.sh
 
 echo "About to remove '$chroot_dir' and install it again, using"
-echo "install-$chroot_name.sh:"
+echo "install-$chroot_type.sh:"
 echo 
-cat install-$chroot_name.sh
+cat install-$chroot_type.sh
 echo 
 cat <<EOF
 what to do?
@@ -182,7 +182,7 @@ case "$ans" in
   r )
     ;;
   s )
-    sudo ./install-$chroot_name.sh
+    sudo ./install-$chroot_type.sh
     ;;
   * )
     echo "bye"
@@ -200,7 +200,7 @@ cachedir = /spools/poldek
 keep_downloads = no
 EOF
 
-chr "useradd -u "$builder_uid" -c 'PLD $chroot_name builder' -d /home/users/builder -m -g users -s /bin/sh builder"
+chr "useradd -u "$builder_uid" -c 'PLD $chroot_type builder' -d /home/users/builder -m -g users -s /bin/sh builder"
 chr "cat > /etc/resolv.conf" < /etc/resolv.conf
 chr "cat > /etc/mtab" < /dev/null
 chr "mkdir -p /spools/ready/" < /dev/null
