@@ -112,6 +112,11 @@ def handle_group(r, user):
                                 % (user.get_login(), pkg, bld, batch.branch))
                     lockf.close()
                     return
+            if not "test-build" in r.flags and not user.can_do("ready", bld, batch.branch):
+                   fail_mail("user %s is not allowed to send ready builds (ready:%s:%s)" \
+                        % (user.get_login(), bld, batch.branch))
+                   lockf.close()
+                   return
 
     r.priority = user.check_priority(r.priority,config.builder)
     r.requester = user.get_login()

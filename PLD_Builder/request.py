@@ -170,6 +170,12 @@ class Batch:
         self.b_id = attr(e, "id")
         self.depends_on = string.split(attr(e, "depends-on"))
         self.upgraded = True
+
+        self.parse_xml(e)
+
+        self._topdir = '/tmp/B.%s' % self.b_id
+
+    def parse_xml(self, e):
         for c in e.childNodes:
             if is_blank(c): continue
 
@@ -210,6 +216,21 @@ class Batch:
                 self.bconds_without.append(text(c))
             else:
                 log.panic("xml: evil batch child (%s)" % c.nodeName)
+
+    def get_package_name(self):
+        if len(self.spec) <= 5:
+            return None
+        return self.spec[:-5]
+
+    def tmpdir(self):
+        """
+        return tmpdir for this batch job building
+        """
+        # it's better to have TMPDIR and BUILD dir on same partition:
+        # + /usr/bin/bzip2 -dc /home/services/builder/rpm/packages/kernel/patch-2.6.27.61.bz2
+        # patch: **** Can't rename file /tmp/B.a1b1d3/poKWwRlp to drivers/scsi/hosts.c : No such file or directory
+        path = os.path.join(self._topdir, 'BUILD', 'tmp')
+        return path
 
     def is_done(self):
         ok = 1
@@ -281,8 +302,8 @@ class Batch:
                 bld = lin_ar.split('-')
                 tree_name = '-'.join(bld[:-1])
                 tree_arch = '-'.join(bld[-1:])
-                link_pre = "<a href=\"http://buildlogs.pld-linux.org/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s&action=tail\">" \
-                        % (urllib.quote(tree_name), urllib.quote(tree_arch), is_ok, urllib.quote(bl_name), urllib.quote(rid))
+                link_pre = "<a href=\"%s/index.php?dist=%s&arch=%s&ok=%d&name=%s&id=%s&action=tail\">" \
+                        % (config.buildlogs, urllib.quote(tree_name), urllib.quote(tree_arch), is_ok, urllib.quote(bl_name), urllib.quote(rid))
                 link_post = "</a>"
 
             def ftime(s):
@@ -312,9 +333,11 @@ class Batch:
         """
         rpmopts = self.bconds_string() + self.kernel_string() + self.target_string() + self.defines_string()
         rpmdefs = \
-            "--define '_topdir %%(echo $HOME/rpm)' " \
-            "--define '_specdir %%{_topdir}/packages/%s' "  \
-            "--define '_sourcedir %%{_specdir}' " % self.spec[:-5]
+            "--define '_topdir %s' " % self._topdir + \
+            "--define '_specdir %{_topdir}' "  \
+            "--define '_sourcedir %{_specdir}' " \
+            "--define '_rpmdir %{_topdir}/RPMS' " \
+            "--define '_builddir %{_topdir}/BUILD' "
         return rpmdefs + rpmopts
 
     def kernel_string(self):

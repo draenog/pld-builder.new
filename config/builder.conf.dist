@@ -70,6 +70,7 @@ tag_prefixes = auto-th-
 arch = i686
 chroot = /home/pld/builderth/chroots/chroot-src/
 buildlogs_url = rsync://blogs-th@buildlogs.pld-linux.org/pld-buildlogs-th-SRPMS/
+buildlogs = http://buildlogs.pld-linux.org/
 ftp_url = scp://pldth@ep09.pld-linux.org:ftp/.incoming/SRPMS/
 notify_url = http://src.th.pld-linux.org:1234/
 test_ftp_url = scp://pldth@ep09.pld-linux.org:ftp/.test-builds/SRPMS/
@@ -79,11 +80,10 @@ rpmqa_filename = rpmqa-SRPMS.txt
 [th-athlon]
 arch = athlon
 chroot = /home/users/builderth/chroot-athlon/
-buildlogs_url = /dev/null
+buildlogs_url = rsync://blogs-th@buildlogs.pld-linux.org/pld-buildlogs-th-athlon/
+buildlogs = http://buildlogs.pld-linux.org/
 notify_url = http://src.th.pld-linux.org:1234/
 ftp_url = scp://pldth@ep09.pld-linux.org:ftp/.incoming/athlon/
-test_ftp_url = /dev/null
-rpmqa_url = /dev/null
-rpmqa_filename = nothing
-
-
+test_ftp_url = scp://pldth@ep09.pld-linux.org:ftp/.test-builds/athlon/
+rpmqa_url = scp://pldth@ep09.pld-linux.org:ftp/.stat/builder/th/
+rpmqa_filename = rpmqa-athlon.txt
