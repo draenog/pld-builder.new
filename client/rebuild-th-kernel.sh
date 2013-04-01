@@ -48,7 +48,7 @@ autotag() {
 		fi
 		out=$(git for-each-ref $ref --sort=-authordate --format='%(refname:short)' --count=1)
 		echo "$spec:$out"
-		cd - >/dev/null
+		cd -
 	done
 }
 
@@ -72,6 +72,10 @@ get_last_tags() {
 		fi
 	done
 }
+
+# The HP-UX ksh and POSIX shell print the target directory to stdout
+# if CDPATH is set.
+(unset CDPATH) >/dev/null 2>&1 && unset CDPATH
 
 cd $rpmdir
 case "$1" in
