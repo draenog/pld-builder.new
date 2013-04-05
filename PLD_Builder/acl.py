@@ -18,6 +18,7 @@ class User:
         self.privs = []
         self.gpg_emails = []
         self.mailto = ""
+        self.change_requester = False
 
         if p.has_option(login, "gpg_emails"):
             self.gpg_emails = string.split(p.get(login, "gpg_emails"))
@@ -29,6 +30,9 @@ class User:
         else:
             if len(self.gpg_emails) > 0:
                 self.mailto = self.gpg_emails[0]
+
+        if p.has_option(login, "change_requester"):
+            self.change_requester = True
 
         if p.has_option(login, "privs"):
             for p in string.split(p.get(login, "privs")):
@@ -123,6 +127,9 @@ class ACL_Conf:
             if self.users.has_key(e):
                 return self.users[e]
         return None
+
+    def user_by_login(self, l):
+        return self.users[l]
 
     def user(self, l):
         if not self.users.has_key(l):

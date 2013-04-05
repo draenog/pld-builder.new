@@ -55,6 +55,14 @@ def handle_group(r, user):
         lockf.close()
         return
 
+    if (user.change_requester and r.requester):
+        try:
+            user = acl.user_by_login(r.requester)
+        except KeyError:
+            user.login = r.requester + '/' + user.login
+        if (r.requester_email):
+            user.mailto = r.requester_email
+
     for batch in r.batches:
 
         if not user.can_do("src", config.builder, batch.branch):
