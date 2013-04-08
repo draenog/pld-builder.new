@@ -19,6 +19,7 @@ from acl import acl
 from lock import lock
 from bqueue import B_Queue
 from config import config, init_conf
+from mailer import Message
 
 def check_double_id(id):
     id_nl = id + "\n"
@@ -45,7 +46,8 @@ def handle_group(r, user):
         else:
             spec = "None.spec"
         log.error("%s: %s" % (spec, msg))
-        m = user.message_to()
+        m = Message()
+        m.set_headers(to = r.requester_email, cc = config.builder_list)
         m.set_headers(subject = "building %s failed" % spec)
         m.write_line(msg)
         m.send()
@@ -55,13 +57,14 @@ def handle_group(r, user):
         lockf.close()
         return
 
-    if (user.change_requester and r.requester):
-        try:
+    try:
+        if (user.change_requester and r.requester):
             user = acl.user_by_login(r.requester)
-        except KeyError:
-            user.login = r.requester + '/' + user.login
-        if (r.requester_email):
-            user.mailto = r.requester_email
+    except KeyError:
+            r.requester += '/' + user.get_login()
+    else:
+        r.requester = user.get_login()
+        r.requester_email = user.mail_to()
 
     for batch in r.batches:
 
@@ -127,8 +130,6 @@ def handle_group(r, user):
                    return
 
     r.priority = user.check_priority(r.priority,config.builder)
-    r.requester = user.get_login()
-    r.requester_email = user.mail_to()
     r.time = time.time()
     log.notice("queued %s from %s" % (r.id, user.get_login()))
     q = B_Queue(path.queue_file)
